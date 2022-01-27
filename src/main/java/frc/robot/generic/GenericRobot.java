@@ -106,9 +106,9 @@ public interface GenericRobot {
 	public double getTargetAngle();
 
 	public double getTurretAngle();
-	public void setTurretAngleRelative();
+	public void setTurretAngleRelative(double angleChange);
 	public void setTurretAngleAbsolute();
-	public void setTurretPowerPct();
+	public void setTurretPowerPct(double powerPct);
 	public double getTurretPowerPct();
 
 	public double getTurretPitchAngle();
@@ -122,10 +122,10 @@ public interface GenericRobot {
 	public double getShooterPowerPctBottom();
 	public double getShooterTargetDistance();
 	public double getShooterTargetHeight();
-	public void setShooterRPM(double rpm);
+	public void setShooterRPM(double topRPM, double bottomRPM);
 	public void setShooterRPMTop(double rpm);
 	public void setShooterRPMBottom(double rpm);
-	public void setShooterPowerPct(double percentage);
+	public void setShooterPowerPct(double topPCT, double bottomPCT);
 	public void setShooterPowerPctTop(double percentage);
 	public void setShooterPowerPctBottom(double percentage);
 	public void setShooterTargetDistance(double length, double height);

@@ -1,10 +1,10 @@
 package frc.robot.generic;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMax.ControlType;
 import edu.wpi.first.wpilibj.*;
 
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
@@ -27,14 +27,14 @@ public class TurretBot implements GenericRobot {
 	CANSparkMax rightMotorA = new CANSparkMax(14, kBrushless);
 	CANSparkMax rightMotorB = new CANSparkMax(15, kBrushless);
 
-	CANEncoder encoderRight     = rightMotorA.getEncoder();
-	CANEncoder encoderLeft      = leftMotorA.getEncoder();
-	CANEncoder encoderTurret    = speeeen.getEncoder();
-	CANEncoder encoderShootA    = shooterA.getEncoder();
-	CANEncoder encoderShootB    = shooterB.getEncoder();
+	RelativeEncoder encoderRight     = rightMotorA.getEncoder();
+	RelativeEncoder encoderLeft      = leftMotorA.getEncoder();
+	RelativeEncoder encoderTurret    = speeeen.getEncoder();
+	RelativeEncoder encoderShootA    = shooterA.getEncoder();
+	RelativeEncoder encoderShootB    = shooterB.getEncoder();
 
-	CANPIDController shooterAPIDController = shooterA.getPIDController();
-	CANPIDController shooterBPIDController = shooterB.getPIDController();
+	SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
+	SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
 
 	Solenoid shifter = new Solenoid(PneumaticsModuleType.CTREPCM,0);
 	Servo elevationLeft = new Servo(0);
@@ -42,12 +42,19 @@ public class TurretBot implements GenericRobot {
 
 	DigitalInput homeSensor = new DigitalInput(6);
 
+	Solenoid testSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM,0);
+
 	@Override
 	public void drivePercent(double leftPercent, double rightPercent) {
 		leftMotorA.set(leftPercent);
 		leftMotorB.set(leftPercent);
 		rightMotorA.set(rightPercent);
 		rightMotorB.set(rightPercent);
+	}
+
+	@Override
+	public void driveRPM(double leftRPM, double rightRPM) {
+
 	}
 
 
@@ -158,19 +165,19 @@ public class TurretBot implements GenericRobot {
 	}
 
 	@Override
-	public int getTargetX() {
+	public double getTargetX() {
 		//TODO
 		return 0;
 	}
 
 	@Override
-	public int getTargetY() {
+	public double getTargetY() {
 		//TODO
 		return 0;
 	}
 
 	@Override
-	public int getTargetDistance() {
+	public double getTargetDistance() {
 		//TODO
 		return 0;
 	}
@@ -187,7 +194,7 @@ public class TurretBot implements GenericRobot {
 	}
 
 	@Override
-	public void setTurretAngleRelative() {
+	public void setTurretAngleRelative(double angleChange) {
 		//TODO
 
 	}
@@ -197,6 +204,8 @@ public class TurretBot implements GenericRobot {
 		//TODO
 
 	}
+
+
 
 	@Override
 	public void setTurretPowerPct(double powerPct) {
@@ -264,6 +273,7 @@ public class TurretBot implements GenericRobot {
 		return 0;
 	}
 
+
 	@Override
 	public void setShooterRPM(double topRPM, double bottomRPM) {
 		setShooterRPMTop(topRPM);
@@ -272,18 +282,20 @@ public class TurretBot implements GenericRobot {
 
 	@Override
 	public void setShooterRPMTop(double rpm) {
-		shooterAPIDController.setReference(rpm, ControlType.kVelocity);
+		shooterAPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
 	}
 
 	@Override
 	public void setShooterRPMBottom(double rpm) {
-		shooterBPIDController.setReference(rpm, ControlType.kVelocity);
+		shooterBPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
 	}
 
+
+
 	@Override
-	public void setShooterPowerPct(double top, double bottom) {
-		setShooterPowerPctTop(top);
-		setShooterPowerPctBottom(bottom);
+	public void setShooterPowerPct(double topPCT, double bottomPCT) {
+		setShooterPowerPctTop(topPCT);
+		setShooterPowerPctBottom(bottomPCT);
 	}
 
 	@Override

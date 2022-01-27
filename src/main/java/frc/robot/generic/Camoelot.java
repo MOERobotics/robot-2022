@@ -151,7 +151,7 @@ public class Camoelot implements GenericRobot {
 	}
 
 	@Override
-	public void setTurretAngleRelative() {
+	public void setTurretAngleRelative(double angleChange) {
 
 	}
 
@@ -161,7 +161,7 @@ public class Camoelot implements GenericRobot {
 	}
 
 	@Override
-	public void setTurretPowerPct() {
+	public void setTurretPowerPct(double powerPct) {
 
 	}
 
@@ -222,9 +222,9 @@ public class Camoelot implements GenericRobot {
 	}
 
 	@Override
-	public void setShooterRPM(double rpm) {
-		setShooterRPMTop(rpm);
-		setShooterRPMBottom(rpm);
+	public void setShooterRPM(double topRPM, double bottomRPM) {
+		setShooterRPMTop(topRPM);
+		setShooterRPMBottom(bottomRPM);
 	}
 
 	@Override
@@ -238,9 +238,9 @@ public class Camoelot implements GenericRobot {
 	}
 
 	@Override
-	public void setShooterPowerPct(double percentage) {
-		setShooterPowerPctTop(percentage);
-		setShooterPowerPctBottom(percentage);
+	public void setShooterPowerPct(double topPCT, double bottomPCT) {
+		setShooterPowerPctTop(topPCT);
+		setShooterPowerPctBottom(bottomPCT);
 	}
 
 	@Override

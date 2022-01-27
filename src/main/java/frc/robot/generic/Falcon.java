@@ -6,6 +6,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.AnalogInput;
 
 public class Falcon implements GenericRobot {
 
@@ -23,9 +24,9 @@ public class Falcon implements GenericRobot {
 	CANSparkMax generatorShift  = null;//new CANSparkMax(11, CANSparkMaxLowLevel.MotorType.kBrushless);
 
 	CANSparkMax shooterA                   = new CANSparkMax( 5, CANSparkMaxLowLevel.MotorType.kBrushless);
-	CANPIDController shooterAPIDController = new CANPIDController(shooterA);
+	SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
 	CANSparkMax shooterB                   = new CANSparkMax( 4, CANSparkMaxLowLevel.MotorType.kBrushless);
-	CANPIDController shooterBPIDController = new CANPIDController(shooterB);
+	SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
 	CANSparkMax indexer         = new CANSparkMax( 6, CANSparkMaxLowLevel.MotorType.kBrushless);
 	CANSparkMax escalator       = new CANSparkMax( 7, CANSparkMaxLowLevel.MotorType.kBrushless);
 	CANSparkMax angleAdj        = new CANSparkMax( 8, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -34,13 +35,13 @@ public class Falcon implements GenericRobot {
 
 	CANSparkMax collector       = new CANSparkMax(10, CANSparkMaxLowLevel.MotorType.kBrushless);
 
-	CANEncoder encoderRight     = new CANEncoder(rightDriveA);
-	CANEncoder encoderLeft      = new CANEncoder( leftDriveA);
-	CANEncoder encoderShootA    = new CANEncoder(shooterA);
-	CANEncoder encoderShootB    = new CANEncoder(shooterB);
+	RelativeEncoder encoderRight     = rightDriveA.getEncoder();
+	RelativeEncoder encoderLeft      = leftDriveA.getEncoder();
+	RelativeEncoder encoderShootA    = shooterA.getEncoder();
+	RelativeEncoder encoderShootB    = shooterB.getEncoder();
 
-	CANEncoder encoderClimbPort = new CANEncoder(climberPort);
-	CANEncoder encoderClimbStarboard = new CANEncoder(climberStarboard);
+	RelativeEncoder encoderClimbPort = climberPort.getEncoder();
+	RelativeEncoder encoderClimbStarboard = climberStarboard.getEncoder();
 
 
 	Solenoid starboardShooter = new Solenoid(PneumaticsModuleType.CTREPCM,7);
@@ -49,8 +50,8 @@ public class Falcon implements GenericRobot {
 	Solenoid portEscalator = new Solenoid(PneumaticsModuleType.CTREPCM,1);
 
 
-	private CANDigitalInput angleAdjusterDigitalInputForward;
-	private CANDigitalInput angleAdjusterDigitalInputReverse;
+	private SparkMaxLimitSwitch angleAdjusterDigitalInputForward;
+	private SparkMaxLimitSwitch angleAdjusterDigitalInputReverse;
 	private AnalogInput input = new AnalogInput(0);
 	private AnalogPotentiometer elevation = new AnalogPotentiometer(input, 180, 90);
 
@@ -79,6 +80,10 @@ public class Falcon implements GenericRobot {
 		rightDriveC.set(rightPercent);
 	}
 
+	@Override
+	public void driveRPM(double leftRPM, double rightRPM) {
+
+	}
 
 
 	@Override
@@ -145,7 +150,7 @@ public class Falcon implements GenericRobot {
 	}
 
 	@Override
-	public void setTurretAngleRelative() {
+	public void setTurretAngleRelative(double angleChange) {
 
 	}
 
@@ -155,7 +160,7 @@ public class Falcon implements GenericRobot {
 	}
 
 	@Override
-	public void setTurretPowerPct() {
+	public void setTurretPowerPct(double powerPct) {
 
 	}
 
@@ -215,25 +220,25 @@ public class Falcon implements GenericRobot {
 	}
 
 	@Override
-	public void setShooterRPM(double rpm) {
-		shooterAPIDController.setReference(rpm, ControlType.kVelocity);
-		shooterBPIDController.setReference(rpm, ControlType.kVelocity);
+	public void setShooterRPM(double topRPM, double bottomRPM) {
+		shooterAPIDController.setReference(topRPM, CANSparkMax.ControlType.kVelocity);
+		shooterBPIDController.setReference(bottomRPM, CANSparkMax.ControlType.kVelocity);
 	}
 
 	@Override
 	public void setShooterRPMTop(double rpm) {
-		shooterAPIDController.setReference(rpm, ControlType.kVelocity);
+		shooterAPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
 	}
 
 	@Override
 	public void setShooterRPMBottom(double rpm) {
-		shooterBPIDController.setReference(rpm, ControlType.kVelocity);
+		shooterBPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
 	}
 
 	@Override
-	public void setShooterPowerPct(double percentage) {
-		shooterA.set(percentage);
-		shooterB.set(percentage);
+	public void setShooterPowerPct(double topPCT, double bottomPCT) {
+		shooterA.set(topPCT);
+		shooterB.set(bottomPCT);
 	}
 
 	@Override
@@ -251,3 +256,4 @@ public class Falcon implements GenericRobot {
 
 	}
 }
+
