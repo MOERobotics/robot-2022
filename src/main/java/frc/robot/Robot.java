@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -15,9 +18,18 @@ public class Robot extends TimedRobot {
   GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
 
+  double turretx;
+  double turrety;
+  double turretarea;
+
+
   @Override public void robotInit() {}
 
   @Override public void robotPeriodic() {
+    SmartDashboard.putNumber("LimelightX", turretx);
+    SmartDashboard.putNumber("LimelightY", turrety);
+    SmartDashboard.putNumber("LimelightArea", turretarea);
+
     SmartDashboard.putNumber("Drive left pct", robot.getDriveLeftPercentage());
     SmartDashboard.putNumber("Drive right pct", robot.getDriveRightPercentage());
     SmartDashboard.putNumber("Drive left rpm", robot.getDriveLeftRPM());
@@ -85,8 +97,30 @@ public class Robot extends TimedRobot {
     if(joystick.getRawButton(3)){
       robot.setTurretPowerPct(-0.15);
     }
+
+
+
+    //Start of Daniel+Saiarun Turret test
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTableEntry tx = table.getEntry("tx");
+    NetworkTableEntry ty = table.getEntry("ty");
+    NetworkTableEntry ta = table.getEntry("ta");
+
+//read values periodically
+    turretx = tx.getDouble(0.0);
+    turrety = ty.getDouble(0.0);
+    turretarea = ta.getDouble(0.0);
+
+//post to smart dashboard periodically
+
     if(joystick.getRawButton(4)){
-      robot.setTurretPowerPct(0.15);
+      if(turretx<0) {
+        robot.setTurretPowerPct(0.15);
+      }else if(turretx>0) {
+        robot.setTurretPowerPct(0.-15);
+      }else{
+        robot.setTurretPowerPct(0.0);
+      }
     }
 
   }
