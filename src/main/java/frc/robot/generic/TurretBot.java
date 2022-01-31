@@ -42,8 +42,6 @@ public class TurretBot implements GenericRobot {
 
 	DigitalInput homeSensor = new DigitalInput(6);
 
-	Solenoid testSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM,0);
-
 	@Override
 	public void drivePercent(double leftPercent, double rightPercent) {
 		leftMotorA.set(leftPercent);

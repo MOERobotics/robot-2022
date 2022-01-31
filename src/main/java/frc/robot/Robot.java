@@ -18,6 +18,8 @@ public class Robot extends TimedRobot {
   GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
 
+  double[] averageTurretX = new double [6];
+
   double turretx;
   double turrety;
   double turretarea;
@@ -26,6 +28,17 @@ public class Robot extends TimedRobot {
   @Override public void robotInit() {}
 
   @Override public void robotPeriodic() {
+
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTableEntry tx = table.getEntry("tx");
+    NetworkTableEntry ty = table.getEntry("ty");
+    NetworkTableEntry ta = table.getEntry("ta");
+
+//read values periodically
+    turretx = tx.getDouble(0.0);
+    turrety = ty.getDouble(0.0);
+    turretarea = ta.getDouble(0.0);
+
     SmartDashboard.putNumber("LimelightX", turretx);
     SmartDashboard.putNumber("LimelightY", turrety);
     SmartDashboard.putNumber("LimelightArea", turretarea);
@@ -78,7 +91,10 @@ public class Robot extends TimedRobot {
 
   @Override public void autonomousPeriodic() {}
 
-  @Override public void teleopInit() { }
+  @Override public void teleopInit() {
+
+
+  }
 
   @Override public void teleopPeriodic() {
     double x = joystick.getX();
@@ -86,41 +102,45 @@ public class Robot extends TimedRobot {
 
     robot.drivePercent(y+x,y-x);
 
-    if(joystick.getRawButton(1)){
+   /* if(joystick.getRawButton(1)){
       robot.setShooterPowerPct(0.2, 0.2);
-    }
+    }*/
 
     if(joystick.getRawButton(2)){
       robot.setCollectorIntakePercentage(0.2);
     }
 
-    if(joystick.getRawButton(3)){
-      robot.setTurretPowerPct(-0.15);
-    }
-
-
 
     //Start of Daniel+Saiarun Turret test
-    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-    NetworkTableEntry tx = table.getEntry("tx");
-    NetworkTableEntry ty = table.getEntry("ty");
-    NetworkTableEntry ta = table.getEntry("ta");
 
-//read values periodically
-    turretx = tx.getDouble(0.0);
-    turrety = ty.getDouble(0.0);
-    turretarea = ta.getDouble(0.0);
+    int counter = 0;
+    double average = 0;
 
-//post to smart dashboard periodically
+    averageTurretX[counter%6] = turretx;
+    counter++;
+    for(double i: averageTurretX){
+      average += i;
+    }
+    average /= 6;
+    SmartDashboard.putNumber("Average", average);
 
-    if(joystick.getRawButton(4)){
-      if(turretx<0) {
-        robot.setTurretPowerPct(0.15);
-      }else if(turretx>0) {
-        robot.setTurretPowerPct(0.-15);
+    if(joystick.getRawButton(1)){
+      if(average<-.5) {
+        robot.setTurretPowerPct(Math.sqrt(average)/12);
+      }else if(average>.5) {
+        robot.setTurretPowerPct(-Math.sqrt(average)/12);
       }else{
         robot.setTurretPowerPct(0.0);
       }
+    }else{
+      if(joystick.getRawButton(3)){
+        robot.setTurretPowerPct(-0.1);
+      }else if(joystick.getRawButton(4)){
+        robot.setTurretPowerPct(0.1);
+      }else{
+        robot.setTurretPowerPct(0);
+      }
+
     }
 
   }
