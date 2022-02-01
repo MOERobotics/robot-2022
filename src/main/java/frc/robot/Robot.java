@@ -97,19 +97,38 @@ public class Robot extends TimedRobot {
   }
 
   @Override public void teleopPeriodic() {
-    double x = joystick.getX();
-    double y = joystick.getY();
+    double jx = joystick.getX();
+    double jy = joystick.getY();
 
-    robot.drivePercent(y+x,y-x);
+    double scaleFactor = 0.8;
+    jx *= scaleFactor;
+    jy *= scaleFactor;
 
-   /* if(joystick.getRawButton(1)){
+    //joystick deaden: yeet smol/weird joystick values when joystick is at rest
+    double cutoff = 0.1;
+    if(jy > -cutoff && jy < cutoff) jy = 0;
+    if(jx > -cutoff && jx < cutoff) jx = 0;
+
+    robot.drivePercent(jy+jx,jy-jx);
+
+    /* if(joystick.getRawButton(1)){
       robot.setShooterPowerPct(0.2, 0.2);
     }*/
 
-    if(joystick.getRawButton(2)){
+    //good luck finding these buttons
+    //theoretically 5 and 6 should be close to each other (so should 11 and 12)
+    if(joystick.getRawButton(5)){
       robot.setCollectorIntakePercentage(0.2);
     }
-
+    if(joystick.getRawButton(6)){
+      robot.setCollectorIntakePercentage(-0.2);
+    }
+    if(joystick.getRawButton(12)){
+      robot.setShooterPowerPct(0.2, 0.2);
+    }
+    if(joystick.getRawButton(11)){
+      robot.setShooterPowerPct(-0.2, -0.2);
+    }
 
     //Start of Daniel+Saiarun Turret test
 
