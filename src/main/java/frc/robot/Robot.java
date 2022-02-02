@@ -18,11 +18,15 @@ public class Robot extends TimedRobot {
   GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
 
-  double[] averageTurretX = new double [6];
+
+  int averageTurretXSize = 2;
+  double[] averageTurretX = new double [averageTurretXSize];
 
   double turretx;
   double turrety;
   double turretarea;
+  double turretv;
+  int counter = 0;
 
 
   @Override public void robotInit() {}
@@ -33,11 +37,15 @@ public class Robot extends TimedRobot {
     NetworkTableEntry tx = table.getEntry("tx");
     NetworkTableEntry ty = table.getEntry("ty");
     NetworkTableEntry ta = table.getEntry("ta");
+    NetworkTableEntry tv = table.getEntry("tv");
 
 //read values periodically
     turretx = tx.getDouble(0.0);
     turrety = ty.getDouble(0.0);
     turretarea = ta.getDouble(0.0);
+    turretv = tv.getDouble(0.0);
+
+    SmartDashboard.putNumber("tv", turretv);
 
     SmartDashboard.putNumber("LimelightX", turretx);
     SmartDashboard.putNumber("LimelightY", turrety);
@@ -112,36 +120,48 @@ public class Robot extends TimedRobot {
 
 
     //Start of Daniel+Saiarun Turret test
-
-    int counter = 0;
     double average = 0;
 
-    averageTurretX[counter%6] = turretx;
-    counter++;
+    if(turretv !=0 ) {
+      averageTurretX[counter % averageTurretXSize] = turretx;
+      counter++;
+    }
+    average = 0;
     for(double i: averageTurretX){
       average += i;
     }
-    average /= 6;
+    average /= averageTurretXSize;
     SmartDashboard.putNumber("Average", average);
 
-    if(joystick.getRawButton(1)){
-      if(average<-.5) {
-        robot.setTurretPowerPct(Math.sqrt(average)/12);
-      }else if(average>.5) {
-        robot.setTurretPowerPct(-Math.sqrt(average)/12);
+    double currentTurretPower = 0;
+
+    if(joystick.getRawButton(1) && turretv !=0){
+      double currentTurretPowerValue = -(Math.signum(average)*average*average)/30;
+      if(currentTurretPowerValue >.2){
+        currentTurretPowerValue = .2;
+      } else if(currentTurretPowerValue <-.2){
+        currentTurretPowerValue = -.2;
+      }
+
+      if(average< -1) {
+        currentTurretPower = currentTurretPowerValue;
+      }else if(average> 1) {
+        currentTurretPower = currentTurretPowerValue;
       }else{
-        robot.setTurretPowerPct(0.0);
+        currentTurretPower = 0;
       }
     }else{
       if(joystick.getRawButton(3)){
-        robot.setTurretPowerPct(-0.1);
+        currentTurretPower = -0.1;
       }else if(joystick.getRawButton(4)){
-        robot.setTurretPowerPct(0.1);
+        currentTurretPower = 0.1;
       }else{
-        robot.setTurretPowerPct(0);
+        currentTurretPower = 0;
       }
-
     }
+
+    SmartDashboard.putNumber("currentTurretPower", currentTurretPower);
+    robot.setTurretPowerPct(currentTurretPower);
 
   }
 
