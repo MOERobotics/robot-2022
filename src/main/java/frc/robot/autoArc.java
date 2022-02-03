@@ -9,7 +9,7 @@ import frc.robot.generic.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 
 public class autoArc extends GenericAutonomous {
-    double rollout = 42;
+    double rollout = 120;
     double radius = 153;
     double wheelBase = 28;
     double innerRadius = radius - wheelBase/2;
@@ -71,7 +71,7 @@ public class autoArc extends GenericAutonomous {
                     defaultPower = .2;
                     leftPower = 0;
                     rightPower = 0;
-                    autonomousStep += 1;
+                    autonomousStep = 5;
                 }
                 break;
 

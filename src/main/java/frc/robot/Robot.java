@@ -7,13 +7,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.generic.Falcon;
 import frc.robot.generic.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.TurretBot;
 
 public class Robot extends TimedRobot {
 
-  GenericRobot robot = new TurretBot();
+  GenericRobot robot = new Falcon();
   Joystick joystick = new Joystick(0);
   GenericAutonomous autonomous = new autoArc();
 
