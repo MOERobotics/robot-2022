@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.generic.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.TurretBot;
 
@@ -14,6 +15,7 @@ public class Robot extends TimedRobot {
 
   GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
+  GenericAutonomous autonomous = new autoArc();
 
   @Override public void robotInit() {}
 
@@ -62,9 +64,13 @@ public class Robot extends TimedRobot {
 
   }
 
-  @Override public void autonomousInit() {}
+  @Override public void autonomousInit() {
+    autonomous.autonomousInit(robot);
+  }
 
-  @Override public void autonomousPeriodic() {}
+  @Override public void autonomousPeriodic() {
+    autonomous.autonomousPeriodic(robot);
+  }
 
   @Override public void teleopInit() { }
 

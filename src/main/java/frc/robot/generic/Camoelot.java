@@ -82,7 +82,48 @@ public class Camoelot implements GenericRobot {
 	}
 
 	@Override
-	public double getYee(){
+	public double getPIDmaneuverP() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDmaneuverI() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDmaneuverD() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDpivotP() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDpivotI() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDpivotD() {
+		return 0;
+	}
+
+	@Override
+	public void resetEncoders() {
+		leftEncoder.reset();
+		rightEncoder.reset();
+	}
+
+	@Override
+	public void resetAttitude() {
+		navx.reset();
+	}
+
+	@Override
+	public double getYaw(){
 		return navx.getYaw();
 	}
 	@Override
