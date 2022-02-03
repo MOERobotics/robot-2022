@@ -22,6 +22,7 @@ public class TurretBot implements GenericRobot {
 	CANSparkMax shooterA  = new CANSparkMax(42, kBrushless);
 	CANSparkMax shooterB  = new CANSparkMax(49, kBrushless);
 	CANSparkMax collector = new CANSparkMax(43, kBrushless);
+
 	CANSparkMax leftMotorA = new CANSparkMax(20, kBrushless);
 	CANSparkMax leftMotorB = new CANSparkMax(1, kBrushless);
 	CANSparkMax rightMotorA = new CANSparkMax(14, kBrushless);
@@ -37,11 +38,19 @@ public class TurretBot implements GenericRobot {
 	SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
 
 	Solenoid shifter = new Solenoid(PneumaticsModuleType.CTREPCM,0);
-	Servo elevationLeft = new Servo(0);
+	Servo iuj = new Servo(0);
 	Servo       elevationRight = new Servo(1);
 
 	DigitalInput homeSensor = new DigitalInput(6);
 
+	public TurretBot(){
+		boolean invertLeft = false;
+		boolean invertRight = true;
+		leftMotorA.setInverted(invertLeft);
+		leftMotorB.setInverted(invertLeft);
+		rightMotorA.setInverted(invertRight);
+		rightMotorB.setInverted(invertRight);
+	}
 
 	@Override
 	public void drivePercent(double leftPercent, double rightPercent) {
