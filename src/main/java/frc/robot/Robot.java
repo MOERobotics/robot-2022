@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Left encoder", robot.getDriveDistanceInchesLeft());
     SmartDashboard.putNumber("Right encoder", robot.getDriveDistanceInchesRight());
 
-    SmartDashboard.putNumber("Yee", robot.getYee());
+    SmartDashboard.putNumber("Yee", robot.getYaw());
     SmartDashboard.putNumber("Pitch", robot.getPitch());
     SmartDashboard.putNumber("Rollll", robot.getRoll());
     SmartDashboard.putNumber("Linear speed", robot.getLinearVelocity());

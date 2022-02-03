@@ -48,7 +48,7 @@ public interface GenericRobot {
 		return 0;
 	}
 
-	public default double getYee(){
+	public default double getYaw(){
 		System.out.println("I don't have a navX");
 		return 0;
 	};
@@ -64,6 +64,22 @@ public interface GenericRobot {
 	}
 
 	public double getLinearVelocity();
+
+	double getPIDmaneuverP();
+
+	double getPIDmaneuverI();
+
+	double getPIDmaneuverD();
+
+	double getPIDpivotP();
+
+	double getPIDpivotI();
+
+	double getPIDpivotD();
+
+	void resetEncoders();
+
+	void resetAttitude();
 
 	public enum TeamColor {
 		RED,

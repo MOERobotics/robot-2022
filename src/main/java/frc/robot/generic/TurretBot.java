@@ -42,7 +42,6 @@ public class TurretBot implements GenericRobot {
 
 	DigitalInput homeSensor = new DigitalInput(6);
 
-	Solenoid testSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM,0);
 
 	@Override
 	public void drivePercent(double leftPercent, double rightPercent) {
@@ -109,7 +108,7 @@ public class TurretBot implements GenericRobot {
 	}
 
 	@Override
-	public double getYee() {
+	public double getYaw() {
 		return navx.getYaw();
 	}
 
@@ -127,6 +126,47 @@ public class TurretBot implements GenericRobot {
 	public double getLinearVelocity() {
 		//TODO
 		return 0;
+	}
+
+	@Override
+	public double getPIDmaneuverP() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDmaneuverI() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDmaneuverD() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDpivotP() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDpivotI() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDpivotD() {
+		return 0;
+	}
+
+	@Override
+	public void resetEncoders() {
+		encoderLeft.setPosition(0.0);
+		encoderRight.setPosition(0.0);
+	}
+
+	@Override
+	public void resetAttitude() {
+		navx.reset();
 	}
 
 	@Override
