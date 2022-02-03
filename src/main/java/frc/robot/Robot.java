@@ -83,7 +83,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.getNumber("Shooter calculate distance", robot.getShooterTargetDistance());
     SmartDashboard.getNumber("Shooter calculate height", robot.getShooterTargetHeight());
 
-
+    SmartDashboard.putNumber("Joystick raw X", joystick.getX());
+    SmartDashboard.putNumber("Joystick raw Y", joystick.getY());
 
   }
 
@@ -100,14 +101,15 @@ public class Robot extends TimedRobot {
     double jx = joystick.getX();
     double jy = joystick.getY();
 
-    double scaleFactor = 0.8;
-    jx *= scaleFactor;
-    jy *= scaleFactor;
-
     //joystick deaden: yeet smol/weird joystick values when joystick is at rest
     double cutoff = 0.1;
     if(jy > -cutoff && jy < cutoff) jy = 0;
     if(jx > -cutoff && jx < cutoff) jx = 0;
+
+    //moved this to after joystick deaden because deaden should be focused on the raw joystick values
+    double scaleFactor = 0.8;
+    jx *= scaleFactor;
+    jy *= scaleFactor;
 
     robot.drivePercent(jy+jx,jy-jx);
 
@@ -116,19 +118,27 @@ public class Robot extends TimedRobot {
     }*/
 
     //good luck finding these buttons
-    //theoretically 5 and 6 should be close to each other (so should 11 and 12)
+    //they are on the base of joystick, top row
+    // button on the left is negative motor power
     if(joystick.getRawButton(5)){
-      robot.setCollectorIntakePercentage(0.2);
-    }
-    if(joystick.getRawButton(6)){
       robot.setCollectorIntakePercentage(-0.2);
     }
-    if(joystick.getRawButton(12)){
-      robot.setShooterPowerPct(0.2, 0.2);
+    else if(joystick.getRawButton(6)){
+      robot.setCollectorIntakePercentage(0.2);
     }
-    if(joystick.getRawButton(11)){
+    else{
+      robot.setCollectorIntakePercentage(0);
+    }
+    if(joystick.getRawButton(12)){
       robot.setShooterPowerPct(-0.2, -0.2);
     }
+    else if(joystick.getRawButton(11)){
+      robot.setShooterPowerPct(0.2, 0.2);
+    }
+    else{
+      robot.setShooterPowerPct(0, 0);
+    }
+
 
     //Start of Daniel+Saiarun Turret test
 
