@@ -17,7 +17,7 @@ import frc.robot.generic.TurretBot;
 
 public class Robot extends TimedRobot {
 
-  GenericRobot robot = new Falcon();
+  GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
   GenericAutonomous autonomous = new autoArc();
 
@@ -51,10 +51,13 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Drive left rpm", robot.getDriveLeftRPM());
     SmartDashboard.putNumber("Drive right rpm", robot.getDriveRightRPM());
 
-    SmartDashboard.putNumber("Left encoder", robot.getDriveDistanceInchesLeft());
-    SmartDashboard.putNumber("Right encoder", robot.getDriveDistanceInchesRight());
+    SmartDashboard.putNumber("Left encoder Ticks", robot.encoderTicksLeftDrive());
+    SmartDashboard.putNumber("Right encoder Ticks", robot.encoderTicksRightDrive());
 
-    SmartDashboard.putNumber("Yee", robot.getYaw());
+    SmartDashboard.putNumber("Left encoder Inches", robot.getDriveDistanceInchesLeft());
+    SmartDashboard.putNumber("Right encoder Inches", robot.getDriveDistanceInchesRight());
+
+    SmartDashboard.putNumber("Yaw", robot.getYaw());
     SmartDashboard.putNumber("Pitch", robot.getPitch());
     SmartDashboard.putNumber("Rollll", robot.getRoll());
     SmartDashboard.putNumber("Linear speed", robot.getLinearVelocity());
@@ -106,15 +109,15 @@ public class Robot extends TimedRobot {
 
   @Override public void teleopPeriodic() {
     double jx = joystick.getX();
-    double jy = joystick.getY();
+    double jy = -joystick.getY();
 
     //joystick deaden: yeet smol/weird joystick values when joystick is at rest
-    double cutoff = 0.1;
+    double cutoff = 0.05;
     if(jy > -cutoff && jy < cutoff) jy = 0;
     if(jx > -cutoff && jx < cutoff) jx = 0;
 
     //moved this to after joystick deaden because deaden should be focused on the raw joystick values
-    double scaleFactor = 0.8;
+    double scaleFactor = 1.0;
     jx *= scaleFactor;
     jy *= scaleFactor;
 

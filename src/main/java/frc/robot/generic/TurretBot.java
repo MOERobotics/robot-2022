@@ -7,10 +7,11 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import edu.wpi.first.wpilibj.*;
 
+import static com.revrobotics.CANSparkMax.IdleMode.kBrake;
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
 public class TurretBot implements GenericRobot {
-	public static final double TICKS_PER_INCH_DRIVE = 116;
+	public static final double TICKS_PER_INCH_DRIVE = 0.75;
 	public static final double TICKS_PER_DEGREE_TURRET = 116;
 	public static final double TICKS_PER_REVOLUTION_SHOOTERA = 116;
 	public static final double TICKS_PER_REVOLUTION_SHOOTERB = 116;
@@ -50,6 +51,12 @@ public class TurretBot implements GenericRobot {
 		leftMotorB.setInverted(invertLeft);
 		rightMotorA.setInverted(invertRight);
 		rightMotorB.setInverted(invertRight);
+
+		leftMotorA.setIdleMode(kBrake);
+		leftMotorB.setIdleMode(kBrake);
+		rightMotorA.setIdleMode(kBrake);
+		rightMotorB.setIdleMode(kBrake);
+
 	}
 
 	@Override
@@ -139,7 +146,7 @@ public class TurretBot implements GenericRobot {
 
 	@Override
 	public double getPIDmaneuverP() {
-		return 0;
+		return 2.0e-2;
 	}
 
 	@Override

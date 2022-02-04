@@ -32,17 +32,19 @@ public class autoArc extends GenericAutonomous {
     double defaultPower = .4;
 
     double correction;
+    PIDController PIDSteering;
+    PIDController PIDPivot;
 
     @Override
     public void autonomousInit(GenericRobot robot) {
         startingTime = System.currentTimeMillis();
-        autonomousStep = -1;
+        PIDSteering = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
+        PIDPivot = new PIDController(robot.getPIDpivotP(), robot.getPIDpivotI(), robot.getPIDpivotD());
+        autonomousStep = 0;
     }
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
-        PIDController PIDSteering = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
-        PIDController PIDPivot = new PIDController(robot.getPIDpivotP(), robot.getPIDpivotI(), robot.getPIDpivotD());
         switch (autonomousStep){
             case 0: //reset
                 PIDSteering.reset();
@@ -62,10 +64,11 @@ public class autoArc extends GenericAutonomous {
                 currentYaw = robot.getYaw();
                 currentDistInches = robot.getDriveDistanceInchesLeft();
                 correction = PIDSteering.calculate(currentYaw - startYaw);
+                SmartDashboard.putNumber("correction:",correction);
                 leftPower = defaultPower + correction;
                 rightPower = defaultPower - correction;
                 if (currentDistInches - startInches >= rollout-10){ //slowdown
-                    defaultPower = .2;
+                    defaultPower = (rollout-currentDistInches+startInches)*.04;
                 }
                 if (currentDistInches - startInches >= rollout){
                     defaultPower = .2;
