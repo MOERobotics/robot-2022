@@ -2,8 +2,6 @@ package frc.robot;
 
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericAutonomous;
 import frc.robot.generic.GenericRobot;

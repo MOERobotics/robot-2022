@@ -7,15 +7,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.generic.GenericAutonomous;
-import frc.robot.generic.GenericRobot;
-import frc.robot.generic.TurretBot;
+import frc.robot.generic.*;
 
 public class Robot extends TimedRobot {
 
-  GenericRobot robot = new TurretBot();
+  GenericRobot robot = new Camoelot();
   Joystick joystick = new Joystick(0);
-  GenericAutonomous autonomous = new autoArc();
+  GenericAutonomous autonomous = new SimpleA(); //used to be autoArc
 
   @Override public void robotInit() {}
 
@@ -76,11 +74,11 @@ public class Robot extends TimedRobot {
 
   @Override public void teleopPeriodic() {
     double x = joystick.getX();
-    double y = joystick.getY();
+    double y = -joystick.getY();
 
     robot.drivePercent(y+x,y-x);
 
-    if(joystick.getRawButton(1)){
+    /*if(joystick.getRawButton(1)){
       robot.setShooterPowerPct(0.2, 0.2);
     }
 
@@ -93,7 +91,7 @@ public class Robot extends TimedRobot {
     }
     if(joystick.getRawButton(4)){
       robot.setTurretPowerPct(0.15);
-    }
+    }*/
 
   }
 
