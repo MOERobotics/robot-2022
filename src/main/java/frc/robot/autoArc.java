@@ -12,7 +12,7 @@ public class autoArc extends GenericAutonomous {
     double wheelBase = 28;
     double innerRadius = radius - wheelBase/2;
     double outerRadius = radius + wheelBase/2;
-    double outerArcDist = 120;
+    double outerArcDist = 180;
 
     int autonomousStep = 0;
 
@@ -54,7 +54,7 @@ public class autoArc extends GenericAutonomous {
                 PIDSteering.reset();
                 PIDPivot.reset();
                 PIDSteering.enableContinuousInput(-180,180);
-                PIDPivot.disableContinuousInput();
+                PIDPivot.enableContinuousInput(-180,180);
                 robot.resetAttitude();
                 robot.resetEncoders();
                 startYaw = robot.getYaw();
@@ -74,7 +74,7 @@ public class autoArc extends GenericAutonomous {
                     defaultPower = (rollout-currentDistInches+startInches)*.04;
                 }
                 if (currentDistInches - startInches >= rollout){
-                    defaultPower = .2;
+                    defaultPower = .4;
                     leftPower = 0;
                     rightPower = 0;
                     autonomousStep += 1;
@@ -100,6 +100,7 @@ public class autoArc extends GenericAutonomous {
                     leftPower = 0;
                     rightPower = 0;
                     autonomousStep += 1;
+                    startingTime = System.currentTimeMillis();
                 }
 
                 break;
@@ -107,9 +108,8 @@ public class autoArc extends GenericAutonomous {
             case 3: //Pid reset
                 PIDSteering.reset();
                 PIDPivot.reset();
-                PIDSteering.enableContinuousInput(-180,180);
-                PIDPivot.disableContinuousInput();
-                robot.resetEncoders();
+                PIDSteering.disableContinuousInput();
+                PIDPivot.enableContinuousInput(-180, 180);
                 startYaw = startYaw - pivotDeg;
                 startInches = robot.getDriveDistanceInchesRight();
                 autonomousStep += 1;
@@ -118,6 +118,12 @@ public class autoArc extends GenericAutonomous {
             case 4: //Pid Arc 10 ft Left
                 currentYaw = robot.getYaw();
                 currentDistInches = robot.getDriveDistanceInchesRight();
+                SmartDashboard.putNumber("startInches", startInches);
+                SmartDashboard.putNumber("currentInches", currentDistInches);
+                SmartDashboard.putNumber("outerRadius", outerRadius);
+                SmartDashboard.putNumber("startYaw", startYaw);
+                SmartDashboard.putNumber("currentYaw", currentYaw);
+                SmartDashboard.putNumber("InchtoDeg", Math.toDegrees((currentDistInches-startInches)/outerRadius));
                 SmartDashboard.putNumber("correction Measurement", Math.toDegrees((currentDistInches-startInches)/outerRadius) + (currentYaw-startYaw));
                 correction = PIDSteering.calculate(Math.toDegrees((currentDistInches-startInches)/outerRadius) + (currentYaw-startYaw));
                 double radiusRatio = outerRadius/innerRadius;
