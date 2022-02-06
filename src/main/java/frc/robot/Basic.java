@@ -6,8 +6,7 @@ import frc.robot.generic.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball A, closest ball to the hangar
-public class SimpleA extends GenericAutonomous {
-    double startingPosition;
+public class Basic extends GenericAutonomous {
     double startingYaw;
 
     int autonomousStep;
@@ -18,11 +17,10 @@ public class SimpleA extends GenericAutonomous {
 
     double correction;
 
-    PIDController PIDDriveStraight = new PIDController(0, 0, 0);
+    PIDController PIDDriveStraight = new PIDController(.025, 0, 0);
 
     @Override
     public void autonomousInit(GenericRobot robot) {
-        startingPosition = robot.getDriveDistanceInchesLeft();
         autonomousStep = 0;
         startingYaw = robot.getYaw(); //might need to change to set degrees
 
@@ -31,9 +29,9 @@ public class SimpleA extends GenericAutonomous {
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
         SmartDashboard.putNumber("Autonomous Step", autonomousStep);
-        SmartDashboard.putNumber("Starting Position", startingPosition);
         SmartDashboard.putNumber("Position", robot.getDriveDistanceInchesLeft());
         SmartDashboard.putNumber("Starting Yaw", startingYaw);
+        SmartDashboard.putNumber("Current Yaw", robot.getYaw());
 
         switch(autonomousStep){
             case 0: //reset
@@ -48,12 +46,12 @@ public class SimpleA extends GenericAutonomous {
             case 4: //drive to ball A
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
-                leftpower = defaultPower; //- correction;
-                rightpower = defaultPower; // + correction;
+                leftpower = defaultPower - correction;
+                rightpower = defaultPower + correction;
 
-                if(robot.getDriveDistanceInchesLeft() < -36){
+                if(robot.getDriveDistanceInchesLeft() < -37){
                     autonomousStep += 1;
-                }
+                } //has 3 inches of momentum with .25 power
                 break;
             case 5: //stop
                 leftpower = 0;

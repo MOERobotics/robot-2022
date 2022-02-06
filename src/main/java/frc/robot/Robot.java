@@ -13,7 +13,7 @@ public class Robot extends TimedRobot {
 
   GenericRobot robot = new Camoelot();
   Joystick joystick = new Joystick(0);
-  GenericAutonomous autonomous = new SimpleA(); //used to be autoArc
+  GenericAutonomous autonomous = new Basic(); //used to be autoArc()
 
   @Override public void robotInit() {}
 
