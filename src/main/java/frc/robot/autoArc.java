@@ -2,14 +2,12 @@ package frc.robot;
 
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 
 public class autoArc extends GenericAutonomous {
-    double rollout = 120;
+    double rollout = 72; //center of rotation changes per robot. Test value per robot
     double radius = 153;
     double wheelBase = 28;
     double innerRadius = radius - wheelBase/2;
@@ -35,22 +33,28 @@ public class autoArc extends GenericAutonomous {
     PIDController PIDSteering;
     PIDController PIDPivot;
 
+    boolean time = false;
+
     @Override
     public void autonomousInit(GenericRobot robot) {
         startingTime = System.currentTimeMillis();
         PIDSteering = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
         PIDPivot = new PIDController(robot.getPIDpivotP(), robot.getPIDpivotI(), robot.getPIDpivotD());
+        defaultPower = .4;
         autonomousStep = 0;
+        time = false;
     }
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
+        SmartDashboard.putNumber("autonomousStep", autonomousStep);
+        SmartDashboard.putNumber("correction", correction);
         switch (autonomousStep){
             case 0: //reset
                 PIDSteering.reset();
                 PIDPivot.reset();
                 PIDSteering.enableContinuousInput(-180,180);
-                PIDPivot.enableContinuousInput(-180,180);
+                PIDPivot.disableContinuousInput();
                 robot.resetAttitude();
                 robot.resetEncoders();
                 startYaw = robot.getYaw();
@@ -64,7 +68,6 @@ public class autoArc extends GenericAutonomous {
                 currentYaw = robot.getYaw();
                 currentDistInches = robot.getDriveDistanceInchesLeft();
                 correction = PIDSteering.calculate(currentYaw - startYaw);
-                SmartDashboard.putNumber("correction:",correction);
                 leftPower = defaultPower + correction;
                 rightPower = defaultPower - correction;
                 if (currentDistInches - startInches >= rollout-10){ //slowdown
@@ -74,28 +77,38 @@ public class autoArc extends GenericAutonomous {
                     defaultPower = .2;
                     leftPower = 0;
                     rightPower = 0;
-                    autonomousStep = 5;
+                    autonomousStep += 1;
                 }
                 break;
 
             case 2: // Pid pivot 90 degrees ccw
                 currentYaw = robot.getYaw();
                 correction = PIDPivot.calculate(pivotDeg + currentYaw - startYaw);
-                leftPower = defaultPower - correction;
-                rightPower = defaultPower + correction;
-                if (currentYaw - startYaw <= -pivotDeg){
+                leftPower = correction;
+                rightPower = -correction;
+                if (Math.abs(Math.abs(currentYaw - startYaw)-pivotDeg) <= 1.5){
+                    if (!time){
+                        startingTime = System.currentTimeMillis();
+                        time = true;
+                    }
+                }
+                else{
+                    startingTime = System.currentTimeMillis();
+                    time = false;
+                }
+                if (System.currentTimeMillis() - startingTime >= 50){
                     leftPower = 0;
                     rightPower = 0;
                     autonomousStep += 1;
                 }
+
                 break;
 
             case 3: //Pid reset
                 PIDSteering.reset();
                 PIDPivot.reset();
                 PIDSteering.enableContinuousInput(-180,180);
-                PIDPivot.enableContinuousInput(-180,180);
-                robot.resetAttitude();
+                PIDPivot.disableContinuousInput();
                 robot.resetEncoders();
                 startYaw = startYaw - 90;
                 startInches = robot.getDriveDistanceInchesLeft();
@@ -105,10 +118,11 @@ public class autoArc extends GenericAutonomous {
             case 4: //Pid Arc 10 ft Left
                 currentYaw = robot.getYaw();
                 currentDistInches = robot.getDriveDistanceInchesLeft();
-                correction = PIDSteering.calculate(currentDistInches-startInches - Math.toRadians(currentYaw-startYaw)*outerRadius);
+                SmartDashboard.putNumber("correction Measurement", Math.toDegrees((currentDistInches-startInches)/outerRadius) + (currentYaw-startYaw));
+                correction = PIDSteering.calculate(Math.toDegrees((currentDistInches-startInches)/outerRadius) + (currentYaw-startYaw));
                 double radiusRatio = outerRadius/innerRadius;
-                leftPower = Math.sqrt(radiusRatio)*defaultPower - correction;
-                rightPower = 1/(Math.sqrt(radiusRatio))*defaultPower + correction;
+                leftPower = 1/Math.sqrt(radiusRatio)*defaultPower + correction;
+                rightPower = (Math.sqrt(radiusRatio))*defaultPower - correction;
                 if (currentDistInches - startInches >= outerArcDist){
                     leftPower = 0;
                     rightPower = 0;

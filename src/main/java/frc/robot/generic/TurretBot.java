@@ -146,7 +146,7 @@ public class TurretBot implements GenericRobot {
 
 	@Override
 	public double getPIDmaneuverP() {
-		return 2.0e-2;
+		return 1.0e-2;
 	}
 
 	@Override
@@ -156,12 +156,12 @@ public class TurretBot implements GenericRobot {
 
 	@Override
 	public double getPIDmaneuverD() {
-		return 0;
+		return 1.0e-3;
 	}
 
 	@Override
 	public double getPIDpivotP() {
-		return 0;
+		return 1.5e-2;
 	}
 
 	@Override
