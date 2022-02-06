@@ -63,6 +63,7 @@ public class Basic extends GenericAutonomous {
             case 7: //shoots second ball
                 autonomousStep += 1;
                 break;
+            case 8: //turn to go to ball @ terminal
         }
         robot.drivePercent(leftpower, rightpower);
 
