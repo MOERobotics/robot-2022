@@ -56,14 +56,41 @@ public class Basic extends GenericAutonomous {
             case 5: //stop
                 leftpower = 0;
                 rightpower = 0;
+                //autonomousStep = 8;
                 break;
             case 6: //collector to collect ball
+            case 7: //collection part 2 not electric nor boogaloo
+            case 8: //nother collection case
+            case 9: //shoot the second ball for funsies
+            case 10: //miss the target and become sadge
+            case 11: //copium
+            //will change these comments when they actually mean somthing
+            case 12: //turn to go to ball @ terminal
+                //turn left
+                leftpower = -defaultPower;
+                rightpower = defaultPower;
+
+                if(robot.getYaw() < 150 /*change to new value later*/) {
+                    autonomousStep += 1;
+                }
+                break;
+            case 13: //reset
+                startingYaw = robot.getYaw();
+                PIDDriveStraight.reset();
+                PIDDriveStraight.enableContinuousInput(-180,180);
+                robot.resetEncoders();
                 autonomousStep += 1;
                 break;
-            case 7: //shoots second ball
-                autonomousStep += 1;
+            case 14: //drive towards the ball
+                correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
+
+                leftpower = defaultPower - correction;
+                rightpower = defaultPower + correction;
+
+                if(robot.getDriveDistanceInchesLeft() < -305 /*change to new value later*/){
+                    autonomousStep += 1;
+                }
                 break;
-            case 8: //turn to go to ball @ terminal
         }
         robot.drivePercent(leftpower, rightpower);
 
