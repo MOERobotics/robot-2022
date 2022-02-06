@@ -5,8 +5,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 
-//Simple autonomous code for ball A, closest ball to the hangar
-public class Basic extends GenericAutonomous {
+//Simple autonomous code for ball C, closest ball to the hangar, and driving to the ball at terminal
+public class SimpleCTerminal extends GenericAutonomous {
     double startingYaw;
 
     int autonomousStep;
