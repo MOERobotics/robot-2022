@@ -11,7 +11,7 @@ import frc.robot.generic.*;
 
 public class Robot extends TimedRobot {
 
-  GenericRobot robot = new Camoelot();
+  GenericRobot robot = new Falcon();
   Joystick joystick = new Joystick(0);
   GenericAutonomous autonomous = new SimpleCTerminal(); //used to be autoArc()
 

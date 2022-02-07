@@ -68,6 +68,28 @@ public class Falcon implements GenericRobot {
 
     double aspectRatioTargDist;
 
+    public Falcon() {
+
+        rightDriveA.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        rightDriveB.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        rightDriveC.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+        leftDriveA .setIdleMode(CANSparkMax.IdleMode.kBrake);
+        leftDriveB .setIdleMode(CANSparkMax.IdleMode.kBrake);
+        leftDriveC .setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+        rightDriveA.setInverted(true);
+        rightDriveB.setInverted(true);
+        rightDriveC.setInverted(true);
+
+        collector.setInverted(true);
+
+        escalator.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+        shooterA.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        shooterB.setIdleMode(CANSparkMax.IdleMode.kCoast);
+
+    }
 
     @Override
     public void drivePercent(double leftPercent, double rightPercent) {
