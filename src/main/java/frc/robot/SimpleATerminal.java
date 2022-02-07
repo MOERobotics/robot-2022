@@ -49,7 +49,7 @@ public class SimpleATerminal extends GenericAutonomous {
                 leftpower = defaultPower - correction;
                 rightpower = defaultPower + correction;
 
-                if(robot.getDriveDistanceInchesLeft() < -37){
+                if(robot.getDriveDistanceInchesLeft() < 37){
                     autonomousStep += 1;
                 } //has 3 inches of momentum with .25 power
                 break;
@@ -66,30 +66,24 @@ public class SimpleATerminal extends GenericAutonomous {
             case 11: //copium
             //will change these comments when they actually mean somthing
             case 12: //turn to go to ball @ terminal
-                //turn left
                 leftpower = -defaultPower;
                 rightpower = defaultPower;
+                //turning left
 
-                if(robot.getYaw() < 150 /*change to new value later*/) {
+                if(robot.getYaw() < 155.05) {
+                    startingYaw = robot.getYaw();
                     autonomousStep += 1;
-                }
+                } //204.95
                 break;
-            case 13: //reset
-                startingYaw = robot.getYaw();
-                PIDDriveStraight.reset();
-                PIDDriveStraight.enableContinuousInput(-180,180);
-                robot.resetEncoders();
-                autonomousStep += 1;
-                break;
-            case 14: //drive towards the ball
+            case 13: //drive towards the ball
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower - correction;
                 rightpower = defaultPower + correction;
 
-                if(robot.getDriveDistanceInchesLeft() < -305 /*change to new value later*/){
+                if(robot.getDriveDistanceInchesLeft() < 259.26) {
                     autonomousStep += 1;
-                }
+                } //might need to tune for momentum
                 break;
         }
         robot.drivePercent(leftpower, rightpower);
