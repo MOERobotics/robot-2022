@@ -32,6 +32,13 @@ public class Camoelot implements GenericRobot {
 	int[] rightEncoderHistory = new int[5];
 
 
+	public Camoelot(){
+		boolean invertLeft = true;
+		leftMotorA.setInverted(invertLeft);
+		leftMotorB.setInverted(invertLeft);
+		leftMotorC.setInverted(invertLeft);
+	}
+
 	@Override
 	public void drivePercent(double leftPercent, double rightPercent) {
 		leftMotorA.set(ControlMode.PercentOutput, leftPercent);
