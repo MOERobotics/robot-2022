@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -30,6 +31,8 @@ public class Robot extends TimedRobot {
   double turretarea;
   double turretv;
   int counter = 0;
+
+  PIDController turretPIDController;
 
 
 
@@ -112,7 +115,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override public void teleopInit() {
-
+      turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
 
   }
 
@@ -176,7 +179,7 @@ public class Robot extends TimedRobot {
     double currentTurretPower = 0;
 
     if(joystick.getRawButton(1) && turretv !=0){
-      double currentTurretPowerValue = -(Math.signum(average)*average*average)/30;
+      /*double currentTurretPowerValue = -(Math.signum(average)*average*average)/30;
       if(currentTurretPowerValue >.2){
         currentTurretPowerValue = .2;
       } else if(currentTurretPowerValue <-.2){
@@ -189,8 +192,23 @@ public class Robot extends TimedRobot {
         currentTurretPower = currentTurretPowerValue;
       }else{
         currentTurretPower = 0;
+      }*/
+
+      /*if (average > 0){
+        currentTurretPower = -0.2;
       }
+      else{
+        currentTurretPower = 0.2;
+      }
+
+      if (Math.abs(average) <= 5){
+        currentTurretPower = currentTurretPower/2;
+      }*/
+      currentTurretPower = turretPIDController.calculate(average);
+
+
     }else{
+      turretPIDController.reset();
       if(joystick.getRawButton(3)){
         currentTurretPower = -0.1;
       }else if(joystick.getRawButton(4)){

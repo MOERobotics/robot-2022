@@ -146,6 +146,16 @@ public interface GenericRobot {
 	public void setShooterPowerPctBottom(double percentage);
 	public void setShooterTargetDistance(double length, double height);
 
+	public default double turretPIDgetP(){
+		return 0;
+	}
+	public  default double turretPIDgetI(){
+		return 0;
+	}
+	public  default double turretPIDgetD(){
+		return 0;
+	}
+
 
 
 

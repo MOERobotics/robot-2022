@@ -5,6 +5,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.*;
 
 import static com.revrobotics.CANSparkMax.IdleMode.kBrake;
@@ -38,6 +39,7 @@ public class TurretBot implements GenericRobot {
 	SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
 	SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
 
+
 	Solenoid shifter = new Solenoid(PneumaticsModuleType.CTREPCM,0);
 	Servo iuj = new Servo(0);
 	Servo       elevationRight = new Servo(1);
@@ -57,6 +59,20 @@ public class TurretBot implements GenericRobot {
 		rightMotorA.setIdleMode(kBrake);
 		rightMotorB.setIdleMode(kBrake);
 
+	}
+
+	@Override
+	public double turretPIDgetP(){
+		return 3.0e-2;
+	}
+
+	@Override
+	public double turretPIDgetI(){
+		return 0;
+	}
+	@Override
+	public double turretPIDgetD(){
+		return 3.0e-4;
 	}
 
 	@Override
