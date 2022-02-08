@@ -10,12 +10,14 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.generic.Camoelot;
 import frc.robot.generic.GenericRobot;
+import frc.robot.generic.Lightning;
 import frc.robot.generic.TurretBot;
 
 public class Robot extends TimedRobot {
 
-  GenericRobot robot = new TurretBot();
+  GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
 
   double[] averageTurretX = new double [6];
@@ -99,15 +101,15 @@ public class Robot extends TimedRobot {
 
   @Override public void teleopPeriodic() {
     double jx = joystick.getX();
-    double jy = joystick.getY();
+    double jy = -joystick.getY();
 
     //joystick deaden: yeet smol/weird joystick values when joystick is at rest
-    double cutoff = 0.1;
+    double cutoff = 0.05;
     if(jy > -cutoff && jy < cutoff) jy = 0;
     if(jx > -cutoff && jx < cutoff) jx = 0;
 
     //moved this to after joystick deaden because deaden should be focused on the raw joystick values
-    double scaleFactor = 0.8;
+    double scaleFactor = 1.0;
     jx *= scaleFactor;
     jy *= scaleFactor;
 
@@ -129,14 +131,13 @@ public class Robot extends TimedRobot {
     else{
       robot.setCollectorIntakePercentage(0);
     }
-    if(joystick.getRawButton(12)){
-      robot.setShooterPowerPct(-0.2, -0.2);
+    if(joystick.getRawButton(12)){      robot.setTurretPowerPct(-0.2);
     }
     else if(joystick.getRawButton(11)){
-      robot.setShooterPowerPct(0.2, 0.2);
+      robot.setTurretPowerPct(0.2);
     }
     else{
-      robot.setShooterPowerPct(0, 0);
+      robot.setTurretPowerPct(0);
     }
 
 
