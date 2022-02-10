@@ -14,8 +14,10 @@ public class SimpleCTerminal extends GenericAutonomous {
     double leftpower;
     double rightpower;
     double defaultPower = .25;
+    double defaultTurnPower = .25;
 
     double correction;
+    double startTime;
 
     PIDController PIDDriveStraight = new PIDController(.025, 0, 0);
 
@@ -23,6 +25,7 @@ public class SimpleCTerminal extends GenericAutonomous {
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
         startingYaw = robot.getYaw(); //might need to change to set degrees
+        startTime = System.currentTimeMillis();
 
     }
 
@@ -38,7 +41,9 @@ public class SimpleCTerminal extends GenericAutonomous {
                 PIDDriveStraight.reset();
                 PIDDriveStraight.enableContinuousInput(-180,180);
                 robot.resetEncoders();
-                autonomousStep = 4;
+                if (System.currentTimeMillis() - startTime > 100){
+                    autonomousStep = 4;
+                }
                 break;
             case 1: //shoot the ball
             case 2: //shoot the ball part 2 electric boogaloo
@@ -66,11 +71,11 @@ public class SimpleCTerminal extends GenericAutonomous {
             case 11: //copium
             //will change these comments when they actually mean something
             case 12: //turn to go to ball @ terminal
-                leftpower = -defaultPower;
-                rightpower = defaultPower;
-                //turning left
+                leftpower = defaultTurnPower;
+                rightpower = -defaultTurnPower;
+                //turning right
 
-                if(robot.getYaw() < 95.46 /*change to new value later*/) {
+                if(robot.getYaw() < -84.54) {
                     startingYaw = robot.getYaw();
                     autonomousStep += 1;
                 } //264.54, might need to tune for momentum
