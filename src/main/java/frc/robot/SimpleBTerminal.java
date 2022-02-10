@@ -16,14 +16,17 @@ public class SimpleBTerminal extends GenericAutonomous {
     double defaultPower = .4;
 
     double correction;
+    double startDistance;
+    double startTime;
 
-    PIDController PIDDriveStraight = new PIDController(.025, 0, 0);
+    PIDController PIDDriveStraight;
 
     @Override
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
         startingYaw = robot.getYaw(); //might need to change to set degrees
-
+        PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
+        startTime = System.currentTimeMillis();
     }
 
     @Override
@@ -32,13 +35,18 @@ public class SimpleBTerminal extends GenericAutonomous {
         SmartDashboard.putNumber("Position", robot.getDriveDistanceInchesLeft());
         SmartDashboard.putNumber("Starting Yaw", startingYaw);
         SmartDashboard.putNumber("Current Yaw", robot.getYaw());
+        SmartDashboard.putNumber("startDistance", startDistance);
 
         switch(autonomousStep){
             case 0: //reset
                 PIDDriveStraight.reset();
                 PIDDriveStraight.enableContinuousInput(-180,180);
                 robot.resetEncoders();
-                autonomousStep = 4;
+                if (System.currentTimeMillis() - startTime > 100){
+                    startDistance = robot.getDriveDistanceInchesLeft();
+                    startingYaw = robot.getYaw();
+                    autonomousStep = 4;
+                }
                 break;
             case 1: //shoot the ball
             case 2: //shoot the ball part 2 electric boogaloo
@@ -46,11 +54,12 @@ public class SimpleBTerminal extends GenericAutonomous {
             case 4: //drive to ball A
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
-                leftpower = defaultPower - correction;
-                rightpower = defaultPower + correction;
+                leftpower = defaultPower + correction;
+                rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() < -61.5){
+                if(robot.getDriveDistanceInchesLeft() >= 61.5){
                     autonomousStep += 1;
+                    startTime = System.currentTimeMillis();
                 } //has 3 inches of momentum with .25 power
                 break;
             case 5: //stop
@@ -68,17 +77,18 @@ public class SimpleBTerminal extends GenericAutonomous {
             case 12://reset
                 PIDDriveStraight.reset();
                 PIDDriveStraight.enableContinuousInput(-180,180);
-                robot.resetEncoders();
-                startingYaw = robot.getYaw();
-                autonomousStep +=1;
+                startDistance = robot.getDriveDistanceInchesLeft();
+                if (System.currentTimeMillis() - startTime >= 1000){
+                    autonomousStep +=1;
+                }
                 break;
             case 13://reset
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
-                leftpower = defaultPower - correction;
-                rightpower = defaultPower + correction;
+                leftpower = defaultPower + correction;
+                rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() < -153.5){
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= 153.5){
                     autonomousStep += 1;
                 } //has 3 inches of momentum with .25 powercase 5: //stop\
                 break;
