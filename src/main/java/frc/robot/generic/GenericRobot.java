@@ -71,9 +71,13 @@ public interface GenericRobot {
 		UNKNOWN;
 	}
 
-	public default TeamColor getCargoColor(){
+	public default boolean getUpperCargo(){
 		System.out.println("robot is colorblind");
-		return TeamColor.UNKNOWN;
+		return false;
+	}
+	public default boolean getLowerCargo(){
+		System.out.println("robot is colorblind");
+		return false;
 	}
 
 	public default int getCargoCount(){
@@ -106,6 +110,15 @@ public interface GenericRobot {
 	public double getTargetAngle();
 
 	public double getTurretAngle();
+	public default double encoderTurretTicksPerDegree(){
+		System.out.println("I don't have a turret encoder");
+		return 1.0;
+	}
+	public default double getTurretAngleDegrees(){
+		return getTurretAngle()/encoderTurretTicksPerDegree();
+	}
+
+
 	public void setTurretAngleRelative(double angleChange);
 	public void setTurretAngleAbsolute();
 	public void setTurretPowerPct(double powerPct);
@@ -130,8 +143,14 @@ public interface GenericRobot {
 	public void setShooterPowerPctBottom(double percentage);
 	public void setShooterTargetDistance(double length, double height);
 
+	public void raiseCollector();
+	public void lowerCollector();
 
+	public void turnOnPTO();
+	public void turnOffPTO();
 
+	public void setArmsForward();
+	public void setArmsBackward();
 
 
 

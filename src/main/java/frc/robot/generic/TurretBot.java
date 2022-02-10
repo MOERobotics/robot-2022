@@ -138,9 +138,15 @@ public class TurretBot implements GenericRobot {
 	}
 
 	@Override
-	public TeamColor getCargoColor() {
-		return GenericRobot.super.getCargoColor();
+	public boolean getUpperCargo() {
+		return GenericRobot.super.getUpperCargo();
 	}
+
+	@Override
+	public boolean getLowerCargo() {
+		return GenericRobot.super.getLowerCargo();
+	}
+
 
 	@Override
 	public int getCargoCount() {
@@ -321,4 +327,22 @@ public class TurretBot implements GenericRobot {
 	public void setShooterTargetDistance(double length, double height) {
 		//TODO
 	}
+
+	@Override
+	public void raiseCollector() { return; }
+
+	@Override
+	public void lowerCollector() { return; }
+
+	@Override
+	public void turnOnPTO() { return; }
+
+	@Override
+	public void turnOffPTO() { return; }
+
+	@Override
+	public void setArmsForward() { return; }
+
+	@Override
+	public void setArmsBackward() { return; }
 }

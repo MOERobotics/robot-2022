@@ -4,7 +4,6 @@ import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.ControlType;
 import edu.wpi.first.wpilibj.*;
 
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
@@ -19,9 +18,9 @@ public class Lightning implements GenericRobot {
 
     CANSparkMax collector = new CANSparkMax(3, kBrushless);
     CANSparkMax indexer   = new CANSparkMax(4, kBrushless);
-    CANSparkMax speeeen   = new CANSparkMax(2, kBrushless);
-    CANSparkMax shooterA  = new CANSparkMax(42, kBrushless);
-    CANSparkMax shooterB  = new CANSparkMax(49, kBrushless);
+    CANSparkMax turretRotator = new CANSparkMax(2, kBrushless);
+    CANSparkMax shooterA  = new CANSparkMax(5, kBrushless);
+    CANSparkMax shooterB  = new CANSparkMax(6, kBrushless);
 
     CANSparkMax leftMotorA = new CANSparkMax(20, kBrushless);
     CANSparkMax leftMotorB = new CANSparkMax(1, kBrushless);
@@ -30,9 +29,15 @@ public class Lightning implements GenericRobot {
 
     RelativeEncoder encoderRight     = rightMotorA.getEncoder();
     RelativeEncoder encoderLeft      = leftMotorA.getEncoder();
-    RelativeEncoder encoderTurret    = speeeen.getEncoder();
+    RelativeEncoder encoderTurret    = turretRotator.getEncoder();
     RelativeEncoder encoderShootA    = shooterA.getEncoder();
     RelativeEncoder encoderShootB    = shooterB.getEncoder();
+
+    //DigitalInput ballSensor = new DigitalInput(0);
+    //DoubleSolenoid PTO = new DoubleSolenoid(PneumaticsModuleType.REVPH, 0, 1);
+    //DoubleSolenoid arms = new DoubleSolenoid(PneumaticsModuleType.REVPH, 2, 3);
+    //Solenoid collectorPosition = new Solenoid(PneumaticsModuleType.REVPH, 4);**/
+
 
     SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
     SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
@@ -45,6 +50,9 @@ public class Lightning implements GenericRobot {
         leftMotorB.setInverted(invertLeft);
         rightMotorA.setInverted(invertRight);
         rightMotorB.setInverted(invertRight);
+
+        indexer.setInverted(true);
+        shooterB.setInverted(true);
     }
 
     @Override
@@ -133,8 +141,12 @@ public class Lightning implements GenericRobot {
     }
 
     @Override
-    public TeamColor getCargoColor() {
-        return GenericRobot.super.getCargoColor();
+    public boolean getUpperCargo() {
+        return GenericRobot.super.getUpperCargo();
+    }
+    @Override
+    public boolean getLowerCargo() {
+        return GenericRobot.super.getLowerCargo();
     }
 
     @Override
@@ -192,9 +204,15 @@ public class Lightning implements GenericRobot {
         return 0;
     }
 
+
     @Override
     public double getTurretAngle() {
-        return encoderTurret.getPosition() / TICKS_PER_DEGREE_TURRET;
+        return encoderTurret.getPosition();
+    }
+
+    @Override
+    public double encoderTurretTicksPerDegree(){
+        return TICKS_PER_DEGREE_TURRET;
     }
 
     @Override
@@ -213,12 +231,12 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void setTurretPowerPct(double powerPct) {
-        speeeen.set(powerPct);
+        turretRotator.set(powerPct);
     }
 
     @Override
     public double getTurretPowerPct() {
-        return speeeen.get();
+        return turretRotator.get();
     }
 
     @Override
@@ -316,5 +334,33 @@ public class Lightning implements GenericRobot {
     @Override
     public void setShooterTargetDistance(double length, double height) {
         //TODO
+    }
+
+    @Override
+    public void raiseCollector(){
+        //collectorPosition.set(true);
+    }
+
+    @Override
+    public void lowerCollector(){
+        //collectorPosition.set(false);
+    }
+
+    @Override
+    public void turnOnPTO(){
+        //PTO.set(DoubleSolenoid.Value.kForward);
+    }
+    @Override
+    public void turnOffPTO(){
+        //PTO.set(DoubleSolenoid.Value.kReverse);
+    }
+
+    @Override
+    public void setArmsForward(){
+        //arms.set(DoubleSolenoid.Value.kForward);
+    }
+    @Override
+    public void setArmsBackward(){
+        //arms.set(DoubleSolenoid.Value.kForward);
     }
 }

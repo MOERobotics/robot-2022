@@ -10,10 +10,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.generic.Camoelot;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
-import frc.robot.generic.TurretBot;
 
 public class Robot extends TimedRobot {
 
@@ -58,7 +56,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Rollll", robot.getRoll());
     SmartDashboard.putNumber("Linear speed", robot.getLinearVelocity());
 
-    SmartDashboard.putString("Held cargo", robot.getCargoColor().name());
+    SmartDashboard.putBoolean("Have upper cargo?", robot.getUpperCargo());
+    SmartDashboard.putBoolean("Have lower cargo?", robot.getLowerCargo());
+
     SmartDashboard.putNumber("Cargo inventory", robot.getCargoCount());
     SmartDashboard.putBoolean("Has detected cargo?", robot.hasFoundCargo());
 
@@ -70,7 +70,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.getNumber("Vision target angle", robot.getTargetAngle());
     SmartDashboard.getNumber("Vision target dist", robot.getTargetDistance());
 
-    SmartDashboard.getNumber("Turret direction angle", robot.getTurretAngle());
+    SmartDashboard.getNumber("Turret direction angle ticks", robot.getTurretAngle());
+    SmartDashboard.getNumber("Turret direction angle degrees", robot.getTurretAngleDegrees());
+
     SmartDashboard.getNumber("Turret direction motor pct", robot.getTurretPowerPct());
 
     SmartDashboard.getNumber("Turret pitch angle", robot.getTurretPitchAngle());
@@ -119,26 +121,28 @@ public class Robot extends TimedRobot {
       robot.setShooterPowerPct(0.2, 0.2);
     }*/
 
-    //good luck finding these buttons
-    //they are on the base of joystick, top row
-    // button on the left is negative motor power
-    if(joystick.getRawButton(5)){
-      robot.setCollectorIntakePercentage(-0.2);
-    }
-    else if(joystick.getRawButton(6)){
-      robot.setCollectorIntakePercentage(0.2);
-    }
-    else{
-      robot.setCollectorIntakePercentage(0);
-    }
-    if(joystick.getRawButton(12)){      robot.setTurretPowerPct(-0.2);
-    }
-    else if(joystick.getRawButton(11)){
-      robot.setTurretPowerPct(0.2);
-    }
-    else{
-      robot.setTurretPowerPct(0);
-    }
+
+    //note to self: buttons control mirrored joystick setting
+    if(joystick.getRawButton(11)) robot.setCollectorIntakePercentage(0.2);
+    else if(joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-0.2);
+    else robot.setCollectorIntakePercentage(0);
+
+    if(joystick.getRawButton(12)) robot.setTurretPowerPct(0.2);
+    else if(joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
+    else robot.setTurretPowerPct(0);
+
+    if(joystick.getRawButton(13)) robot.setShooterPowerPct(0.2, 0.2);
+    else if(joystick.getRawButton(14)) robot.setShooterPowerPct(-0.2, -0.2);
+    else robot.setShooterPowerPct(0, 0);
+
+    if(joystick.getRawButton(7)) robot.raiseCollector();
+    if(joystick.getRawButton(8)) robot.lowerCollector();
+
+    if(joystick.getRawButton(6)) robot.turnOnPTO();
+    if(joystick.getRawButton(9)) robot.turnOffPTO();
+
+    if(joystick.getRawButton(5)) robot.setArmsForward();
+    if(joystick.getRawButton(10)) robot.setArmsBackward();
 
 
     //Start of Daniel+Saiarun Turret test

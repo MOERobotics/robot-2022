@@ -259,4 +259,23 @@ public class Camoelot implements GenericRobot {
 	public void setShooterTargetDistance(double length, double height) {
 
 	}
+
+
+	@Override
+	public void raiseCollector() { return; }
+
+	@Override
+	public void lowerCollector() { return; }
+
+	@Override
+	public void turnOnPTO() { return; }
+
+	@Override
+	public void turnOffPTO() { return; }
+
+	@Override
+	public void setArmsForward() { return; }
+
+	@Override
+	public void setArmsBackward() { return; }
 }
