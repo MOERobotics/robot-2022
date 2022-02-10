@@ -100,6 +100,7 @@ public class Falcon implements GenericRobot {
         rightDriveA.set(rightPercent);
         rightDriveB.set(rightPercent);
         rightDriveC.set(rightPercent);
+
     }
 
     @Override
@@ -126,6 +127,51 @@ public class Falcon implements GenericRobot {
     @Override
     public double getDriveRightRPM() {
         return rightDriveA.getEncoder().getVelocity();
+    }
+
+    @Override
+    public double getDriveDistanceInchesLeft() {
+        return encoderTicksLeftDrive()/encoderLeftDriveTicksPerInch();
+    }
+
+    @Override
+    public double getDriveDistanceInchesRight() {
+        return encoderTicksRightDrive()/encoderRightDriveTicksPerInch();
+    }
+
+    @Override
+    public double encoderLeftDriveTicksPerInch() {
+        return .306;
+    }
+
+    @Override
+    public double encoderRightDriveTicksPerInch() {
+        return .306;
+    }
+
+    @Override
+    public double encoderTicksLeftDrive() {
+        return encoderLeft.getPosition();
+    }
+
+    @Override
+    public double encoderTicksRightDrive() {
+        return encoderRight.getPosition();
+    }
+
+    @Override
+    public double getYaw() {
+        return navx.getYaw();
+    }
+
+    @Override
+    public double getPitch() {
+        return navx.getPitch();
+    }
+
+    @Override
+    public double getRoll() {
+        return navx.getRoll();
     }
 
     @Override
@@ -175,6 +221,16 @@ public class Falcon implements GenericRobot {
     }
 
     @Override
+    public TeamColor getCargoColor() {
+        return GenericRobot.super.getCargoColor();
+    }
+
+    @Override
+    public int getCargoCount() {
+        return GenericRobot.super.getCargoCount();
+    }
+
+    @Override
     public void setCollectorIntakePercentage(double percentage) {
         collector.set(percentage);
     }
@@ -182,6 +238,21 @@ public class Falcon implements GenericRobot {
     @Override
     public double getCollectorIntakePercentage() {
         return collector.get();
+    }
+
+    @Override
+    public boolean hasFoundCargo() {
+        return GenericRobot.super.hasFoundCargo();
+    }
+
+    @Override
+    public TeamColor getFoundCargoColor() {
+        return GenericRobot.super.getFoundCargoColor();
+    }
+
+    @Override
+    public boolean isTargetFound() {
+        return GenericRobot.super.isTargetFound();
     }
 
 
@@ -317,6 +388,8 @@ public class Falcon implements GenericRobot {
     public void setShooterTargetDistance(double length, double height) {
 
     }
+
+
 }
 
 

@@ -7,7 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.generic.*;
+import frc.robot.generic.Falcon;
+import frc.robot.generic.GenericAutonomous;
+import frc.robot.generic.GenericRobot;
+import frc.robot.generic.TurretBot;
 
 public class Robot extends TimedRobot {
 
@@ -23,10 +26,13 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Drive left rpm", robot.getDriveLeftRPM());
     SmartDashboard.putNumber("Drive right rpm", robot.getDriveRightRPM());
 
-    SmartDashboard.putNumber("Left encoder", robot.getDriveDistanceInchesLeft());
-    SmartDashboard.putNumber("Right encoder", robot.getDriveDistanceInchesRight());
+    SmartDashboard.putNumber("Left encoder Ticks", robot.encoderTicksLeftDrive());
+    SmartDashboard.putNumber("Right encoder Ticks", robot.encoderTicksRightDrive());
 
-    SmartDashboard.putNumber("Yee", robot.getYaw());
+    SmartDashboard.putNumber("Left encoder Inches", robot.getDriveDistanceInchesLeft());
+    SmartDashboard.putNumber("Right encoder Inches", robot.getDriveDistanceInchesRight());
+
+    SmartDashboard.putNumber("Yaw", robot.getYaw());
     SmartDashboard.putNumber("Pitch", robot.getPitch());
     SmartDashboard.putNumber("Rollll", robot.getRoll());
     SmartDashboard.putNumber("Linear speed", robot.getLinearVelocity());
@@ -58,7 +64,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.getNumber("Shooter calculate distance", robot.getShooterTargetDistance());
     SmartDashboard.getNumber("Shooter calculate height", robot.getShooterTargetHeight());
 
-
+    SmartDashboard.putNumber("Joystick raw X", joystick.getX());
+    SmartDashboard.putNumber("Joystick raw Y", joystick.getY());
 
   }
 

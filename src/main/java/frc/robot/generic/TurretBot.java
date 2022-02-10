@@ -5,12 +5,14 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.*;
 
+import static com.revrobotics.CANSparkMax.IdleMode.kBrake;
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
 public class TurretBot implements GenericRobot {
-	public static final double TICKS_PER_INCH_DRIVE = 116;
+	public static final double TICKS_PER_INCH_DRIVE = 0.75;
 	public static final double TICKS_PER_DEGREE_TURRET = 116;
 	public static final double TICKS_PER_REVOLUTION_SHOOTERA = 116;
 	public static final double TICKS_PER_REVOLUTION_SHOOTERB = 116;
@@ -22,6 +24,7 @@ public class TurretBot implements GenericRobot {
 	CANSparkMax shooterA  = new CANSparkMax(42, kBrushless);
 	CANSparkMax shooterB  = new CANSparkMax(49, kBrushless);
 	CANSparkMax collector = new CANSparkMax(43, kBrushless);
+
 	CANSparkMax leftMotorA = new CANSparkMax(20, kBrushless);
 	CANSparkMax leftMotorB = new CANSparkMax(1, kBrushless);
 	CANSparkMax rightMotorA = new CANSparkMax(14, kBrushless);
@@ -36,12 +39,41 @@ public class TurretBot implements GenericRobot {
 	SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
 	SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
 
+
 	Solenoid shifter = new Solenoid(PneumaticsModuleType.CTREPCM,0);
-	Servo elevationLeft = new Servo(0);
+	Servo iuj = new Servo(0);
 	Servo       elevationRight = new Servo(1);
 
 	DigitalInput homeSensor = new DigitalInput(6);
 
+	public TurretBot(){
+		boolean invertLeft = false;
+		boolean invertRight = true;
+		leftMotorA.setInverted(invertLeft);
+		leftMotorB.setInverted(invertLeft);
+		rightMotorA.setInverted(invertRight);
+		rightMotorB.setInverted(invertRight);
+
+		leftMotorA.setIdleMode(kBrake);
+		leftMotorB.setIdleMode(kBrake);
+		rightMotorA.setIdleMode(kBrake);
+		rightMotorB.setIdleMode(kBrake);
+
+	}
+
+	@Override
+	public double turretPIDgetP(){
+		return 3.0e-2;
+	}
+
+	@Override
+	public double turretPIDgetI(){
+		return 0;
+	}
+	@Override
+	public double turretPIDgetD(){
+		return 3.0e-4;
+	}
 
 	@Override
 	public void drivePercent(double leftPercent, double rightPercent) {
@@ -130,7 +162,7 @@ public class TurretBot implements GenericRobot {
 
 	@Override
 	public double getPIDmaneuverP() {
-		return 0;
+		return 1.0e-2;
 	}
 
 	@Override
@@ -140,12 +172,12 @@ public class TurretBot implements GenericRobot {
 
 	@Override
 	public double getPIDmaneuverD() {
-		return 0;
+		return 1.0e-3;
 	}
 
 	@Override
 	public double getPIDpivotP() {
-		return 0;
+		return 1.5e-2;
 	}
 
 	@Override
