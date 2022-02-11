@@ -14,15 +14,21 @@ public class SimpleATerminal extends GenericAutonomous {
     double leftpower;
     double rightpower;
     double defaultPower = .25;
+    double defaultTurnPower = .25;
 
     double correction;
+    double startTime;
 
-    PIDController PIDDriveStraight = new PIDController(.025, 0, 0);
+    double startDistance;
+
+    PIDController PIDDriveStraight;
 
     @Override
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
         startingYaw = robot.getYaw(); //might need to change to set degrees
+        startTime = System.currentTimeMillis();
+        PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDpivotD());
 
     }
 
@@ -38,7 +44,11 @@ public class SimpleATerminal extends GenericAutonomous {
                 PIDDriveStraight.reset();
                 PIDDriveStraight.enableContinuousInput(-180,180);
                 robot.resetEncoders();
-                autonomousStep = 4;
+                if (System.currentTimeMillis() - startTime > 100){
+                    autonomousStep = 4;
+                    startingYaw = robot.getYaw();
+                    startDistance = robot.getDriveDistanceInchesLeft();
+                }
                 break;
             case 1: //shoot the ball
             case 2: //shoot the ball part 2 electric boogaloo
@@ -46,16 +56,20 @@ public class SimpleATerminal extends GenericAutonomous {
             case 4: //drive to ball A
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
-                leftpower = defaultPower - correction;
-                rightpower = defaultPower + correction;
+                leftpower = defaultPower + correction;
+                rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() < 37){
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= 37){
                     autonomousStep += 1;
+                    startTime = System.currentTimeMillis();
                 } //has 3 inches of momentum with .25 power
                 break;
             case 5: //stop
                 leftpower = 0;
                 rightpower = 0;
+                if (System.currentTimeMillis() - startTime > 1000){
+                    autonomousStep = 12;
+                }
                 //autonomousStep = 8;
                 break;
             case 6: //collector to collect ball
@@ -66,24 +80,31 @@ public class SimpleATerminal extends GenericAutonomous {
             case 11: //copium
             //will change these comments when they actually mean somthing
             case 12: //turn to go to ball @ terminal
-                leftpower = -defaultPower;
-                rightpower = defaultPower;
-                //turning left
+                leftpower = defaultTurnPower;
+                rightpower = -defaultTurnPower;
+                //turning right
 
-                if(robot.getYaw() < 155.05) {
+                if(robot.getYaw()- startingYaw > 87.74) {
                     startingYaw = robot.getYaw();
+                    startDistance = robot.getDriveDistanceInchesLeft();
                     autonomousStep += 1;
                 } //204.95
                 break;
             case 13: //drive towards the ball
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
-                leftpower = defaultPower - correction;
-                rightpower = defaultPower + correction;
+                leftpower = defaultPower + correction;
+                rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() < 259.26) {
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= 259.26) {
                     autonomousStep += 1;
+                    leftpower = 0;
+                    rightpower = 0;
                 } //might need to tune for momentum
+                break;
+            case 14:
+                leftpower = 0;
+                rightpower = 0;
                 break;
         }
         robot.drivePercent(leftpower, rightpower);
