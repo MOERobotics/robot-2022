@@ -6,6 +6,9 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
 
 import static com.revrobotics.CANSparkMax.IdleMode.kBrake;
@@ -45,6 +48,8 @@ public class TurretBot implements GenericRobot {
 	Servo       elevationRight = new Servo(1);
 
 	DigitalInput homeSensor = new DigitalInput(6);
+
+
 
 	public TurretBot(){
 		boolean invertLeft = false;
@@ -172,7 +177,7 @@ public class TurretBot implements GenericRobot {
 
 	@Override
 	public double getPIDmaneuverD() {
-		return 1.0e-3;
+		return 1.0e-4;
 	}
 
 	@Override
@@ -236,17 +241,6 @@ public class TurretBot implements GenericRobot {
 		return GenericRobot.super.isTargetFound();
 	}
 
-	@Override
-	public double getTargetX() {
-		//TODO
-		return 0;
-	}
-
-	@Override
-	public double getTargetY() {
-		//TODO
-		return 0;
-	}
 
 	@Override
 	public double getTargetDistance() {
