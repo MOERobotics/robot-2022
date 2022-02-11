@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,13 +18,46 @@ import frc.robot.generic.TurretBot;
 
 public class Robot extends TimedRobot {
 
-  GenericRobot robot = new Falcon();
+  GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
-  GenericAutonomous autonomous = new SimpleCTerminal(); //used to be autoArc()
+  GenericAutonomous autonomous = new autoArc();
+
+
+  int averageTurretXSize = 2;
+  double[] averageTurretX = new double [averageTurretXSize];
+
+  double turretx;
+  double turrety;
+  double turretarea;
+  double turretv;
+  int counter = 0;
+
+  PIDController turretPIDController;
+
+
 
   @Override public void robotInit() {}
 
   @Override public void robotPeriodic() {
+
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTableEntry tx = table.getEntry("tx");
+    NetworkTableEntry ty = table.getEntry("ty");
+    NetworkTableEntry ta = table.getEntry("ta");
+    NetworkTableEntry tv = table.getEntry("tv");
+
+//read values periodically
+    turretx = tx.getDouble(0.0);
+    turrety = ty.getDouble(0.0);
+    turretarea = ta.getDouble(0.0);
+    turretv = tv.getDouble(0.0);
+
+    SmartDashboard.putNumber("tv", turretv);
+
+    SmartDashboard.putNumber("LimelightX", turretx);
+    SmartDashboard.putNumber("LimelightY", turrety);
+    SmartDashboard.putNumber("LimelightArea", turretarea);
+
     SmartDashboard.putNumber("Drive left pct", robot.getDriveLeftPercentage());
     SmartDashboard.putNumber("Drive right pct", robot.getDriveRightPercentage());
     SmartDashboard.putNumber("Drive left rpm", robot.getDriveLeftRPM());
@@ -77,28 +114,112 @@ public class Robot extends TimedRobot {
     autonomous.autonomousPeriodic(robot);
   }
 
-  @Override public void teleopInit() { }
+  @Override public void teleopInit() {
+      turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
+
+  }
 
   @Override public void teleopPeriodic() {
-    double x = joystick.getX();
-    double y = -joystick.getY();
+    double jx = joystick.getX();
+    double jy = -joystick.getY();
 
-    robot.drivePercent(y+x,y-x);
+    //joystick deaden: yeet smol/weird joystick values when joystick is at rest
+    double cutoff = 0.05;
+    if(jy > -cutoff && jy < cutoff) jy = 0;
+    if(jx > -cutoff && jx < cutoff) jx = 0;
 
-    /*if(joystick.getRawButton(1)){
+    //moved this to after joystick deaden because deaden should be focused on the raw joystick values
+    double scaleFactor = 1.0;
+    jx *= scaleFactor;
+    jy *= scaleFactor;
+
+    robot.drivePercent(jy+jx,jy-jx);
+
+    /* if(joystick.getRawButton(1)){
       robot.setShooterPowerPct(0.2, 0.2);
-    }
+    }*/
 
-    if(joystick.getRawButton(2)){
+    //good luck finding these buttons
+    //they are on the base of joystick, top row
+    // button on the left is negative motor power
+    if(joystick.getRawButton(5)){
+      robot.setCollectorIntakePercentage(-0.2);
+    }
+    else if(joystick.getRawButton(6)){
       robot.setCollectorIntakePercentage(0.2);
     }
-
-    if(joystick.getRawButton(3)){
-      robot.setTurretPowerPct(-0.15);
+    else{
+      robot.setCollectorIntakePercentage(0);
     }
-    if(joystick.getRawButton(4)){
-      robot.setTurretPowerPct(0.15);
-    }*/
+    if(joystick.getRawButton(12)){
+      robot.setShooterPowerPct(-0.2, -0.2);
+    }
+    else if(joystick.getRawButton(11)){
+      robot.setShooterPowerPct(0.2, 0.2);
+    }
+    else{
+      robot.setShooterPowerPct(0, 0);
+    }
+
+
+    //Start of Daniel+Saiarun Turret test
+    double average = 0;
+
+    if(turretv !=0 ) {
+      averageTurretX[counter % averageTurretXSize] = turretx;
+      counter++;
+    }
+    average = 0;
+    for(double i: averageTurretX){
+      average += i;
+    }
+    average /= averageTurretXSize;
+    SmartDashboard.putNumber("Average", average);
+
+    double currentTurretPower = 0;
+
+    if(joystick.getRawButton(1) && turretv !=0){
+      /*double currentTurretPowerValue = -(Math.signum(average)*average*average)/30;
+      if(currentTurretPowerValue >.2){
+        currentTurretPowerValue = .2;
+      } else if(currentTurretPowerValue <-.2){
+        currentTurretPowerValue = -.2;
+      }
+
+      if(average< -1) {
+        currentTurretPower = currentTurretPowerValue;
+      }else if(average> 1) {
+        currentTurretPower = currentTurretPowerValue;
+      }else{
+        currentTurretPower = 0;
+      }*/
+
+      /*if (average > 0){
+        currentTurretPower = -0.2;
+      }
+      else{
+        currentTurretPower = 0.2;
+      }
+
+      if (Math.abs(average) <= 5){
+        currentTurretPower = currentTurretPower/2;
+      }*/
+      currentTurretPower = turretPIDController.calculate(average);
+
+
+    }else{
+      turretPIDController.reset();
+      if(joystick.getRawButton(3)){
+        currentTurretPower = -0.1;
+      }else if(joystick.getRawButton(4)){
+        currentTurretPower = 0.1;
+      }else{
+        currentTurretPower = 0;
+      }
+    }
+
+    SmartDashboard.putNumber("currentTurretPower", currentTurretPower);
+    robot.setTurretPowerPct(currentTurretPower);
 
   }
 
