@@ -34,9 +34,9 @@ public class Lightning implements GenericRobot {
     RelativeEncoder encoderShootB    = shooterB.getEncoder();
 
     //DigitalInput ballSensor = new DigitalInput(0);
-    //DoubleSolenoid PTO = new DoubleSolenoid(PneumaticsModuleType.REVPH, 0, 1);
-    //DoubleSolenoid arms = new DoubleSolenoid(PneumaticsModuleType.REVPH, 2, 3);
-    //Solenoid collectorPosition = new Solenoid(PneumaticsModuleType.REVPH, 4);**/
+    DoubleSolenoid PTO = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 4, 5);
+    DoubleSolenoid arms = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
+    Solenoid collectorPosition = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
 
 
     SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
@@ -338,29 +338,29 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void raiseCollector(){
-        //collectorPosition.set(true);
+        collectorPosition.set(true);
     }
 
     @Override
     public void lowerCollector(){
-        //collectorPosition.set(false);
+        collectorPosition.set(false);
     }
 
     @Override
     public void turnOnPTO(){
-        //PTO.set(DoubleSolenoid.Value.kForward);
+        PTO.set(DoubleSolenoid.Value.kForward);
     }
     @Override
     public void turnOffPTO(){
-        //PTO.set(DoubleSolenoid.Value.kReverse);
+        PTO.set(DoubleSolenoid.Value.kReverse);
     }
 
     @Override
     public void setArmsForward(){
-        //arms.set(DoubleSolenoid.Value.kForward);
+        arms.set(DoubleSolenoid.Value.kForward);
     }
     @Override
     public void setArmsBackward(){
-        //arms.set(DoubleSolenoid.Value.kForward);
+        arms.set(DoubleSolenoid.Value.kReverse);
     }
 }

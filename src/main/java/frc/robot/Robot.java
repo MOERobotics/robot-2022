@@ -60,10 +60,10 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Have lower cargo?", robot.getLowerCargo());
 
     SmartDashboard.putNumber("Cargo inventory", robot.getCargoCount());
-    SmartDashboard.putBoolean("Has detected cargo?", robot.hasFoundCargo());
+    //SmartDashboard.putBoolean("Has detected cargo?", robot.hasFoundCargo());
 
     SmartDashboard.getNumber("Collector intake power", robot.getCollectorIntakePercentage());
-    SmartDashboard.getBoolean("Sees target?", robot.isTargetFound());
+    //SmartDashboard.getBoolean("Sees target?", robot.isTargetFound());
 
     SmartDashboard.getNumber("Vision target x", robot.getTargetX());
     SmartDashboard.getNumber("Vision target y", robot.getTargetY());
@@ -123,11 +123,12 @@ public class Robot extends TimedRobot {
 
 
     //note to self: buttons control mirrored joystick setting
-    if(joystick.getRawButton(11)) robot.setCollectorIntakePercentage(0.2);
-    else if(joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-0.2);
+    if(joystick.getRawButton(11)) robot.setCollectorIntakePercentage(0.6);
+    else if(joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-0.6);
     else robot.setCollectorIntakePercentage(0);
 
-    if(joystick.getRawButton(12)) robot.setTurretPowerPct(0.2);
+    if(joystick.getRawButton
+            (12)) robot.setTurretPowerPct(0.2);
     else if(joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
     else robot.setTurretPowerPct(0);
 

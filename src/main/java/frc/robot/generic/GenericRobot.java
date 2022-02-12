@@ -72,16 +72,16 @@ public interface GenericRobot {
 	}
 
 	public default boolean getUpperCargo(){
-		System.out.println("robot is colorblind");
+		//System.out.println("robot is colorblind");
 		return false;
 	}
 	public default boolean getLowerCargo(){
-		System.out.println("robot is colorblind");
+		//System.out.println("robot is colorblind");
 		return false;
 	}
 
 	public default int getCargoCount(){
-		System.out.println("robot can't count");
+		//System.out.println("robot can't count");
 		return 0;
 	}
 
@@ -91,12 +91,12 @@ public interface GenericRobot {
 	public double getCollectorIntakePercentage();
 
 	public default boolean hasFoundCargo(){
-		System.out.println("robot has tunnel vision");
+		//System.out.println("robot has tunnel vision");
 		return false;
 	}
 
 	public default TeamColor getFoundCargoColor(){
-		System.out.println("Robot is colorblind");
+		//System.out.println("Robot is colorblind");
 		return TeamColor.UNKNOWN;
 	}
 
