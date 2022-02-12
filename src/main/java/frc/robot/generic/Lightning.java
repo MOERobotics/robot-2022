@@ -16,11 +16,15 @@ public class Lightning implements GenericRobot {
 
     AHRS navx = new AHRS(SPI.Port.kMXP, (byte) 50);
 
+    //Compressor phCompressor = new Compressor(7, PneumaticsModuleType.REVPH);
+
+    Solenoid test = new Solenoid(PneumaticsModuleType.REVPH, 0);
     CANSparkMax collector = new CANSparkMax(3, kBrushless);
     CANSparkMax indexer   = new CANSparkMax(4, kBrushless);
     CANSparkMax turretRotator = new CANSparkMax(2, kBrushless);
-    CANSparkMax shooterA  = new CANSparkMax(5, kBrushless);
-    CANSparkMax shooterB  = new CANSparkMax(6, kBrushless);
+    //CANSparkMax shooterA  = new CANSparkMax(5, kBrushless);
+    //CANSparkMax shooterB  = new CANSparkMax(6, kBrushless);
+
 
     CANSparkMax leftMotorA = new CANSparkMax(20, kBrushless);
     CANSparkMax leftMotorB = new CANSparkMax(1, kBrushless);
@@ -30,17 +34,18 @@ public class Lightning implements GenericRobot {
     RelativeEncoder encoderRight     = rightMotorA.getEncoder();
     RelativeEncoder encoderLeft      = leftMotorA.getEncoder();
     RelativeEncoder encoderTurret    = turretRotator.getEncoder();
-    RelativeEncoder encoderShootA    = shooterA.getEncoder();
-    RelativeEncoder encoderShootB    = shooterB.getEncoder();
+    //RelativeEncoder encoderShootA    = shooterA.getEncoder();
+    //RelativeEncoder encoderShootB    = shooterB.getEncoder();
 
     //DigitalInput ballSensor = new DigitalInput(0);
-    //DoubleSolenoid PTO = new DoubleSolenoid(PneumaticsModuleType.REVPH, 0, 1);
-    //DoubleSolenoid arms = new DoubleSolenoid(PneumaticsModuleType.REVPH, 2, 3);
-    //Solenoid collectorPosition = new Solenoid(PneumaticsModuleType.REVPH, 4);**/
+
+    //DoubleSolenoid PTO = new DoubleSolenoid(PneumaticsModuleType.REVPH, 13, 14);
+    //DoubleSolenoid arms = new DoubleSolenoid(PneumaticsModuleType.REVPH, 1, 2);
+    //Solenoid collectorPosition = new Solenoid(PneumaticsModuleType.REVPH, 0)
 
 
-    SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
-    SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
+    //SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
+    //SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
 
 
     public Lightning(){
@@ -52,7 +57,8 @@ public class Lightning implements GenericRobot {
         rightMotorB.setInverted(invertRight);
 
         indexer.setInverted(true);
-        shooterB.setInverted(true);
+        //phCompressor.enabled();
+        //shooterB.setInverted(true);
     }
 
     @Override
@@ -265,22 +271,26 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double getShooterRPMTop() {
-        return encoderShootA.getVelocity() / TICKS_PER_REVOLUTION_SHOOTERA;
+        //return encoderShootA.getVelocity() / TICKS_PER_REVOLUTION_SHOOTERA;
+        return 0;
     }
 
     @Override
     public double getShooterRPMBottom() {
-        return encoderShootB.getVelocity() / TICKS_PER_REVOLUTION_SHOOTERB;
+        //return encoderShootB.getVelocity() / TICKS_PER_REVOLUTION_SHOOTERB;
+        return 0;
     }
 
     @Override
     public double getShooterPowerPctTop() {
-        return shooterA.get();
+        //return shooterA.get();
+        return 0;
     }
 
     @Override
     public double getShooterPowerPctBottom() {
-        return shooterB.get();
+        //return shooterB.get();
+        return 0;
     }
 
     @Override
@@ -304,12 +314,14 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void setShooterRPMTop(double rpm) {
-        shooterAPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
+        //shooterAPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
+
     }
 
     @Override
     public void setShooterRPMBottom(double rpm) {
-        shooterBPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
+        //shooterBPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
+
     }
 
 
@@ -322,12 +334,12 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void setShooterPowerPctTop(double percentage) {
-        shooterA.set(percentage);
+        //shooterA.set(percentage);
     }
 
     @Override
     public void setShooterPowerPctBottom(double percentage) {
-        shooterB.set(percentage);
+        //shooterB.set(percentage);
 
     }
 
@@ -348,10 +360,12 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void turnOnPTO(){
+        test.set(true);
         //PTO.set(DoubleSolenoid.Value.kForward);
     }
     @Override
     public void turnOffPTO(){
+        test.set(false);
         //PTO.set(DoubleSolenoid.Value.kReverse);
     }
 

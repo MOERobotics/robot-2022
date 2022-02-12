@@ -8,6 +8,8 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
@@ -23,6 +25,7 @@ public class Robot extends TimedRobot {
   double turretx;
   double turrety;
   double turretarea;
+  //Solenoid test = new Solenoid(PneumaticsModuleType.REVPH, 7);
 
 
   @Override public void robotInit() {}
