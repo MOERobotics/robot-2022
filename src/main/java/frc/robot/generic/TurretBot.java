@@ -215,11 +215,6 @@ public class TurretBot implements GenericRobot {
 
 
 	@Override
-	public int getCargoCount() {
-		return GenericRobot.super.getCargoCount();
-	}
-
-	@Override
 	public void setCollectorIntakePercentage(double percentage) {
 		collector.set(percentage);
 	}
@@ -246,32 +241,8 @@ public class TurretBot implements GenericRobot {
 
 
 	@Override
-	public double getTargetDistance() {
-		//TODO
-		return 0;
-	}
-
-	@Override
-	public double getTargetAngle() {
-		//TODO
-		return 0;
-	}
-
-	@Override
 	public double getTurretAngle() {
 		return encoderTurret.getPosition() / TICKS_PER_DEGREE_TURRET;
-	}
-
-	@Override
-	public void setTurretAngleRelative(double angleChange) {
-		//TODO
-
-	}
-
-	@Override
-	public void setTurretAngleAbsolute() {
-		//TODO
-
 	}
 
 
@@ -284,30 +255,6 @@ public class TurretBot implements GenericRobot {
 	@Override
 	public double getTurretPowerPct() {
 		return speeeen.get();
-	}
-
-	@Override
-	public double getTurretPitchAngle() {
-		//TODO
-		return 0;
-	}
-
-	@Override
-	public double getTurretPitchPowerPct() {
-		//TODO
-		return 0;
-	}
-
-	@Override
-	public void setTurretPitchAngle() {
-		//TODO
-
-	}
-
-	@Override
-	public void setTurretPitchPowerPct() {
-		//TODO
-
 	}
 
 	@Override
@@ -328,18 +275,6 @@ public class TurretBot implements GenericRobot {
 	@Override
 	public double getShooterPowerPctBottom() {
 		return shooterB.get();
-	}
-
-	@Override
-	public double getShooterTargetDistance() {
-		//TODO
-		return 0;
-	}
-
-	@Override
-	public double getShooterTargetHeight() {
-		//TODO
-		return 0;
 	}
 
 

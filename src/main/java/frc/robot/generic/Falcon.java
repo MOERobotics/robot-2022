@@ -82,6 +82,10 @@ public class Falcon implements GenericRobot {
         rightDriveB.setInverted(true);
         rightDriveC.setInverted(true);
 
+        leftDriveA.setInverted(false);
+        leftDriveB.setInverted(false);
+        leftDriveC.setInverted(false);
+
         collector.setInverted(true);
 
         escalator.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -103,10 +107,6 @@ public class Falcon implements GenericRobot {
 
     }
 
-    @Override
-    public void driveRPM(double leftRPM, double rightRPM) {
-
-    }
 
 
     @Override
@@ -220,18 +220,6 @@ public class Falcon implements GenericRobot {
         navx.reset();
     }
 
-    @Override
-    public boolean getUpperCargo() {
-        return GenericRobot.super.getUpperCargo();
-    }
-
-    @Override
-    public boolean getLowerCargo(){return GenericRobot.super.getLowerCargo();}
-
-    @Override
-    public int getCargoCount() {
-        return GenericRobot.super.getCargoCount();
-    }
 
     @Override
     public void setCollectorIntakePercentage(double percentage) {
@@ -242,22 +230,6 @@ public class Falcon implements GenericRobot {
     public double getCollectorIntakePercentage() {
         return collector.get();
     }
-
-    @Override
-    public boolean hasFoundCargo() {
-        return GenericRobot.super.hasFoundCargo();
-    }
-
-    @Override
-    public TeamColor getFoundCargoColor() {
-        return GenericRobot.super.getFoundCargoColor();
-    }
-
-    @Override
-    public boolean isTargetFound() {
-        return GenericRobot.super.isTargetFound();
-    }
-
 
     @Override
     public double getTargetX() {

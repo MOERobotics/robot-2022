@@ -182,80 +182,9 @@ public class Camoelot implements GenericRobot {
 		return 0;
 	}
 
-	@Override
-	public double getTargetX() {
-		return 0;
-	}
 
-	@Override
-	public double getTargetY() {
-		return 0;
-	}
 
-	@Override
-	public double getTargetDistance() {
-		return 0;
-	}
 
-	@Override
-	public double getTargetAngle() {
-		return 0;
-	}
-
-	@Override
-	public double getTurretAngle() {
-		return 0;
-	}
-
-	@Override
-	public void setTurretAngleRelative(double angleChange) {
-
-	}
-
-	@Override
-	public void setTurretAngleAbsolute() {
-
-	}
-
-	@Override
-	public void setTurretPowerPct(double powerPct) {
-
-	}
-
-	@Override
-	public double getTurretPowerPct() {
-		return 0;
-	}
-
-	@Override
-	public double getTurretPitchAngle() {
-		return 0;
-	}
-
-	@Override
-	public double getTurretPitchPowerPct() {
-		return 0;
-	}
-
-	@Override
-	public void setTurretPitchAngle() {
-
-	}
-
-	@Override
-	public void setTurretPitchPowerPct() {
-
-	}
-
-	@Override
-	public double getShooterRPMTop() {
-		return 0;
-	}
-
-	@Override
-	public double getShooterRPMBottom() {
-		return 0;
-	}
 
 	@Override
 	public double getShooterPowerPctTop() {
@@ -285,16 +214,6 @@ public class Camoelot implements GenericRobot {
 	}
 
 	@Override
-	public void setShooterRPMTop(double rpm) {
-
-	}
-
-	@Override
-	public void setShooterRPMBottom(double rpm) {
-
-	}
-
-	@Override
 	public void setShooterPowerPct(double topPCT, double bottomPCT) {
 		setShooterPowerPctTop(topPCT);
 		setShooterPowerPctBottom(bottomPCT);
@@ -312,27 +231,5 @@ public class Camoelot implements GenericRobot {
 		shooterB.set(ControlMode.PercentOutput, percentage);
 	}
 
-	@Override
-	public void setShooterTargetDistance(double length, double height) {
 
-	}
-
-
-	@Override
-	public void raiseCollector() { return; }
-
-	@Override
-	public void lowerCollector() { return; }
-
-	@Override
-	public void turnOnPTO() { return; }
-
-	@Override
-	public void turnOffPTO() { return; }
-
-	@Override
-	public void setArmsForward() { return; }
-
-	@Override
-	public void setArmsBackward() { return; }
 }
