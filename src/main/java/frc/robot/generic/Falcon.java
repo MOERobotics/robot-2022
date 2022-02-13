@@ -221,9 +221,12 @@ public class Falcon implements GenericRobot {
     }
 
     @Override
-    public TeamColor getCargoColor() {
-        return GenericRobot.super.getCargoColor();
+    public boolean getUpperCargo() {
+        return GenericRobot.super.getUpperCargo();
     }
+
+    @Override
+    public boolean getLowerCargo(){return GenericRobot.super.getLowerCargo();}
 
     @Override
     public int getCargoCount() {
@@ -390,25 +393,26 @@ public class Falcon implements GenericRobot {
 	}
 
 	@Override
-	public void raiseCollector() { return; }
+	public void raiseCollector() {}
 
 	@Override
-	public void lowerCollector() { return; }
+	public void lowerCollector() {}
 
 	@Override
-	public void turnOnPTO() { return; }
+	public void turnOnPTO() {}
 
 	@Override
-	public void turnOffPTO() { return; }
+	public void turnOffPTO() {}
 
 	@Override
-	public void setArmsForward() { return; }
+	public void setArmsForward() {}
 
 	@Override
-	public void setArmsBackward() { return; }
-    }
+	public void setArmsBackward() {}
+
 
 
 }
+
 
 

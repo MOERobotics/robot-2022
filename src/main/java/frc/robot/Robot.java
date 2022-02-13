@@ -231,7 +231,22 @@ public class Robot extends TimedRobot {
 
   @Override public void disabledInit() {}
 
-  @Override public void disabledPeriodic() {}
+  @Override public void disabledPeriodic() {
+    if (joystick.getRawButton(4)){
+      autonomous = new autoArc();
+
+    }
+    if (joystick.getRawButton(5)){
+      autonomous = new SimpleATerminal();
+    }
+    if (joystick.getRawButton(6)){
+      autonomous = new SimpleBTerminal();
+    }
+    if (joystick.getRawButton(7)){
+      autonomous = new SimpleCTerminal();
+    }
+
+  }
 
   @Override public void testInit() {}
 
