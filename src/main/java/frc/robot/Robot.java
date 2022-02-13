@@ -187,13 +187,13 @@ public class Robot extends TimedRobot {
     }
 
 
-    //COLLECTOR INDEXER LOGIC (from jack)
+    //Collector indexer logic based on cargo already in sensors (from jack)
     double defCollectorPower = 0.5;
     double defIndexerPower = 0.4;
     double curCollector = 0;
     double curIndexer = 0;
 
-    //button 2 = trigger
+    //button 2 = bottom center button
     if(joystick.getRawButton(2)){
       if(!robot.getUpperCargo()){
         curCollector = defCollectorPower;
