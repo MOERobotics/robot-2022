@@ -1,6 +1,7 @@
-package frc.robot.generic;
+package frc.robot.command;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.generic.GenericRobot;
 
 public abstract class GenericCommand {
 

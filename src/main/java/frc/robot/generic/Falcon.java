@@ -61,11 +61,6 @@ public class Falcon implements GenericRobot {
     DigitalInput escalatorSensorHigh = new DigitalInput(3);
 
 
-    public NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-    NetworkTableEntry tx = table.getEntry("tx");
-    NetworkTableEntry ty = table.getEntry("ty");
-    NetworkTableEntry ta = table.getEntry("ta");
-
     double aspectRatioTargDist;
 
     public Falcon() {
@@ -232,70 +227,11 @@ public class Falcon implements GenericRobot {
     }
 
     @Override
-    public double getTargetX() {
-        return tx.getDouble(0.0);
-    }
-
-    @Override
-    public double getTargetY() {
-        return ty.getDouble(0.0);
-    }
-
-    @Override
     public double getTargetDistance() {
         return getTargetY() * aspectRatioTargDist;
     }
 
-    @Override
-    public double getTargetAngle() {
-        // do some math
-        return 0;
-    }
 
-    @Override
-    public double getTurretAngle() {
-        return 0;
-    }
-
-    @Override
-    public void setTurretAngleRelative(double angleChange) {
-
-    }
-
-    @Override
-    public void setTurretAngleAbsolute() {
-
-    }
-
-    @Override
-    public void setTurretPowerPct(double powerPct) {
-
-    }
-
-    @Override
-    public double getTurretPowerPct() {
-        return 0;
-    }
-
-    @Override
-    public double getTurretPitchAngle() {
-        return 0;
-    }
-
-    @Override
-    public double getTurretPitchPowerPct() {
-        return 0;
-    }
-
-    @Override
-    public void setTurretPitchAngle() {
-
-    }
-
-    @Override
-    public void setTurretPitchPowerPct() {
-
-    }
 
     @Override
     public double getShooterRPMTop() {
@@ -317,15 +253,6 @@ public class Falcon implements GenericRobot {
         return shooterB.get();
     }
 
-    @Override
-    public double getShooterTargetDistance() {
-        return 0;
-    }
-
-    @Override
-    public double getShooterTargetHeight() {
-        return getTargetDistance(); //+ some fancy math stuff that I don't know right now
-    }
 
     @Override
     public void setShooterRPM(double topRPM, double bottomRPM) {
@@ -358,29 +285,6 @@ public class Falcon implements GenericRobot {
     public void setShooterPowerPctBottom(double percentage) {
         shooterB.set(percentage);
     }
-
-    @Override
-    public void setShooterTargetDistance(double length, double height) {
-
-	}
-
-	@Override
-	public void raiseCollector() {}
-
-	@Override
-	public void lowerCollector() {}
-
-	@Override
-	public void turnOnPTO() {}
-
-	@Override
-	public void turnOffPTO() {}
-
-	@Override
-	public void setArmsForward() {}
-
-	@Override
-	public void setArmsBackward() {}
 
 
 

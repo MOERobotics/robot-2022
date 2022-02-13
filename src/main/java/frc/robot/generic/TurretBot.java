@@ -43,8 +43,8 @@ public class TurretBot implements GenericRobot {
 	SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
 
 	Solenoid shifter = new Solenoid(PneumaticsModuleType.CTREPCM,0);
-	Servo iuj = new Servo(0);
-	Servo       elevationRight = new Servo(1);
+	Servo elevationLeft  = new Servo(0);
+	Servo elevationRight = new Servo(1);
 
 	DigitalInput homeSensor = new DigitalInput(6);
 
@@ -83,11 +83,6 @@ public class TurretBot implements GenericRobot {
 		leftMotorB.set(leftPercent);
 		rightMotorA.set(rightPercent);
 		rightMotorB.set(rightPercent);
-	}
-
-	@Override
-	public void driveRPM(double leftRPM, double rightRPM) {
-
 	}
 
 
@@ -225,22 +220,6 @@ public class TurretBot implements GenericRobot {
 	}
 
 	@Override
-	public boolean hasFoundCargo() {
-		return GenericRobot.super.hasFoundCargo();
-	}
-
-	@Override
-	public TeamColor getFoundCargoColor() {
-		return GenericRobot.super.getFoundCargoColor();
-	}
-
-	@Override
-	public boolean isTargetFound() {
-		return GenericRobot.super.isTargetFound();
-	}
-
-
-	@Override
 	public double getTurretAngle() {
 		return encoderTurret.getPosition() / TICKS_PER_DEGREE_TURRET;
 	}
@@ -313,26 +292,4 @@ public class TurretBot implements GenericRobot {
 
 	}
 
-	@Override
-	public void setShooterTargetDistance(double length, double height) {
-		//TODO
-	}
-
-	@Override
-	public void raiseCollector() { return; }
-
-	@Override
-	public void lowerCollector() { return; }
-
-	@Override
-	public void turnOnPTO() { return; }
-
-	@Override
-	public void turnOffPTO() { return; }
-
-	@Override
-	public void setArmsForward() { return; }
-
-	@Override
-	public void setArmsBackward() { return; }
 }
