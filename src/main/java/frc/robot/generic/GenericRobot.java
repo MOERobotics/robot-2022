@@ -75,17 +75,17 @@ public interface GenericRobot {
 
 	public double getLinearVelocity();
 
-	double getPIDmaneuverP();
+	public default double getPIDmaneuverP() {return 0; }
 
-	double getPIDmaneuverI();
+	public default double getPIDmaneuverI() {return 0; }
 
-	double getPIDmaneuverD();
+	public default double getPIDmaneuverD() {return 0; }
 
-	double getPIDpivotP();
+	public default double getPIDpivotP() {return 0; }
 
-	double getPIDpivotI();
+	public default double getPIDpivotI() {return 0; }
 
-	double getPIDpivotD();
+	public default double getPIDpivotD() {return 0; }
 
 	void resetEncoders();
 
@@ -142,8 +142,6 @@ public interface GenericRobot {
 		return ty.getDouble(0.0);
 	}
 
-
-
 	public default double getTargetArea(){
 		return ta.getDouble(0.0);
 	}
@@ -158,7 +156,6 @@ public interface GenericRobot {
 	public default double getTurretAngleDegrees(){
 		return getTurretAngle()/encoderTurretTicksPerDegree();
 	}
-
 
 	public void setTurretAngleRelative(double angleChange);
 	public void setTurretAngleAbsolute();
@@ -202,7 +199,4 @@ public interface GenericRobot {
 
 	public void setArmsForward();
 	public void setArmsBackward();
-
-
-
 }

@@ -38,10 +38,8 @@ public class Lightning implements GenericRobot {
     DoubleSolenoid arms = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
     Solenoid collectorPosition = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
 
-
     SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
     SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
-
 
     public Lightning(){
         boolean invertLeft = false;
@@ -65,9 +63,7 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void driveRPM(double leftRPM, double rightRPM) {
-
     }
-
 
     @Override
     public double getDriveLeftPercentage() {
