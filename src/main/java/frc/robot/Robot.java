@@ -145,8 +145,8 @@ public class Robot extends TimedRobot {
 
 
     //note to self: buttons control mirrored joystick setting
-    if(joystick.getRawButton(11)) robot.setCollectorIntakePercentage(0.6);
-    else if(joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-0.6);
+    if(joystick.getRawButton(11)) robot.setCollectorIntakePercentage(1.0);
+    else if(joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-1.0);
     else robot.setCollectorIntakePercentage(0);
 
     if(joystick.getRawButton
