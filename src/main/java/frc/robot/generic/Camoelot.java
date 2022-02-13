@@ -1,6 +1,7 @@
 package frc.robot.generic;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.Encoder;
@@ -12,7 +13,7 @@ public class Camoelot implements GenericRobot {
 
 	AHRS navx = new AHRS(SPI.Port.kMXP, (byte) 50);
 
-	private TalonSRX leftMotorA = new TalonSRX(12);
+	private TalonSRX  leftMotorA = new TalonSRX(12);
 	private TalonSRX  leftMotorB = new TalonSRX(13);
 	private TalonSRX  leftMotorC = new TalonSRX(14);
 	private TalonSRX rightMotorA = new TalonSRX( 1);
@@ -31,6 +32,21 @@ public class Camoelot implements GenericRobot {
 	int[] leftEncoderHistory = new int[5];
 	int[] rightEncoderHistory = new int[5];
 
+
+	public Camoelot(){
+		boolean invertLeft = true;
+		leftMotorA.setInverted(invertLeft);
+		leftMotorB.setInverted(invertLeft);
+		leftMotorC.setInverted(invertLeft);
+
+		leftMotorA.setNeutralMode(NeutralMode.Brake);
+		leftMotorB.setNeutralMode(NeutralMode.Brake);
+		leftMotorC.setNeutralMode(NeutralMode.Brake);
+
+		rightMotorA.setNeutralMode(NeutralMode.Brake);
+		rightMotorB.setNeutralMode(NeutralMode.Brake);
+		rightMotorC.setNeutralMode(NeutralMode.Brake);
+	}
 
 	@Override
 	public void drivePercent(double leftPercent, double rightPercent) {
@@ -82,7 +98,59 @@ public class Camoelot implements GenericRobot {
 	}
 
 	@Override
-	public double getYee(){
+	public double getPIDmaneuverP() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDmaneuverI() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDmaneuverD() {
+		return 0;
+	}
+
+
+	@Override
+	public void setIndexerIntakePercentage(double percentage) {
+		System.out.println("Camelot cannot index");
+	}
+
+	@Override
+	public double getIndexerIntakePercentage() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDpivotP() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDpivotI() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDpivotD() {
+		return 0;
+	}
+
+	@Override
+	public void resetEncoders() {
+		leftEncoder.reset();
+		rightEncoder.reset();
+	}
+
+	@Override
+	public void resetAttitude() {
+		navx.reset();
+	}
+
+	@Override
+	public double getYaw(){
 		return navx.getYaw();
 	}
 	@Override
@@ -126,90 +194,8 @@ public class Camoelot implements GenericRobot {
 	}
 
 
-	@Override
-	public void setIndexerIntakePercentage(double percentage) {
-		System.out.println("Camelot cannot index");
-	}
 
-	@Override
-	public double getIndexerIntakePercentage() {
-		return 0;
-	}
 
-	@Override
-	public double getTargetX() {
-		return 0;
-	}
-
-	@Override
-	public double getTargetY() {
-		return 0;
-	}
-
-	@Override
-	public double getTargetDistance() {
-		return 0;
-	}
-
-	@Override
-	public double getTargetAngle() {
-		return 0;
-	}
-
-	@Override
-	public double getTurretAngle() {
-		return 0;
-	}
-
-	@Override
-	public void setTurretAngleRelative(double angleChange) {
-
-	}
-
-	@Override
-	public void setTurretAngleAbsolute() {
-
-	}
-
-	@Override
-	public void setTurretPowerPct(double powerPct) {
-
-	}
-
-	@Override
-	public double getTurretPowerPct() {
-		return 0;
-	}
-
-	@Override
-	public double getTurretPitchAngle() {
-		return 0;
-	}
-
-	@Override
-	public double getTurretPitchPowerPct() {
-		return 0;
-	}
-
-	@Override
-	public void setTurretPitchAngle() {
-
-	}
-
-	@Override
-	public void setTurretPitchPowerPct() {
-
-	}
-
-	@Override
-	public double getShooterRPMTop() {
-		return 0;
-	}
-
-	@Override
-	public double getShooterRPMBottom() {
-		return 0;
-	}
 
 	@Override
 	public double getShooterPowerPctTop() {
@@ -239,16 +225,6 @@ public class Camoelot implements GenericRobot {
 	}
 
 	@Override
-	public void setShooterRPMTop(double rpm) {
-
-	}
-
-	@Override
-	public void setShooterRPMBottom(double rpm) {
-
-	}
-
-	@Override
 	public void setShooterPowerPct(double topPCT, double bottomPCT) {
 		setShooterPowerPctTop(topPCT);
 		setShooterPowerPctBottom(bottomPCT);
@@ -266,27 +242,5 @@ public class Camoelot implements GenericRobot {
 		shooterB.set(ControlMode.PercentOutput, percentage);
 	}
 
-	@Override
-	public void setShooterTargetDistance(double length, double height) {
 
-	}
-
-
-	@Override
-	public void raiseCollector() { return; }
-
-	@Override
-	public void lowerCollector() { return; }
-
-	@Override
-	public void turnOnPTO() { return; }
-
-	@Override
-	public void turnOffPTO() { return; }
-
-	@Override
-	public void setArmsForward() { return; }
-
-	@Override
-	public void setArmsBackward() { return; }
 }

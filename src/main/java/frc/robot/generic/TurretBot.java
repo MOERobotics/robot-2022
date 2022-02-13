@@ -5,12 +5,17 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
 
+import static com.revrobotics.CANSparkMax.IdleMode.kBrake;
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
 public class TurretBot implements GenericRobot {
-	public static final double TICKS_PER_INCH_DRIVE = 116;
+	public static final double TICKS_PER_INCH_DRIVE = 0.75;
 	public static final double TICKS_PER_DEGREE_TURRET = 116;
 	public static final double TICKS_PER_REVOLUTION_SHOOTERA = 116;
 	public static final double TICKS_PER_REVOLUTION_SHOOTERB = 116;
@@ -50,6 +55,26 @@ public class TurretBot implements GenericRobot {
 		leftMotorB.setInverted(invertLeft);
 		rightMotorA.setInverted(invertRight);
 		rightMotorB.setInverted(invertRight);
+
+		leftMotorA.setIdleMode(kBrake);
+		leftMotorB.setIdleMode(kBrake);
+		rightMotorA.setIdleMode(kBrake);
+		rightMotorB.setIdleMode(kBrake);
+
+	}
+
+	@Override
+	public double turretPIDgetP(){
+		return 3.0e-2;
+	}
+
+	@Override
+	public double turretPIDgetI(){
+		return 0;
+	}
+	@Override
+	public double turretPIDgetD(){
+		return 3.0e-4;
 	}
 
 	@Override
@@ -117,7 +142,7 @@ public class TurretBot implements GenericRobot {
 	}
 
 	@Override
-	public double getYee() {
+	public double getYaw() {
 		return navx.getYaw();
 	}
 
@@ -138,6 +163,47 @@ public class TurretBot implements GenericRobot {
 	}
 
 	@Override
+	public double getPIDmaneuverP() {
+		return 1.0e-2;
+	}
+
+	@Override
+	public double getPIDmaneuverI() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDmaneuverD() {
+		return 1.0e-4;
+	}
+
+	@Override
+	public double getPIDpivotP() {
+		return 1.5e-2;
+	}
+
+	@Override
+	public double getPIDpivotI() {
+		return 0;
+	}
+
+	@Override
+	public double getPIDpivotD() {
+		return 0;
+	}
+
+	@Override
+	public void resetEncoders() {
+		encoderLeft.setPosition(0.0);
+		encoderRight.setPosition(0.0);
+	}
+
+	@Override
+	public void resetAttitude() {
+		navx.reset();
+	}
+
+	@Override
 	public boolean getUpperCargo() {
 		return GenericRobot.super.getUpperCargo();
 	}
@@ -147,11 +213,6 @@ public class TurretBot implements GenericRobot {
 		return GenericRobot.super.getLowerCargo();
 	}
 
-
-	@Override
-	public int getCargoCount() {
-		return GenericRobot.super.getCargoCount();
-	}
 
 	@Override
 	public void setCollectorIntakePercentage(double percentage) {
@@ -188,45 +249,10 @@ public class TurretBot implements GenericRobot {
 		return GenericRobot.super.isTargetFound();
 	}
 
-	@Override
-	public double getTargetX() {
-		//TODO
-		return 0;
-	}
-
-	@Override
-	public double getTargetY() {
-		//TODO
-		return 0;
-	}
-
-	@Override
-	public double getTargetDistance() {
-		//TODO
-		return 0;
-	}
-
-	@Override
-	public double getTargetAngle() {
-		//TODO
-		return 0;
-	}
 
 	@Override
 	public double getTurretAngle() {
 		return encoderTurret.getPosition() / TICKS_PER_DEGREE_TURRET;
-	}
-
-	@Override
-	public void setTurretAngleRelative(double angleChange) {
-		//TODO
-
-	}
-
-	@Override
-	public void setTurretAngleAbsolute() {
-		//TODO
-
 	}
 
 
@@ -239,30 +265,6 @@ public class TurretBot implements GenericRobot {
 	@Override
 	public double getTurretPowerPct() {
 		return speeeen.get();
-	}
-
-	@Override
-	public double getTurretPitchAngle() {
-		//TODO
-		return 0;
-	}
-
-	@Override
-	public double getTurretPitchPowerPct() {
-		//TODO
-		return 0;
-	}
-
-	@Override
-	public void setTurretPitchAngle() {
-		//TODO
-
-	}
-
-	@Override
-	public void setTurretPitchPowerPct() {
-		//TODO
-
 	}
 
 	@Override
@@ -283,18 +285,6 @@ public class TurretBot implements GenericRobot {
 	@Override
 	public double getShooterPowerPctBottom() {
 		return shooterB.get();
-	}
-
-	@Override
-	public double getShooterTargetDistance() {
-		//TODO
-		return 0;
-	}
-
-	@Override
-	public double getShooterTargetHeight() {
-		//TODO
-		return 0;
 	}
 
 

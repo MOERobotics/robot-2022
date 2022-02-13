@@ -1,6 +1,16 @@
 package frc.robot.generic;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 public interface GenericRobot {
+
+	NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+	NetworkTableEntry tx = table.getEntry("tx");
+	NetworkTableEntry ty = table.getEntry("ty");
+	NetworkTableEntry ta = table.getEntry("ta");
+	NetworkTableEntry tv = table.getEntry("tv");
 
 
 	public void drivePercent(
@@ -8,17 +18,27 @@ public interface GenericRobot {
 		double rightPercent
 	);
 
-	public void driveRPM(
+	public default void driveRPM(
 		double leftRPM,
 		double rightRPM
-	);
+	) {
+		//System.out.println("I don't have an encoder to measure my RPM");
+	};
 
 
-	public double getDriveLeftPercentage();
-	public double getDriveRightPercentage();
+	public default double getDriveLeftPercentage(){
+		return 0;
+	}
+	public default double getDriveRightPercentage(){
+		return 0;
+	}
 
-	public double getDriveLeftRPM();
-	public double getDriveRightRPM();
+	public default double getDriveLeftRPM(){
+		return 0;
+	};
+	public default double getDriveRightRPM(){
+		return 0;
+	};
 
 	public default double getDriveDistanceInchesLeft(){
 		return encoderTicksLeftDrive()/encoderLeftDriveTicksPerInch();
@@ -27,43 +47,66 @@ public interface GenericRobot {
 	public default double getDriveDistanceInchesRight(){
 		return encoderTicksRightDrive()/encoderRightDriveTicksPerInch();
 	}
-	
+
 	public default double encoderLeftDriveTicksPerInch(){
-		System.out.println("I don't have an encoder");
+		//System.out.println("I don't have an encoder");
 		return 1.0;
 	}
 
 	public default double encoderRightDriveTicksPerInch(){
-		System.out.println("I don't have an encoder");
+		//System.out.println("I don't have an encoder");
 		return 1.0;
 	}
-	
+
 	public default double encoderTicksLeftDrive(){
-		System.out.println("I don't have an encoder");
+		//System.out.println("I don't have an encoder");
 		return 0;
 	}
 
 	public default double encoderTicksRightDrive(){
-		System.out.println("I don't have an encoder");
+		//System.out.println("I don't have an encoder");
 		return 0;
 	}
 
-	public default double getYee(){
-		System.out.println("I don't have a navX");
+	public default double getYaw(){
+		//System.out.println("I don't have a navX");
 		return 0;
-	};
+	}
 
 	public default double getPitch(){
-		System.out.println("I don't have a navX");
+		//System.out.println("I don't have a navX");
 		return 0;
 	}
 
 	public default double getRoll(){
-		System.out.println("I don't have a navX");
+		//System.out.println("I don't have a navX");
 		return 0;
 	}
 
-	public double getLinearVelocity();
+	public default double getLinearVelocity() {
+		//System.out.println("I don't have a mouse");
+		return 0;
+	}
+
+	public default double getPIDmaneuverP() {return 0; }
+
+	public default double getPIDmaneuverI() {return 0; }
+
+	public default double getPIDmaneuverD() {return 0; }
+
+	public default double getPIDpivotP() {return 0; }
+
+	public default double getPIDpivotI() {return 0; }
+
+	public default double getPIDpivotD() {return 0; }
+
+	public default void resetEncoders() {
+		System.out.println("I don't have encoders");
+	}
+
+	public default void resetAttitude() {
+		System.out.println("I don't have a navx");
+	}
 
 	public enum TeamColor {
 		RED,
@@ -72,23 +115,21 @@ public interface GenericRobot {
 	}
 
 	public default boolean getUpperCargo(){
-		System.out.println("robot is colorblind");
+		//System.out.println("robot is colorblind");
 		return false;
 	}
 	public default boolean getLowerCargo(){
-		System.out.println("robot is colorblind");
+		//System.out.println("robot is colorblind");
 		return false;
 	}
-
-	public default int getCargoCount(){
-		System.out.println("robot can't count");
-		return 0;
-	}
-
-	public void setCollectorIntakePercentage(
+	public default void setCollectorIntakePercentage(
 		double percentage
-	);
-	public double getCollectorIntakePercentage();
+	) {
+		//System.out.println("robot cannot collect");
+	}
+	public default double getCollectorIntakePercentage() {
+		return 0;
+	};
 
 	public void setIndexerIntakePercentage(
 			double percentage
@@ -96,67 +137,154 @@ public interface GenericRobot {
 	public double getIndexerIntakePercentage();
 
 	public default boolean hasFoundCargo(){
-		System.out.println("robot has tunnel vision");
+		//System.out.println("robot has tunnel vision");
 		return false;
 	}
-
 	public default TeamColor getFoundCargoColor(){
-		System.out.println("Robot is colorblind");
+		//System.out.println("Robot is colorblind");
 		return TeamColor.UNKNOWN;
 	}
 
 	public default boolean isTargetFound() {
-		return false;
+		if (tv.getDouble(0.0) != 0){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 
-	public double getTargetX();
-	public double getTargetY();
-	public double getTargetDistance();
-	public double getTargetAngle();
+	public default double getTargetX(){
+		return tx.getDouble(0.0);
+	}
+	public default double getTargetY(){
+		return ty.getDouble(0.0);
+	}
 
-	public double getTurretAngle();
+	public default double getTargetArea(){
+		return ta.getDouble(0.0);
+	}
+
+
+	public default double getTargetDistance(){
+		return 0;
+	}
+	public default  double getTargetAngle() {
+		return 0;
+	}
+
+
+	//turret stuff
+
+	public default double turretPIDgetP(){
+		return 0;
+	}
+	public default double turretPIDgetI(){
+		return 0;
+	}
+	public default double turretPIDgetD(){
+		return 0;
+	}
+
+	public default double getTurretAngle(){
+		return 0;
+	}
 	public default double encoderTurretTicksPerDegree(){
-		System.out.println("I don't have a turret encoder");
+		//System.out.println("I don't have a turret encoder");
 		return 1.0;
 	}
 	public default double getTurretAngleDegrees(){
 		return getTurretAngle()/encoderTurretTicksPerDegree();
 	}
 
+	public default void setTurretAngleRelative(double angleChange){
+		//System.out.println("I don't have a turret");
+	}
+	public default void setTurretAngleAbsolute(){
+		//System.out.println("I don't have a turret");
+	}
+	public default void setTurretPowerPct(double powerPct){
+		//System.out.println("I don't have a turret");
+	}
+	public default double getTurretPowerPct(){
+		return 0;
+	}
 
-	public void setTurretAngleRelative(double angleChange);
-	public void setTurretAngleAbsolute();
-	public void setTurretPowerPct(double powerPct);
-	public double getTurretPowerPct();
+	public default double getTurretPitchAngle(){
+		return 0;
+	}
+	public default double getTurretPitchPowerPct(){
+		return 0;
+	}
+	public default void setTurretPitchAngle(){
+		//System.out.println("I don't have a turret");
+	}
+	public default void setTurretPitchPowerPct(){
+		//System.out.println("I don't have a collector");
+	}
 
-	public double getTurretPitchAngle();
-	public double getTurretPitchPowerPct();
-	public void setTurretPitchAngle();
-	public void setTurretPitchPowerPct();
+	public default double getShooterRPMTop(){
+		return 0;
+	}
+	public default double getShooterRPMBottom(){
+		return 0;
+	}
+	public default double getShooterPowerPctTop(){
+		return 0;
+	}
+	public default double getShooterPowerPctBottom(){
+		return 0;
+	}
+	public default double getShooterTargetDistance(){
+		return 0;
+	}
+	public default double getShooterTargetHeight(){
+		return 0;
+	}
 
-	public double getShooterRPMTop();
-	public double getShooterRPMBottom();
-	public double getShooterPowerPctTop();
-	public double getShooterPowerPctBottom();
-	public double getShooterTargetDistance();
-	public double getShooterTargetHeight();
-	public void setShooterRPM(double topRPM, double bottomRPM);
-	public void setShooterRPMTop(double rpm);
-	public void setShooterRPMBottom(double rpm);
-	public void setShooterPowerPct(double topPCT, double bottomPCT);
-	public void setShooterPowerPctTop(double percentage);
-	public void setShooterPowerPctBottom(double percentage);
-	public void setShooterTargetDistance(double length, double height);
-
-	public void raiseCollector();
-	public void lowerCollector();
-
-	public void turnOnPTO();
-	public void turnOffPTO();
-
-	public void setArmsForward();
-	public void setArmsBackward();
-
+	public default void setShooterRPM(double topRPM, double bottomRPM){
+		//System.out.println("I don't have a shooter");
+	}
+	public default void setShooterRPMTop(double rpm){
+		//System.out.println("I don't have a shooter");
+	}
+	public default void setShooterRPMBottom(double rpm) {
+		//System.out.println("I don't have a shooter");
+	}
+	public default void setShooterPowerPct(double topPCT, double bottomPCT) {
+		//System.out.println("I don't have a shooter");
+	}
+	public default void setShooterPowerPctTop(double percentage) {
+		//System.out.println("I don't have a shooter");
+	}
+	public default void setShooterPowerPctBottom(double percentage) {
+		//System.out.println("I don't have a shooter");
+	}
+	public default void setShooterTargetDistance(double length, double height) {
+		//System.out.println("I don't have a shooter");
+	}
 
 
+
+	public default void raiseCollector() {
+		//System.out.println("I don't have a collector");
+	}
+
+	public default void lowerCollector() {
+		//System.out.println("I don't have a collector");
+	}
+
+	public default void turnOnPTO() {
+		//System.out.println("I don't have a PTO");
+	}
+	public default void turnOffPTO() {
+		//System.out.println("I don't have a PTO");
+	}
+
+	public default void setArmsForward() {
+		//System.out.println("I don't have a climber");
+	}
+	public default void setArmsBackward() {
+		//System.out.println("I don't have a climber");
+	}
 }

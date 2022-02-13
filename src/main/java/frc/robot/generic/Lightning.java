@@ -16,32 +16,30 @@ public class Lightning implements GenericRobot {
 
     AHRS navx = new AHRS(SPI.Port.kMXP, (byte) 50);
 
-    CANSparkMax collector = new CANSparkMax(3, kBrushless);
-    CANSparkMax indexer   = new CANSparkMax(4, kBrushless);
-    CANSparkMax turretRotator = new CANSparkMax(2, kBrushless);
-    CANSparkMax shooterA  = new CANSparkMax(5, kBrushless);
-    CANSparkMax shooterB  = new CANSparkMax(6, kBrushless);
+    CANSparkMax collector         = new CANSparkMax( 3, kBrushless);
+    CANSparkMax indexer           = new CANSparkMax( 4, kBrushless);
+    CANSparkMax turretRotator     = new CANSparkMax( 2, kBrushless);
+    CANSparkMax shooterA          = new CANSparkMax( 5, kBrushless);
+    CANSparkMax shooterB          = new CANSparkMax( 6, kBrushless);
 
-    CANSparkMax leftMotorA = new CANSparkMax(20, kBrushless);
-    CANSparkMax leftMotorB = new CANSparkMax(1, kBrushless);
-    CANSparkMax rightMotorA = new CANSparkMax(18, kBrushless);
-    CANSparkMax rightMotorB = new CANSparkMax(19, kBrushless);
+    CANSparkMax leftMotorA        = new CANSparkMax(20, kBrushless);
+    CANSparkMax leftMotorB        = new CANSparkMax( 1, kBrushless);
+    CANSparkMax rightMotorA       = new CANSparkMax(18, kBrushless);
+    CANSparkMax rightMotorB       = new CANSparkMax(19, kBrushless);
 
-    RelativeEncoder encoderRight     = rightMotorA.getEncoder();
-    RelativeEncoder encoderLeft      = leftMotorA.getEncoder();
-    RelativeEncoder encoderTurret    = turretRotator.getEncoder();
-    RelativeEncoder encoderShootA    = shooterA.getEncoder();
-    RelativeEncoder encoderShootB    = shooterB.getEncoder();
+    RelativeEncoder encoderRight  = rightMotorA.getEncoder();
+    RelativeEncoder encoderLeft   = leftMotorA.getEncoder();
+    RelativeEncoder encoderTurret = turretRotator.getEncoder();
+    RelativeEncoder encoderShootA = shooterA.getEncoder();
+    RelativeEncoder encoderShootB = shooterB.getEncoder();
 
     //DigitalInput ballSensor = new DigitalInput(0);
-    //DoubleSolenoid PTO = new DoubleSolenoid(PneumaticsModuleType.REVPH, 0, 1);
-    //DoubleSolenoid arms = new DoubleSolenoid(PneumaticsModuleType.REVPH, 2, 3);
-    //Solenoid collectorPosition = new Solenoid(PneumaticsModuleType.REVPH, 4);**/
-
+    DoubleSolenoid PTO = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 4, 5);
+    DoubleSolenoid arms = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
+    Solenoid collectorPosition = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
 
     SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
     SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
-
 
     public Lightning(){
         boolean invertLeft = false;
@@ -52,22 +50,18 @@ public class Lightning implements GenericRobot {
         rightMotorB.setInverted(invertRight);
 
         indexer.setInverted(true);
+        collector.setInverted(false);
         shooterB.setInverted(true);
+        shooterA.setInverted(false);
     }
 
     @Override
     public void drivePercent(double leftPercent, double rightPercent) {
-        leftMotorA.set(leftPercent); //20
-        leftMotorB.set(leftPercent); //1
-        rightMotorA.set(rightPercent); //18
-        rightMotorB.set(rightPercent); //19
+        leftMotorA .set( leftPercent);
+        leftMotorB .set( leftPercent);
+        rightMotorA.set(rightPercent);
+        rightMotorB.set(rightPercent);
     }
-
-    @Override
-    public void driveRPM(double leftRPM, double rightRPM) {
-
-    }
-
 
     @Override
     public double getDriveLeftPercentage() {
@@ -89,15 +83,6 @@ public class Lightning implements GenericRobot {
         return encoderRight.getVelocity()/encoderRightDriveTicksPerInch();
     }
 
-    @Override
-    public double getDriveDistanceInchesLeft() {
-        return encoderTicksLeftDrive() / encoderLeftDriveTicksPerInch();
-    }
-
-    @Override
-    public double getDriveDistanceInchesRight() {
-        return encoderTicksRightDrive() / encoderRightDriveTicksPerInch();
-    }
 
     @Override
     public double encoderLeftDriveTicksPerInch() {
@@ -120,7 +105,7 @@ public class Lightning implements GenericRobot {
     }
 
     @Override
-    public double getYee() {
+    public double getYaw() {
         return navx.getYaw();
     }
 
@@ -135,12 +120,6 @@ public class Lightning implements GenericRobot {
     }
 
     @Override
-    public double getLinearVelocity() {
-        //TODO
-        return 0;
-    }
-
-    @Override
     public boolean getUpperCargo() {
         return GenericRobot.super.getUpperCargo();
     }
@@ -149,10 +128,6 @@ public class Lightning implements GenericRobot {
         return GenericRobot.super.getLowerCargo();
     }
 
-    @Override
-    public int getCargoCount() {
-        return GenericRobot.super.getCargoCount();
-    }
 
     @Override
     public void setCollectorIntakePercentage(double percentage) {
@@ -187,30 +162,6 @@ public class Lightning implements GenericRobot {
     @Override
     public boolean isTargetFound() {
         return GenericRobot.super.isTargetFound();
-    }
-
-    @Override
-    public double getTargetX() {
-        //TODO
-        return 0;
-    }
-
-    @Override
-    public double getTargetY() {
-        //TODO
-        return 0;
-    }
-
-    @Override
-    public double getTargetDistance() {
-        //TODO
-        return 0;
-    }
-
-    @Override
-    public double getTargetAngle() {
-        //TODO
-        return 0;
     }
 
 
@@ -248,29 +199,6 @@ public class Lightning implements GenericRobot {
         return turretRotator.get();
     }
 
-    @Override
-    public double getTurretPitchAngle() {
-        //TODO
-        return 0;
-    }
-
-    @Override
-    public double getTurretPitchPowerPct() {
-        //TODO
-        return 0;
-    }
-
-    @Override
-    public void setTurretPitchAngle() {
-        //TODO
-
-    }
-
-    @Override
-    public void setTurretPitchPowerPct() {
-        //TODO
-
-    }
 
     @Override
     public double getShooterRPMTop() {
@@ -347,29 +275,87 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void raiseCollector(){
-        //collectorPosition.set(true);
+        collectorPosition.set(true);
     }
 
     @Override
     public void lowerCollector(){
-        //collectorPosition.set(false);
+        collectorPosition.set(false);
     }
 
     @Override
     public void turnOnPTO(){
-        //PTO.set(DoubleSolenoid.Value.kForward);
+        PTO.set(DoubleSolenoid.Value.kForward);
     }
     @Override
     public void turnOffPTO(){
-        //PTO.set(DoubleSolenoid.Value.kReverse);
+        PTO.set(DoubleSolenoid.Value.kReverse);
     }
 
     @Override
     public void setArmsForward(){
-        //arms.set(DoubleSolenoid.Value.kForward);
+        arms.set(DoubleSolenoid.Value.kReverse);
     }
     @Override
     public void setArmsBackward(){
-        //arms.set(DoubleSolenoid.Value.kForward);
+        arms.set(DoubleSolenoid.Value.kForward);
+    }
+
+    @Override
+    public double getPIDmaneuverP() {
+        return GenericRobot.super.getPIDmaneuverP();
+    }
+
+    @Override
+    public double getPIDmaneuverI() {
+        return GenericRobot.super.getPIDmaneuverI();
+    }
+
+    @Override
+    public double getPIDmaneuverD() {
+        return GenericRobot.super.getPIDmaneuverD();
+    }
+
+    @Override
+    public double getPIDpivotP() {
+        return GenericRobot.super.getPIDpivotP();
+    }
+
+    @Override
+    public double getPIDpivotI() {
+        return GenericRobot.super.getPIDpivotI();
+    }
+
+    @Override
+    public double getPIDpivotD() {
+        return GenericRobot.super.getPIDpivotD();
+    }
+
+    @Override
+    public void resetEncoders() {
+        leftMotorA.getEncoder().setPosition(0);
+        leftMotorB.getEncoder().setPosition(0);
+        rightMotorA.getEncoder().setPosition(0);
+        rightMotorB.getEncoder().setPosition(0);
+    }
+
+    @Override
+    public void resetAttitude() {
+        navx.reset();
+    }
+
+    @Override
+    public double turretPIDgetP() {
+        return GenericRobot.super.turretPIDgetP();
+    }
+
+    @Override
+    public double turretPIDgetI() {
+        return GenericRobot.super.turretPIDgetI();
+    }
+
+    @Override
+    public double turretPIDgetD() {
+        return GenericRobot.super.turretPIDgetD();
     }
 }
