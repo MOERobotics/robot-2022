@@ -77,7 +77,6 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Have upper cargo?", robot.getUpperCargo());
     SmartDashboard.putBoolean("Have lower cargo?", robot.getLowerCargo());
 
-    SmartDashboard.putNumber("Cargo inventory", robot.getCargoCount());
     //SmartDashboard.putBoolean("Has detected cargo?", robot.hasFoundCargo());
 
     SmartDashboard.getNumber("Collector intake power", robot.getCollectorIntakePercentage());
