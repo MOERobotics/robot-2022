@@ -1,6 +1,16 @@
 package frc.robot.generic;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 public interface GenericRobot {
+
+	NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+	NetworkTableEntry tx = table.getEntry("tx");
+	NetworkTableEntry ty = table.getEntry("ty");
+	NetworkTableEntry ta = table.getEntry("ta");
+	NetworkTableEntry tv = table.getEntry("tv");
 
 
 	public void drivePercent(
@@ -113,11 +123,26 @@ public interface GenericRobot {
 	}
 
 	public default boolean isTargetFound() {
-		return false;
+		if (tv.getDouble(0.0) != 0){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 
-	public double getTargetX();
-	public double getTargetY();
+	public default double getTargetX(){
+		return tx.getDouble(0.0);
+	}
+	public default double getTargetY(){
+		return ty.getDouble(0.0);
+	}
+
+
+
+	public default double getTargetArea(){
+		return ta.getDouble(0.0);
+	}
 	public double getTargetDistance();
 	public double getTargetAngle();
 

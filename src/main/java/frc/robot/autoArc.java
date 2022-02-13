@@ -34,6 +34,12 @@ public class autoArc extends GenericAutonomous {
     PIDController PIDPivot;
 
     boolean time = false;
+    int counter;
+    double[] averageX = new double [2];
+    double currentTurretPower = 0;
+
+    double average;
+    PIDController turretPIDController;
 
     @Override
     public void autonomousInit(GenericRobot robot) {
@@ -43,12 +49,40 @@ public class autoArc extends GenericAutonomous {
         defaultPower = .4;
         autonomousStep = 0;
         time = false;
+        counter = 0;
+        turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     }
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
+        // Turret Auto Track
         SmartDashboard.putNumber("autonomousStep", autonomousStep);
         SmartDashboard.putNumber("correction", correction);
+        average = 0;
+
+        if(robot.isTargetFound()) {
+            averageX[counter % 2] = robot.getTargetX();
+            counter++;
+        }
+        average = 0;
+        for(double i: averageX){
+            average += i;
+        }
+        average /= 2;
+        SmartDashboard.putNumber("Average", average);
+
+        if (robot.isTargetFound()){
+            currentTurretPower = turretPIDController.calculate(average);
+
+
+        }else{
+            turretPIDController.reset();
+            currentTurretPower = 0;
+        }
+        SmartDashboard.putNumber("currentTurretPower", currentTurretPower);
+
+        // Turret AutoTrack
+
         switch (autonomousStep){
             case 0: //reset
                 PIDSteering.reset();
@@ -86,6 +120,7 @@ public class autoArc extends GenericAutonomous {
                 correction = PIDPivot.calculate(pivotDeg + currentYaw - startYaw);
                 leftPower = correction;
                 rightPower = -correction;
+                currentTurretPower = .05;
                 if (Math.abs(Math.abs(currentYaw - startYaw)-pivotDeg) <= 1.5){
                     if (!time){
                         startingTime = System.currentTimeMillis();
@@ -143,6 +178,7 @@ public class autoArc extends GenericAutonomous {
 
         }
         robot.drivePercent(leftPower, rightPower);
+        robot.setTurretPowerPct(currentTurretPower);
 
     }
 
