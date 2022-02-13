@@ -1,6 +1,16 @@
 package frc.robot.generic;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 public interface GenericRobot {
+
+	NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+	NetworkTableEntry tx = table.getEntry("tx");
+	NetworkTableEntry ty = table.getEntry("ty");
+	NetworkTableEntry ta = table.getEntry("ta");
+	NetworkTableEntry tv = table.getEntry("tv");
 
 
 	public void drivePercent(
@@ -48,7 +58,7 @@ public interface GenericRobot {
 		return 0;
 	}
 
-	public default double getYee(){
+	public default double getYaw(){
 		System.out.println("I don't have a navX");
 		return 0;
 	};
@@ -64,6 +74,22 @@ public interface GenericRobot {
 	}
 
 	public double getLinearVelocity();
+
+	double getPIDmaneuverP();
+
+	double getPIDmaneuverI();
+
+	double getPIDmaneuverD();
+
+	double getPIDpivotP();
+
+	double getPIDpivotI();
+
+	double getPIDpivotD();
+
+	void resetEncoders();
+
+	void resetAttitude();
 
 	public enum TeamColor {
 		RED,
@@ -101,11 +127,26 @@ public interface GenericRobot {
 	}
 
 	public default boolean isTargetFound() {
-		return false;
+		if (tv.getDouble(0.0) != 0){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 
-	public double getTargetX();
-	public double getTargetY();
+	public default double getTargetX(){
+		return tx.getDouble(0.0);
+	}
+	public default double getTargetY(){
+		return ty.getDouble(0.0);
+	}
+
+
+
+	public default double getTargetArea(){
+		return ta.getDouble(0.0);
+	}
 	public double getTargetDistance();
 	public double getTargetAngle();
 
@@ -142,6 +183,16 @@ public interface GenericRobot {
 	public void setShooterPowerPctTop(double percentage);
 	public void setShooterPowerPctBottom(double percentage);
 	public void setShooterTargetDistance(double length, double height);
+
+	public default double turretPIDgetP(){
+		return 0;
+	}
+	public  default double turretPIDgetI(){
+		return 0;
+	}
+	public  default double turretPIDgetD(){
+		return 0;
+	}
 
 	public void raiseCollector();
 	public void lowerCollector();
