@@ -90,6 +90,11 @@ public interface GenericRobot {
 	);
 	public double getCollectorIntakePercentage();
 
+	public void setIndexerIntakePercentage(
+			double percentage
+	);
+	public double getIndexerIntakePercentage();
+
 	public default boolean hasFoundCargo(){
 		System.out.println("robot has tunnel vision");
 		return false;

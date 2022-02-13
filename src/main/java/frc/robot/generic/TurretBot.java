@@ -164,6 +164,16 @@ public class TurretBot implements GenericRobot {
 	}
 
 	@Override
+	public void setIndexerIntakePercentage(double percentage) {
+		indexer.set(percentage);
+	}
+
+	@Override
+	public double getIndexerIntakePercentage() {
+		return indexer.get();
+	}
+
+	@Override
 	public boolean hasFoundCargo() {
 		return GenericRobot.super.hasFoundCargo();
 	}

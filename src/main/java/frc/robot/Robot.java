@@ -123,9 +123,18 @@ public class Robot extends TimedRobot {
 
 
     //note to self: buttons control mirrored joystick setting
-    if(joystick.getRawButton(11)) robot.setCollectorIntakePercentage(0.2);
-    else if(joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-0.2);
-    else robot.setCollectorIntakePercentage(0);
+    if(joystick.getRawButton(11)) {
+      robot.setCollectorIntakePercentage(0.2);
+      robot.setIndexerIntakePercentage(0.2);
+    }
+    else if(joystick.getRawButton(16)){
+      robot.setCollectorIntakePercentage(-0.2);
+      robot.setIndexerIntakePercentage(0.2);
+    }
+    else{
+      robot.setCollectorIntakePercentage(0);
+      robot.setIndexerIntakePercentage(0);
+    }
 
     if(joystick.getRawButton(12)) robot.setTurretPowerPct(0.2);
     else if(joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
@@ -176,6 +185,33 @@ public class Robot extends TimedRobot {
       }
 
     }
+
+
+    //COLLECTOR INDEXER LOGIC (from jack)
+    double defCollectorPower = 0.5;
+    double defIndexerPower = 0.4;
+    double curCollector = 0;
+    double curIndexer = 0;
+
+    //button 2 = trigger
+    if(joystick.getRawButton(2)){
+      if(!robot.getUpperCargo()){
+        curCollector = defCollectorPower;
+        curIndexer = defIndexerPower;
+      }
+      else{
+        curIndexer = 0;
+        if(!robot.getLowerCargo()){
+          curCollector = defCollectorPower;
+        }
+        else{
+          curCollector = 0;
+        }
+      }
+    }
+
+    robot.setCollectorIntakePercentage(curCollector);
+    robot.setIndexerIntakePercentage(curIndexer);
 
   }
 

@@ -157,12 +157,21 @@ public class Lightning implements GenericRobot {
     @Override
     public void setCollectorIntakePercentage(double percentage) {
         collector.set(percentage);
-        indexer.set(percentage);
     }
 
     @Override
     public double getCollectorIntakePercentage() {
         return collector.get();
+    }
+
+    @Override
+    public void setIndexerIntakePercentage(double percentage) {
+        indexer.set(percentage);
+    }
+
+    @Override
+    public double getIndexerIntakePercentage() {
+        return indexer.get();
     }
 
     @Override
