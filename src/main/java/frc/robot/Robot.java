@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
 
   GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
-  GenericAutonomous autonomous = new autoArc();
+  GenericAutonomous autonomous = new SimpleCTerminal();
 
 
   int averageTurretXSize = 2;
