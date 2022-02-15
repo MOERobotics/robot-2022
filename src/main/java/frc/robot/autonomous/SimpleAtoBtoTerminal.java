@@ -1,28 +1,26 @@
 package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
-//Simple autonomous code for ball A, closest ball to the scoring table, and driving to the ball at terminal
-public class SimpleATerminal extends GenericAutonomous {
+//Simple autonomous code for ball A, and then driving to the ball B, and finally to ball at terminal
+public class SimpleAtoBtoTerminal extends GenericAutonomous {
     double startingYaw;
+    double startTime;
+    double startDistance;
 
     double leftpower;
     double rightpower;
     double defaultPower = .25;
     double defaultTurnPower = .25;
-
     double correction;
-    double startTime;
-    double startDistance;
 
     double distanceA = 37;
-    double distanceB = 259.26;
+    double distanceB = 117.1;
+    double distanceC = 160.6;
     double angleA = 87.74;
-
+    double angleB = 0; //NEED TO ASK CAD FOR ANGLE
     double rampDownDist = 10;
-
 
     PIDController PIDDriveStraight;
 
@@ -43,7 +41,6 @@ public class SimpleATerminal extends GenericAutonomous {
                 PIDDriveStraight.reset();
                 PIDDriveStraight.enableContinuousInput(-180,180);
                 robot.resetEncoders();
-                robot.resetAttitude();
                 if (System.currentTimeMillis() - startTime > 100){
                     autonomousStep = 4;
                     startingYaw = robot.getYaw();
@@ -73,7 +70,6 @@ public class SimpleATerminal extends GenericAutonomous {
                 if (System.currentTimeMillis() - startTime > 1000){
                     autonomousStep = 12;
                 }
-                //autonomousStep = 8;
                 break;
             case 6: //collector to collect ball
             case 7: //collection part 2 not electric nor boogaloo
@@ -81,20 +77,20 @@ public class SimpleATerminal extends GenericAutonomous {
             case 9: //shoot the second ball for funsies
             case 10: //miss the target and become sadge
             case 11: //copium
-            //will change these comments when they actually mean something
-            case 12: //turn to go to ball @ terminal
+                //will change these comments when they actually mean something
+            case 12: //turn to go to ball B
                 leftpower = defaultTurnPower;
                 rightpower = -defaultTurnPower;
                 //turning right
 
-                if(robot.getYaw()- startingYaw > angleA) {
+                if(robot.getYaw() - startingYaw > angleA) {
                     startingYaw = startingYaw + angleA;
                     startDistance = robot.getDriveDistanceInchesLeft();
                     PIDDriveStraight.reset();
                     autonomousStep += 1;
                 }
                 break;
-            case 13: //drive towards the ball
+            case 13: //drive towards the ball B
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
@@ -109,10 +105,45 @@ public class SimpleATerminal extends GenericAutonomous {
                     rightpower = 0;
                 }
                 break;
-            case 14:
+            case 14: //collect / shoot
+            case 15:
+            case 16:
+            case 17:
+            case 18:
+            case 19:
+            case 20:
+            case 21: //turn to ball Terminal
+                leftpower  = -defaultTurnPower;
+                rightpower = defaultTurnPower;
+                //turning ???
+
+                if(robot.getYaw() - startingYaw > angleB) {
+                    startingYaw = robot.getYaw();
+                    startDistance = robot.getDriveDistanceInchesLeft();
+                    autonomousStep += 1;
+                }
+                break;
+            case 22: //drive to ball Terminal
+                correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
+
+                leftpower = defaultPower + correction;
+                rightpower = defaultPower - correction;
+
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC - rampDownDist){
+                    defaultPower = (distanceC-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                }
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC) {
+                    autonomousStep += 1;
+                    leftpower = 0;
+                    rightpower = 0;
+                }
+                break;
+            case 23:
                 leftpower = 0;
                 rightpower = 0;
                 break;
+            case 24:
+            case 25:
         }
         robot.drivePercent(leftpower, rightpower);
 
