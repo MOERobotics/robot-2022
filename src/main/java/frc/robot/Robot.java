@@ -15,12 +15,13 @@ import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
+import frc.robot.generic.TurretBot;
 
 public class Robot extends TimedRobot {
 
-  GenericRobot robot = new Lightning();
+  GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
-  GenericAutonomous autonomous = new SimpleCTerminal();
+  GenericAutonomous autonomous = new SimpleBTerminal();
 
 
   int averageTurretXSize = 2;
@@ -147,7 +148,7 @@ public class Robot extends TimedRobot {
     //note to self: buttons currently assume mirrored joystick setting
     if      (joystick.getRawButton(11)) robot.setCollectorIntakePercentage( 1.0);
     else if (joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-1.0);
-    else                                robot.setCollectorIntakePercentage( 1.0);
+    else                                robot.setCollectorIntakePercentage( 0);
 
     if      (joystick.getRawButton(12)) robot.setTurretPowerPct( 0.2);
     else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
