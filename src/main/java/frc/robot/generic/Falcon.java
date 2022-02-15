@@ -61,11 +61,6 @@ public class Falcon implements GenericRobot {
     DigitalInput escalatorSensorHigh = new DigitalInput(3);
 
 
-    public NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-    NetworkTableEntry tx = table.getEntry("tx");
-    NetworkTableEntry ty = table.getEntry("ty");
-    NetworkTableEntry ta = table.getEntry("ta");
-
     double aspectRatioTargDist;
 
     public Falcon() {
@@ -81,6 +76,10 @@ public class Falcon implements GenericRobot {
         rightDriveA.setInverted(true);
         rightDriveB.setInverted(true);
         rightDriveC.setInverted(true);
+
+        leftDriveA.setInverted(false);
+        leftDriveB.setInverted(false);
+        leftDriveC.setInverted(false);
 
         collector.setInverted(true);
 
@@ -103,10 +102,6 @@ public class Falcon implements GenericRobot {
 
     }
 
-    @Override
-    public void driveRPM(double leftRPM, double rightRPM) {
-
-    }
 
 
     @Override
@@ -220,15 +215,6 @@ public class Falcon implements GenericRobot {
         navx.reset();
     }
 
-    @Override
-    public TeamColor getCargoColor() {
-        return GenericRobot.super.getCargoColor();
-    }
-
-    @Override
-    public int getCargoCount() {
-        return GenericRobot.super.getCargoCount();
-    }
 
     @Override
     public void setCollectorIntakePercentage(double percentage) {
@@ -241,86 +227,11 @@ public class Falcon implements GenericRobot {
     }
 
     @Override
-    public boolean hasFoundCargo() {
-        return GenericRobot.super.hasFoundCargo();
-    }
-
-    @Override
-    public TeamColor getFoundCargoColor() {
-        return GenericRobot.super.getFoundCargoColor();
-    }
-
-    @Override
-    public boolean isTargetFound() {
-        return GenericRobot.super.isTargetFound();
-    }
-
-
-    @Override
-    public double getTargetX() {
-        return tx.getDouble(0.0);
-    }
-
-    @Override
-    public double getTargetY() {
-        return ty.getDouble(0.0);
-    }
-
-    @Override
     public double getTargetDistance() {
         return getTargetY() * aspectRatioTargDist;
     }
 
-    @Override
-    public double getTargetAngle() {
-        // do some math
-        return 0;
-    }
 
-    @Override
-    public double getTurretAngle() {
-        return 0;
-    }
-
-    @Override
-    public void setTurretAngleRelative(double angleChange) {
-
-    }
-
-    @Override
-    public void setTurretAngleAbsolute() {
-
-    }
-
-    @Override
-    public void setTurretPowerPct(double powerPct) {
-
-    }
-
-    @Override
-    public double getTurretPowerPct() {
-        return 0;
-    }
-
-    @Override
-    public double getTurretPitchAngle() {
-        return 0;
-    }
-
-    @Override
-    public double getTurretPitchPowerPct() {
-        return 0;
-    }
-
-    @Override
-    public void setTurretPitchAngle() {
-
-    }
-
-    @Override
-    public void setTurretPitchPowerPct() {
-
-    }
 
     @Override
     public double getShooterRPMTop() {
@@ -342,15 +253,6 @@ public class Falcon implements GenericRobot {
         return shooterB.get();
     }
 
-    @Override
-    public double getShooterTargetDistance() {
-        return 0;
-    }
-
-    @Override
-    public double getShooterTargetHeight() {
-        return getTargetDistance(); //+ some fancy math stuff that I don't know right now
-    }
 
     @Override
     public void setShooterRPM(double topRPM, double bottomRPM) {
@@ -384,12 +286,9 @@ public class Falcon implements GenericRobot {
         shooterB.set(percentage);
     }
 
-    @Override
-    public void setShooterTargetDistance(double length, double height) {
-
-    }
 
 
 }
+
 
 

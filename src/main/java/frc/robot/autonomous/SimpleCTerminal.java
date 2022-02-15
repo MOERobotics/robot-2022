@@ -1,19 +1,16 @@
-package frc.robot;
+package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.generic.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 
-//Simple autonomous code for ball A, closest ball to the scoring table, and driving to the ball at terminal
-public class SimpleATerminal extends GenericAutonomous {
+//Simple autonomous code for ball C, closest ball to the hangar, and driving to the ball at terminal
+public class SimpleCTerminal extends GenericAutonomous {
     double startingYaw;
-
-    int autonomousStep;
-
+    double startDistance;
     double leftpower;
     double rightpower;
     double defaultPower = .25;
@@ -22,12 +19,10 @@ public class SimpleATerminal extends GenericAutonomous {
     double correction;
     double startTime;
 
-    double startDistance;
-
     PIDController PIDDriveStraight;
 
     //<Turret>
-    int averageTurretXSize = 2;
+    int averageTurretXSize = 6;
     double[] averageTurretX = new double [averageTurretXSize];
     double turretx;
     double turrety;
@@ -37,13 +32,12 @@ public class SimpleATerminal extends GenericAutonomous {
     PIDController turretPIDController;
     //</Turret>
 
-
     @Override
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
         startingYaw = robot.getYaw(); //might need to change to set degrees
         startTime = System.currentTimeMillis();
-        PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDpivotD());
+        PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
 
         turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     }
@@ -69,16 +63,13 @@ public class SimpleATerminal extends GenericAutonomous {
         SmartDashboard.putNumber("Starting Yaw", startingYaw);
         SmartDashboard.putNumber("Current Yaw", robot.getYaw());
 
-        SmartDashboard.putNumber("tx", turretx);
-        SmartDashboard.putNumber("ty", turrety);
-        SmartDashboard.putNumber("ta", turretarea);
-        SmartDashboard.putNumber("tv", turretv);
-
         switch(autonomousStep){
             case 0: //reset
+                robot.lowerCollector();
                 PIDDriveStraight.reset();
                 PIDDriveStraight.enableContinuousInput(-180,180);
                 robot.resetEncoders();
+                robot.resetAttitude();
                 if (System.currentTimeMillis() - startTime > 100){
                     autonomousStep = 4;
                     startingYaw = robot.getYaw();
@@ -94,36 +85,35 @@ public class SimpleATerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= 37){
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= 37) {
                     autonomousStep += 1;
-                    startTime = System.currentTimeMillis();
                 } //has 3 inches of momentum with .25 power
                 break;
             case 5: //stop
                 leftpower = 0;
                 rightpower = 0;
-                if (System.currentTimeMillis() - startTime > 1000){
-                    autonomousStep = 12;
-                }
+                startDistance = robot.getDriveDistanceInchesLeft();
+                autonomousStep = 12;
                 //autonomousStep = 8;
                 break;
             case 6: //collector to collect ball
             case 7: //collection part 2 not electric nor boogaloo
-            case 8: //nother collection case
+            case 8: //another collection case
             case 9: //shoot the second ball for funsies
             case 10: //miss the target and become sadge
             case 11: //copium
-            //will change these comments when they actually mean somthing
+            //will change these comments when they actually mean something
             case 12: //turn to go to ball @ terminal
-                leftpower = defaultTurnPower;
-                rightpower = -defaultTurnPower;
-                //turning right
+                leftpower = -defaultTurnPower;
+                rightpower = defaultTurnPower;
+                //turning left
 
-                if(robot.getYaw()- startingYaw > 87.74) {
-                    startingYaw = robot.getYaw();
+                if(robot.getYaw() - startingYaw < -84.54) {
+                    startingYaw = startingYaw - 84.54;
                     startDistance = robot.getDriveDistanceInchesLeft();
+                    PIDDriveStraight.reset();
                     autonomousStep += 1;
-                } //204.95
+                }
                 break;
             case 13: //drive towards the ball
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
@@ -131,7 +121,7 @@ public class SimpleATerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= 259.26) {
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= 251) {
                     autonomousStep += 1;
                     leftpower = 0;
                     rightpower = 0;
@@ -156,8 +146,6 @@ public class SimpleATerminal extends GenericAutonomous {
         }
         average /= averageTurretXSize;
 
-        SmartDashboard.putNumber("Average", average);
-
         double currentTurretPower = 0;
 
         if(turretv !=0){
@@ -166,7 +154,6 @@ public class SimpleATerminal extends GenericAutonomous {
             turretPIDController.reset();
         }
 
-        SmartDashboard.putNumber("currentTurretPower", currentTurretPower);
         robot.setTurretPowerPct(currentTurretPower);
 
     }

@@ -1,26 +1,31 @@
-package frc.robot;
+package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.generic.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 
-//Simple autonomous code for ball A, closest ball to the hangar
-public class SimpleBTerminal extends GenericAutonomous {
+//Simple autonomous code for ball A, closest ball to the scoring table, and driving to the ball at terminal
+public class SimpleATerminal extends GenericAutonomous {
     double startingYaw;
-
-    int autonomousStep;
 
     double leftpower;
     double rightpower;
-    double defaultPower = .4;
+    double defaultPower = .25;
+    double defaultTurnPower = .25;
 
     double correction;
-    double startDistance;
     double startTime;
+    double startDistance;
+
+    double distanceA = 37;
+    double distanceB = 259.26;
+    double angleA = 87.74;
+
+    double rampDownDist = 10;
+
 
     PIDController PIDDriveStraight;
 
@@ -39,8 +44,8 @@ public class SimpleBTerminal extends GenericAutonomous {
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
         startingYaw = robot.getYaw(); //might need to change to set degrees
-        PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
         startTime = System.currentTimeMillis();
+        PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDpivotD());
 
         turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     }
@@ -58,29 +63,19 @@ public class SimpleBTerminal extends GenericAutonomous {
         turrety = ty.getDouble(0.0);
         turretarea = ta.getDouble(0.0);
         turretv = tv.getDouble(0.0);
-
-        SmartDashboard.putNumber("tx", turretx);
-        SmartDashboard.putNumber("ty", turrety);
-        SmartDashboard.putNumber("ta", turretarea);
-        SmartDashboard.putNumber("tv", turretv);
         //</Turret>
-
-
-        SmartDashboard.putNumber("Autonomous Step", autonomousStep);
-        SmartDashboard.putNumber("Position", robot.getDriveDistanceInchesLeft());
-        SmartDashboard.putNumber("Starting Yaw", startingYaw);
-        SmartDashboard.putNumber("Current Yaw", robot.getYaw());
-        SmartDashboard.putNumber("startDistance", startDistance);
 
         switch(autonomousStep){
             case 0: //reset
+                robot.lowerCollector();
                 PIDDriveStraight.reset();
                 PIDDriveStraight.enableContinuousInput(-180,180);
                 robot.resetEncoders();
+                robot.resetAttitude();
                 if (System.currentTimeMillis() - startTime > 100){
-                    startDistance = robot.getDriveDistanceInchesLeft();
-                    startingYaw = robot.getYaw();
                     autonomousStep = 4;
+                    startingYaw = robot.getYaw();
+                    startDistance = robot.getDriveDistanceInchesLeft();
                 }
                 break;
             case 1: //shoot the ball
@@ -92,7 +87,10 @@ public class SimpleBTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() >= 61.5){
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceA - rampDownDist){
+                    defaultPower = (distanceA-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                }
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceA){
                     autonomousStep += 1;
                     startTime = System.currentTimeMillis();
                 } //has 3 inches of momentum with .25 power
@@ -100,7 +98,10 @@ public class SimpleBTerminal extends GenericAutonomous {
             case 5: //stop
                 leftpower = 0;
                 rightpower = 0;
-                autonomousStep = 12;
+                if (System.currentTimeMillis() - startTime > 1000){
+                    autonomousStep = 12;
+                }
+                //autonomousStep = 8;
                 break;
             case 6: //collector to collect ball
             case 7: //collection part 2 not electric nor boogaloo
@@ -108,33 +109,38 @@ public class SimpleBTerminal extends GenericAutonomous {
             case 9: //shoot the second ball for funsies
             case 10: //miss the target and become sadge
             case 11: //copium
-                //will change these comments when they actually mean somthing
-            case 12://reset
-                PIDDriveStraight.reset();
-                PIDDriveStraight.enableContinuousInput(-180,180);
-                startDistance = robot.getDriveDistanceInchesLeft();
-                if (System.currentTimeMillis() - startTime >= 1000){
-                    autonomousStep +=1;
+            //will change these comments when they actually mean something
+            case 12: //turn to go to ball @ terminal
+                leftpower = defaultTurnPower;
+                rightpower = -defaultTurnPower;
+                //turning right
+
+                if(robot.getYaw()- startingYaw > angleA) {
+                    startingYaw = startingYaw + angleA;
+                    startDistance = robot.getDriveDistanceInchesLeft();
+                    PIDDriveStraight.reset();
+                    autonomousStep += 1;
                 }
                 break;
-            case 13://reset
+            case 13: //drive towards the ball
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= 153.5){
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB - rampDownDist){
+                    defaultPower = (distanceB-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                }
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB) {
                     autonomousStep += 1;
-                } //has 3 inches of momentum with .25 powercase 5: //stop\
+                    leftpower = 0;
+                    rightpower = 0;
+                } //might need to tune for momentum
                 break;
             case 14:
                 leftpower = 0;
                 rightpower = 0;
                 break;
-            case 15: //collector to collect ball
-            case 16: //collection part 2 not electric nor boogaloo
-            case 17: //nother collection case
-            case 18: //shoot the second ball for funsies
         }
         robot.drivePercent(leftpower, rightpower);
 
@@ -150,8 +156,6 @@ public class SimpleBTerminal extends GenericAutonomous {
         }
         average /= averageTurretXSize;
 
-        SmartDashboard.putNumber("Average", average);
-
         double currentTurretPower = 0;
 
         if(turretv !=0){
@@ -160,7 +164,6 @@ public class SimpleBTerminal extends GenericAutonomous {
             turretPIDController.reset();
         }
 
-        SmartDashboard.putNumber("currentTurretPower", currentTurretPower);
         robot.setTurretPowerPct(currentTurretPower);
 
     }

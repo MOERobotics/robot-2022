@@ -28,11 +28,6 @@ public class Camoelot implements GenericRobot {
 
 
 
-
-	int[] leftEncoderHistory = new int[5];
-	int[] rightEncoderHistory = new int[5];
-
-
 	public Camoelot(){
 		boolean invertLeft = true;
 		leftMotorA.setInverted(invertLeft);
@@ -60,10 +55,6 @@ public class Camoelot implements GenericRobot {
 	}
 
 
-	@Override
-	public void driveRPM(double leftRPM, double rightRPM) {
-	}
-
 
 	@Override
 	public double getDriveLeftPercentage() {
@@ -75,15 +66,6 @@ public class Camoelot implements GenericRobot {
 		return rightMotorA.getMotorOutputPercent();
 	}
 
-	@Override
-	public double getDriveLeftRPM() {
-		return 0;
-	}
-
-	@Override
-	public double getDriveRightRPM() {
-		return 0;
-	}
 
 	//in inches per second
 	@Override
@@ -171,91 +153,6 @@ public class Camoelot implements GenericRobot {
 		return rightEncoder.get();
 	}
 
-	@Override
-	public void setCollectorIntakePercentage(double percentage) {
-
-		System.out.println("Camelot cannot collect");
-	}
-
-	@Override
-	public double getCollectorIntakePercentage() {
-		return 0;
-	}
-
-	@Override
-	public double getTargetX() {
-		return 0;
-	}
-
-	@Override
-	public double getTargetY() {
-		return 0;
-	}
-
-	@Override
-	public double getTargetDistance() {
-		return 0;
-	}
-
-	@Override
-	public double getTargetAngle() {
-		return 0;
-	}
-
-	@Override
-	public double getTurretAngle() {
-		return 0;
-	}
-
-	@Override
-	public void setTurretAngleRelative(double angleChange) {
-
-	}
-
-	@Override
-	public void setTurretAngleAbsolute() {
-
-	}
-
-	@Override
-	public void setTurretPowerPct(double powerPct) {
-
-	}
-
-	@Override
-	public double getTurretPowerPct() {
-		return 0;
-	}
-
-	@Override
-	public double getTurretPitchAngle() {
-		return 0;
-	}
-
-	@Override
-	public double getTurretPitchPowerPct() {
-		return 0;
-	}
-
-	@Override
-	public void setTurretPitchAngle() {
-
-	}
-
-	@Override
-	public void setTurretPitchPowerPct() {
-
-	}
-
-	@Override
-	public double getShooterRPMTop() {
-		return 0;
-	}
-
-	@Override
-	public double getShooterRPMBottom() {
-		return 0;
-	}
 
 	@Override
 	public double getShooterPowerPctTop() {
@@ -268,30 +165,11 @@ public class Camoelot implements GenericRobot {
 		return shooterB.getMotorOutputPercent();
 	}
 
-	@Override
-	public double getShooterTargetDistance() {
-		return 0;
-	}
-
-	@Override
-	public double getShooterTargetHeight() {
-		return 0;
-	}
 
 	@Override
 	public void setShooterRPM(double topRPM, double bottomRPM) {
 		setShooterRPMTop(topRPM);
 		setShooterRPMBottom(bottomRPM);
-	}
-
-	@Override
-	public void setShooterRPMTop(double rpm) {
-
-	}
-
-	@Override
-	public void setShooterRPMBottom(double rpm) {
-
 	}
 
 	@Override
@@ -312,8 +190,5 @@ public class Camoelot implements GenericRobot {
 		shooterB.set(ControlMode.PercentOutput, percentage);
 	}
 
-	@Override
-	public void setShooterTargetDistance(double length, double height) {
 
-	}
 }
