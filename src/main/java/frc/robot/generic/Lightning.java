@@ -41,6 +41,9 @@ public class Lightning implements GenericRobot {
     SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
     SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
 
+    //shootReadyTimer is used to check if shooter ready
+    long shootReadyTimer;
+
     public Lightning(){
         boolean invertLeft = false;
         boolean invertRight = true;
@@ -53,6 +56,7 @@ public class Lightning implements GenericRobot {
         collector.setInverted(false);
         shooterB.setInverted(true);
         shooterA.setInverted(false);
+        shootReadyTimer = System.currentTimeMillis();
     }
 
     @Override
@@ -265,6 +269,11 @@ public class Lightning implements GenericRobot {
     }
 
     @Override
+    public double getShooterTargetRPM(){
+        return 1000;
+    }
+
+    @Override
     public void raiseCollector(){
         collectorPosition.set(true);
     }
@@ -348,5 +357,15 @@ public class Lightning implements GenericRobot {
     @Override
     public double turretPIDgetD() {
         return GenericRobot.super.turretPIDgetD();
+    }
+
+
+    @Override
+    public long getShootReadyTimer(){
+        return shootReadyTimer;
+    }
+    @Override
+    public void shooterNotReady(){
+        shootReadyTimer = System.currentTimeMillis();
     }
 }

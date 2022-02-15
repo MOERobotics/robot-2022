@@ -236,6 +236,7 @@ public interface GenericRobot {
 	public default double getShooterTargetHeight(){
 		return 0;
 	}
+	public default double getShooterTargetRPM() { return 0; }
 
 	public default void setShooterRPM(double topRPM, double bottomRPM){
 		//System.out.println("I don't have a shooter");
@@ -281,5 +282,29 @@ public interface GenericRobot {
 	}
 	public default void setArmsBackward() {
 		//System.out.println("I don't have a climber");
+	}
+
+
+	public default long getShootReadyTimer(){
+		//System.out.println("Robot doesn't check if it's ready to shoot");
+		return System.currentTimeMillis();
+	}
+	public default void shooterNotReady(){
+		//System.out.println("Robot doesn't check if it's ready to shoot");
+	}
+	public default boolean isReadyToShoot(){
+		return isReadyToShoot(0.02, 100);
+	}
+	public default boolean isReadyToShoot(double tolerance, double time){
+		double shooterRPM = getShooterRPMBottom();
+		double targetRPM = getShooterTargetRPM();
+
+		//absolute percent error between actual shooter and target
+		double error = Math.abs( (shooterRPM - targetRPM) / targetRPM);
+
+		if(error > tolerance) shooterNotReady();
+
+		if(System.currentTimeMillis() - getShootReadyTimer() > time) return true;
+		return false;
 	}
 }
