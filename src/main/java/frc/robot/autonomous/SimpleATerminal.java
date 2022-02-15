@@ -88,7 +88,9 @@ public class SimpleATerminal extends GenericAutonomous {
                 rightpower = defaultPower - correction;
 
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceA - rampDownDist){
-                    defaultPower = (distanceA-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                    double a = rampDown(defaultPower, 0, startDistance, rampDownDist, robot.getDriveDistanceInchesLeft(), distanceA);
+                    leftpower = a;
+                    rightpower = a;
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceA){
                     autonomousStep += 1;
@@ -129,7 +131,9 @@ public class SimpleATerminal extends GenericAutonomous {
                 rightpower = defaultPower - correction;
 
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB - rampDownDist){
-                    defaultPower = (distanceB-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                    double a = rampDown(defaultPower, 0, startDistance, rampDownDist, robot.getDriveDistanceInchesLeft(), distanceB);
+                    leftpower = a;
+                    rightpower = a;
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB) {
                     autonomousStep += 1;

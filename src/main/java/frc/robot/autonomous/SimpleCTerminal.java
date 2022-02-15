@@ -85,6 +85,12 @@ public class SimpleCTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= 27){
+                    double a = rampDown(defaultPower, 0, startDistance, 10, robot.getDriveDistanceInchesLeft(), 37);
+                    leftpower = a;
+                    rightpower = a;
+                }
+
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= 37) {
                     autonomousStep += 1;
                 } //has 3 inches of momentum with .25 power
@@ -121,6 +127,11 @@ public class SimpleCTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= 241){
+                    double a = rampDown(defaultPower, 0, startDistance, 10, robot.getDriveDistanceInchesLeft(), 251);
+                    leftpower = a;
+                    rightpower = a;
+                }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= 251) {
                     autonomousStep += 1;
                     leftpower = 0;

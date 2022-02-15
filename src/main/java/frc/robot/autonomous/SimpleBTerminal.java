@@ -85,7 +85,13 @@ public class SimpleBTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() >= 61.5){
+                if (robot.getDriveDistanceInchesLeft()- startDistance >= 51.5){
+                    double a = rampDown(defaultPower, 0, startDistance,10, robot.getDriveDistanceInchesLeft(), 61.5);
+                    leftpower = a;
+                    rightpower = a;
+                }
+
+                if(robot.getDriveDistanceInchesLeft()- startDistance >= 61.5){
                     autonomousStep += 1;
                     startTime = System.currentTimeMillis();
                 } //has 3 inches of momentum with .25 power
@@ -115,6 +121,12 @@ public class SimpleBTerminal extends GenericAutonomous {
 
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
+
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= 143.5){
+                    double a = rampDown(defaultPower,0,startDistance,10, robot.getDriveDistanceInchesLeft(), 153.5);
+                    leftpower = a;
+                    rightpower = a;
+                }
 
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= 153.5){
                     autonomousStep += 1;
