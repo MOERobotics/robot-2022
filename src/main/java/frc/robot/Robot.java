@@ -18,9 +18,18 @@ import frc.robot.generic.Lightning;
 
 public class Robot extends TimedRobot {
 
+  //Instantiate autonomous once, don't create unnecessary duplicates
+  //Add new Autos here when they're authored
+  public static final GenericAutonomous
+    autoArc         = new autoArc(),
+    simpleATerminal = new SimpleATerminal(),
+    simpleBTerminal = new SimpleBTerminal(),
+    simpleCTerminal = new SimpleCTerminal();
+
+
   GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
-  GenericAutonomous autonomous = new autoArc();
+  GenericAutonomous autonomous = autoArc;
 
 
   int averageTurretXSize = 2;
@@ -203,19 +212,10 @@ public class Robot extends TimedRobot {
       robot.resetEncoders();
     }
 
-    if (joystick.getRawButton(4)){
-      autonomous = new autoArc();
-
-    }
-    if (joystick.getRawButton(5)){
-      autonomous = new SimpleATerminal();
-    }
-    if (joystick.getRawButton(6)){
-      autonomous = new SimpleBTerminal();
-    }
-    if (joystick.getRawButton(7)){
-      autonomous = new SimpleCTerminal();
-    }
+    if (joystick.getRawButton(4)) autonomous = autoArc;
+    if (joystick.getRawButton(5)) autonomous = simpleATerminal;
+    if (joystick.getRawButton(6)) autonomous = simpleBTerminal;
+    if (joystick.getRawButton(7)) autonomous = simpleCTerminal;
 
   }
 
