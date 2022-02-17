@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
 //insert blurb
-public class autoArc extends GenericAutonomous {
+public class autoArcDifferent extends GenericAutonomous {
     double rollout = 72; //center of rotation changes per robot. Test value per robot
     double radius = 153;
     double wheelBase = 28;
@@ -13,7 +13,7 @@ public class autoArc extends GenericAutonomous {
     double outerRadius = radius + wheelBase/2;
     double outerArcDist = 180;
     double defaultPower = .4;
-    double pivotDeg = 90;
+    double pivotDeg = -90;
     double rampDownDist = 10;
 
     double startYaw;
@@ -149,17 +149,17 @@ public class autoArc extends GenericAutonomous {
                 PIDSteering.disableContinuousInput();
                 PIDPivot.enableContinuousInput(-180, 180);
                 startYaw = startYaw - pivotDeg;
-                startInches = robot.getDriveDistanceInchesRight();
+                startInches = robot.getDriveDistanceInchesLeft();
                 autonomousStep += 1;
                 break;
 
-            case 4: //Pid Arc 10 ft Left
+            case 4: //Pid Arc 10 ft Right
                 currentYaw = robot.getYaw();
-                currentDistInches = robot.getDriveDistanceInchesRight();
+                currentDistInches = robot.getDriveDistanceInchesLeft();
                 correction = PIDSteering.calculate(Math.toDegrees((currentDistInches-startInches)/outerRadius) + (currentYaw-startYaw));
                 double radiusRatio = outerRadius/innerRadius;
-                leftPower = 1/Math.sqrt(radiusRatio)*defaultPower + correction;
-                rightPower = (Math.sqrt(radiusRatio))*defaultPower - correction;
+                leftPower = (Math.sqrt(radiusRatio))*defaultPower - correction;
+                rightPower = 1/Math.sqrt(radiusRatio)*defaultPower + correction;
                 if (currentDistInches - startInches >= outerArcDist){
                     leftPower = 0;
                     rightPower = 0;
