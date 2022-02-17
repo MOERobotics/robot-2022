@@ -195,14 +195,26 @@ public class Robot extends TimedRobot {
     double tolerance = 0.8;
     double drivePower = 0.2;
 
+    double driveLeft = 0;
+    double driveRight = 0;
+
     if(robot.getPTOState()){
-      if(xbox.getRawAxis(leftAxis) > tolerance && xbox.getRawAxis(rightAxis) > tolerance){
-        robot.drivePercent(drivePower, drivePower);
+      if(xbox.getRawAxis(leftAxis) > tolerance){
+        driveLeft = drivePower;
       }
-      if(xbox.getRawAxis(leftAxis) < -tolerance && xbox.getRawAxis(rightAxis) < -tolerance){
-        robot.drivePercent(-drivePower, -drivePower);
+      else if(xbox.getRawAxis(leftAxis) < -tolerance){
+        driveLeft = -drivePower;
       }
+
+      if(xbox.getRawAxis(rightAxis) > tolerance){
+        driveRight = drivePower;
+      }
+      else if(xbox.getRawAxis(rightAxis) < -tolerance){
+        driveRight = -drivePower;
+      }
+
     }
+    robot.drivePercent(driveLeft, driveRight);
 
 
 
