@@ -26,7 +26,7 @@ public class BallCtoTerminal extends GenericAutonomous {
     @Override
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
-        startingYaw = robot.getYaw(); //might need to change to set degrees
+        startingYaw = robot.getYaw();
         startTime = System.currentTimeMillis();
         PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
 
@@ -79,7 +79,15 @@ public class BallCtoTerminal extends GenericAutonomous {
             case 10: //miss the target and become sadge
             case 11: //copium
             //will change these comments when they actually mean something
-            case 12: //turn to go to ball @ terminal
+            case 12://reset
+                if (System.currentTimeMillis() - startTime >= 1000){
+                    PIDDriveStraight.reset();
+                    PIDDriveStraight.enableContinuousInput(-180,180);
+                    startDistance = robot.getDriveDistanceInchesLeft();
+                    autonomousStep +=1;
+                }
+                break;
+            case 13: //turn to go to ball @ terminal
                 leftpower = -defaultTurnPower;
                 rightpower = defaultTurnPower;
                 //turning left
@@ -91,7 +99,7 @@ public class BallCtoTerminal extends GenericAutonomous {
                     autonomousStep += 1;
                 }
                 break;
-            case 13: //drive towards the ball
+            case 14: //drive towards the ball
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
@@ -106,7 +114,7 @@ public class BallCtoTerminal extends GenericAutonomous {
                     startTime = System.currentTimeMillis();
                 }
                 break;
-            case 14:
+            case 15:
                 leftpower = 0;
                 rightpower = 0;
                 break;

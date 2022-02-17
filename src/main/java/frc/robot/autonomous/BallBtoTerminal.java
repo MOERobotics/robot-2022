@@ -7,20 +7,25 @@ import frc.robot.generic.GenericRobot;
 //Simple autonomous code for ball A, closest ball to the hangar
 public class BallBtoTerminal extends GenericAutonomous {
     double startingYaw;
+    double startDistance;
+    double startTime;
+
     double leftpower;
     double rightpower;
     double defaultPower = .4;
-
     double correction;
-    double startDistance;
-    double startTime;
+
+    double distanceB = 61.5;
+    double distanceTerminal = 0;
+    double rampDownDist = 10;
+
 
     PIDController PIDDriveStraight;
 
     @Override
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
-        startingYaw = robot.getYaw(); //might need to change to set degrees
+        startingYaw = robot.getYaw();
         PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
         startTime = System.currentTimeMillis();
     }
@@ -50,10 +55,13 @@ public class BallBtoTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() >= 61.5){
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB - rampDownDist){
+                    defaultPower = (distanceB-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                }
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB){
                     autonomousStep += 1;
                     startTime = System.currentTimeMillis();
-                } //has 3 inches of momentum with .25 power
+                }
                 break;
             case 5: //stop
                 leftpower = 0;
@@ -81,8 +89,13 @@ public class BallBtoTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= 153.5){
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal - rampDownDist){
+                    defaultPower = (distanceTerminal -robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                }
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal) {
                     autonomousStep += 1;
+                    leftpower = 0;
+                    rightpower = 0;
                 }
                 break;
             case 14:

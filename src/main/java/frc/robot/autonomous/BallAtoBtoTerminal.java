@@ -12,13 +12,13 @@ public class BallAtoBtoTerminal extends GenericAutonomous {
 
     double leftpower;
     double rightpower;
-    double defaultPower = .25;
-    double defaultTurnPower = .25;
+    double defaultPower = .4;
+    double defaultTurnPower = .4;
     double correction;
 
     double distanceA = 37;
     double distanceB = 117.1;
-    double distanceC = 160.6;
+    double distanceTerminal = 160.6;
     double angleA = 87.74;
     double angleB = 0; //ASK CAD LATER
     double rampDownDist = 10;
@@ -130,10 +130,10 @@ public class BallAtoBtoTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC - rampDownDist){
-                    defaultPower = (distanceC-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal - rampDownDist){
+                    defaultPower = (distanceTerminal -robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
                 }
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC) {
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal) {
                     autonomousStep += 1;
                     leftpower = 0;
                     rightpower = 0;

@@ -1,6 +1,7 @@
 package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball B
@@ -14,8 +15,7 @@ public class BallSimpleB extends GenericAutonomous {
     double correction;
     double startTime;
 
-    double distance = 61.5;
-    //distance to ball B from the tarmac
+    double distance = 61.5; //distance to ball B from the tarmac
     double rampDownDist = 10;
 
     PIDController PIDDriveStraight;

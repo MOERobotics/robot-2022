@@ -7,20 +7,18 @@ import frc.robot.generic.GenericRobot;
 //Simple autonomous code for ball A, closest ball to the scoring table, and driving to the ball at terminal
 public class BallAtoTerminal extends GenericAutonomous {
     double startingYaw;
-
-    double leftpower;
-    double rightpower;
-    double defaultPower = .25;
-    double defaultTurnPower = .25;
-
-    double correction;
     double startTime;
     double startDistance;
 
-    double distanceA = 40.44;
-    double distanceB = 259.26;
-    double angleA = 87.74;
+    double leftpower;
+    double rightpower;
+    double defaultPower = .4;
+    double defaultTurnPower = .4;
+    double correction;
 
+    double distanceA = 40.44;
+    double distanceTerminal = 259.26;
+    double angleA = 87.74;
     double rampDownDist = 10;
 
 
@@ -73,7 +71,6 @@ public class BallAtoTerminal extends GenericAutonomous {
                 if (System.currentTimeMillis() - startTime > 1000){
                     autonomousStep = 12;
                 }
-                //autonomousStep = 8;
                 break;
             case 6: //collector to collect ball
             case 7: //collection part 2 not electric nor boogaloo
@@ -100,10 +97,10 @@ public class BallAtoTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB - rampDownDist){
-                    defaultPower = (distanceB-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal - rampDownDist){
+                    defaultPower = (distanceTerminal -robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
                 }
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB) {
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal) {
                     autonomousStep += 1;
                     leftpower = 0;
                     rightpower = 0;

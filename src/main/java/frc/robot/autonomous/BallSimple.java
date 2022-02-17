@@ -15,8 +15,7 @@ public class BallSimple extends GenericAutonomous {
     double correction;
     double startTime;
 
-    double distance = 40.44;
-    //either to Balls A, B or C depending on where the robot is positioned
+    double distance = 40.44; //either to Balls A, B or C depending on where the robot is positioned
     double rampDownDist = 10;
 
     PIDController PIDDriveStraight;
