@@ -1,6 +1,9 @@
 package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
@@ -26,6 +29,17 @@ public class SimpleATerminal extends GenericAutonomous {
 
     PIDController PIDDriveStraight;
 
+    //<Turret>
+    int averageTurretXSize = 2;
+    double[] averageTurretX = new double [averageTurretXSize];
+    double turretx;
+    double turrety;
+    double turretarea;
+    double turretv;
+    int counter = 0;
+    PIDController turretPIDController;
+    //</Turret>
+
     @Override
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
@@ -33,10 +47,23 @@ public class SimpleATerminal extends GenericAutonomous {
         startTime = System.currentTimeMillis();
         PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDpivotD());
 
+        turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     }
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
+        //<Turret>
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+        NetworkTableEntry tx = table.getEntry("tx");
+        NetworkTableEntry ty = table.getEntry("ty");
+        NetworkTableEntry ta = table.getEntry("ta");
+        NetworkTableEntry tv = table.getEntry("tv");
+
+        turretx = tx.getDouble(0.0);
+        turrety = ty.getDouble(0.0);
+        turretarea = ta.getDouble(0.0);
+        turretv = tv.getDouble(0.0);
+        //</Turret>
 
         switch(autonomousStep){
             case 0: //reset
@@ -61,7 +88,9 @@ public class SimpleATerminal extends GenericAutonomous {
                 rightpower = defaultPower - correction;
 
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceA - rampDownDist){
-                    defaultPower = (distanceA-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                    double a = rampDown(defaultPower, 0, startDistance, rampDownDist, robot.getDriveDistanceInchesLeft(), distanceA);
+                    leftpower = a;
+                    rightpower = a;
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceA){
                     autonomousStep += 1;
@@ -102,7 +131,9 @@ public class SimpleATerminal extends GenericAutonomous {
                 rightpower = defaultPower - correction;
 
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB - rampDownDist){
-                    defaultPower = (distanceB-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                    double a = rampDown(defaultPower, 0, startDistance, rampDownDist, robot.getDriveDistanceInchesLeft(), distanceB);
+                    leftpower = a;
+                    rightpower = a;
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB) {
                     autonomousStep += 1;
@@ -116,6 +147,28 @@ public class SimpleATerminal extends GenericAutonomous {
                 break;
         }
         robot.drivePercent(leftpower, rightpower);
+
+        //If turret works set value of averageTurretX[] to turretx
+        if(turretv !=0 ) {
+            averageTurretX[counter % averageTurretXSize] = turretx;
+            counter++;
+        }
+
+        double average = 0;
+        for(double i: averageTurretX){
+            average += i;
+        }
+        average /= averageTurretXSize;
+
+        double currentTurretPower = 0;
+
+        if(turretv !=0){
+            currentTurretPower = turretPIDController.calculate(average);
+        }else{
+            turretPIDController.reset();
+        }
+
+        robot.setTurretPowerPct(currentTurretPower);
 
     }
 }

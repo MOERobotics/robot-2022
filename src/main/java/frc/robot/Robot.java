@@ -15,21 +15,14 @@ import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
+import frc.robot.generic.TurretBot;
 
 public class Robot extends TimedRobot {
 
-  //Instantiate autonomous once, don't create unnecessary duplicates
-  //Add new Autos here when they're authored
-  public static final GenericAutonomous
-    autoArc         = new autoArc(),
-    simpleATerminal = new SimpleATerminal(),
-    simpleBTerminal = new SimpleBTerminal(),
-    simpleCTerminal = new SimpleCTerminal();
 
-
-  GenericRobot robot = new Lightning();
+  GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
-  GenericAutonomous autonomous = autoArc;
+  GenericAutonomous autonomous = new SimpleBTerminal();
 
 
   int averageTurretXSize = 2;
@@ -157,6 +150,7 @@ public class Robot extends TimedRobot {
     if      (joystick.getRawButton(11)) robot.setCollectorIntakePercentage( 1.0);
     else if (joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-1.0);
     else                                robot.setCollectorIntakePercentage( 0.0);
+
 
     if      (joystick.getRawButton(12)) robot.setTurretPowerPct( 0.2);
     else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
