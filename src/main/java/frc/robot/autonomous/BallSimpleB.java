@@ -70,6 +70,7 @@ public class BallSimpleB extends GenericAutonomous {
                 break;
             case 6: //collect/shoot the ball again
         }
+        robot.drivePercent(leftpower, rightpower);
     }
 
 
