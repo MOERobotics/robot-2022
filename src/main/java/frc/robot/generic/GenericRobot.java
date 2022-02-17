@@ -260,6 +260,12 @@ public interface GenericRobot {
 		//System.out.println("I don't have a shooter");
 	}
 
+	public default boolean getFloorSensorLeft(){
+		return false;
+	}
+	public default boolean getFloorSensorRight(){
+		return false;
+	}
 
 
 	public default void raiseCollector() {
@@ -284,6 +290,18 @@ public interface GenericRobot {
 		//System.out.println("I don't have a climber");
 	}
 
+	//returns true if PTO set to arms, return false if PTO set to drive
+	public default boolean getPTOState(){
+		return false;
+	}
+
+	public default boolean getClimbSensorLeft(){
+		return false;
+	}
+	public default boolean getClimbSensorRight(){
+		return false;
+	}
+
 
 	public default long getShootReadyTimer(){
 		//System.out.println("Robot doesn't check if it's ready to shoot");
@@ -304,6 +322,7 @@ public interface GenericRobot {
 
 		if(error > tolerance) shooterNotReady();
 
+		//we haven't called shooterNotReady() in the last "time" milliseconds
 		if(System.currentTimeMillis() - getShootReadyTimer() > time) return true;
 		return false;
 	}

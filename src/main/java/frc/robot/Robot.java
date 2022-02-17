@@ -20,6 +20,7 @@ public class Robot extends TimedRobot {
 
   GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
+  Joystick xbox = new Joystick(1);
   GenericAutonomous autonomous = new autoArc();
 
 
@@ -142,10 +143,14 @@ public class Robot extends TimedRobot {
     //moved this to after joystick deaden because deaden should be focused on the raw joystick values
     double scaleFactor = 1.0;
 
-    robot.drivePercent(
-        (jy+jx) * scaleFactor,
-        (jy-jx) * scaleFactor
-    );
+    //robot PTO not on arms, give joystick carte blanche
+    if(robot.getPTOState() == false){
+      robot.drivePercent(
+              (jy+jx) * scaleFactor,
+              (jy-jx) * scaleFactor
+      );
+    }
+
 
     //note to self: buttons currently assume mirrored joystick setting
     if      (joystick.getRawButton(11)) robot.setCollectorIntakePercentage( 1.0);
@@ -168,6 +173,28 @@ public class Robot extends TimedRobot {
 
     if      (joystick.getRawButton( 5)) robot.setArmsForward();
     if      (joystick.getRawButton(10)) robot.setArmsBackward();
+
+    SmartDashboard.putNumber("XBOX AXIS DEBUG - 0 ", xbox.getRawAxis(0));
+    SmartDashboard.putNumber("XBOX AXIS DEBUG - 1 ", xbox.getRawAxis(1));
+    SmartDashboard.putNumber("XBOX AXIS DEBUG - 2 ", xbox.getRawAxis(2));
+    SmartDashboard.putNumber("XBOX AXIS DEBUG - 3 ", xbox.getRawAxis(3));
+
+
+
+    //currently Jack has no clue what axises these are supposed to be
+    int leftAxis = 0; int rightAxis = 1;
+    double tolerance = 0.8;
+    double drivePower = 0.2;
+
+    if(robot.getPTOState()){
+      if(xbox.getRawAxis(leftAxis) > tolerance && xbox.getRawAxis(rightAxis) > tolerance){
+        robot.drivePercent(drivePower, drivePower);
+      }
+      if(xbox.getRawAxis(leftAxis) < -tolerance && xbox.getRawAxis(rightAxis) < -tolerance){
+        robot.drivePercent(-drivePower, -drivePower);
+      }
+    }
+
 
 
     //Start of Daniel+Saiarun Turret test
