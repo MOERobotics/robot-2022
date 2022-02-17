@@ -192,12 +192,21 @@ public interface GenericRobot {
 		return getTurretAngle()/encoderTurretTicksPerDegree();
 	}
 
+	public default double getAlternateTurretAngle(){
+		return 0;
+	}
+	public default double getAlternateTurretAngleDegrees(){
+		return getAlternateTurretAngle()/encoderTurretTicksPerDegree();
+	}
+
+
 	public default void setTurretAngleRelative(double angleChange){
 		//System.out.println("I don't have a turret");
 	}
 	public default void setTurretAngleAbsolute(){
 		//System.out.println("I don't have a turret");
 	}
+
 	public default void setTurretPowerPct(double powerPct){
 		//System.out.println("I don't have a turret");
 	}

@@ -102,6 +102,8 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.getNumber("Turret direction angle ticks", robot.getTurretAngle());
     SmartDashboard.getNumber("Turret direction angle degrees", robot.getTurretAngleDegrees());
+    SmartDashboard.getNumber("Alternate turret angle ticks", robot.getAlternateTurretAngleDegrees());
+
 
     SmartDashboard.getNumber("Turret direction motor pct", robot.getTurretPowerPct());
 
