@@ -11,8 +11,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.generic.Falcon;
-import frc.robot.generic.GenericAutonomous;
+import frc.robot.autonomous.*;
+import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
 
@@ -20,17 +20,21 @@ public class Robot extends TimedRobot {
 
   GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
+  Joystick xbox = new Joystick(1);
   GenericAutonomous autonomous = new autoArc();
 
 
   int averageTurretXSize = 2;
-  double[] averageTurretX = new double [averageTurretXSize];
+  double[] averageX = new double [averageTurretXSize];
 
   double turretx;
   double turrety;
   double turretarea;
   double turretv;
   int counter = 0;
+  double average;
+  double currentTurretPower;
+
 
   PIDController turretPIDController;
 
@@ -103,10 +107,15 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.getNumber("Shooter calculate distance", robot.getShooterTargetDistance());
     SmartDashboard.getNumber("Shooter calculate height", robot.getShooterTargetHeight());
+    SmartDashboard.putNumber("Shooter target RPM", robot.getShooterTargetRPM());
 
     SmartDashboard.putNumber("Joystick raw X", joystick.getX());
     SmartDashboard.putNumber("Joystick raw Y", joystick.getY());
 
+    SmartDashboard.putNumber("Autonomous Step", autonomous.autonomousStep);
+
+    SmartDashboard.putNumber("Shooter Ready Timer", robot.getShootReadyTimer());
+    SmartDashboard.putBoolean("Shooter is Ready?", robot.isReadyToShoot());
   }
 
   @Override public void autonomousInit() {
@@ -123,7 +132,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override public void teleopPeriodic() {
-    double jx = joystick.getX();
+    double jx =  joystick.getX();
     double jy = -joystick.getY();
 
     //joystick deaden: yeet smol/weird joystick values when joystick is at rest
@@ -133,15 +142,14 @@ public class Robot extends TimedRobot {
 
     //moved this to after joystick deaden because deaden should be focused on the raw joystick values
     double scaleFactor = 1.0;
-    jx *= scaleFactor;
-    jy *= scaleFactor;
 
-    robot.drivePercent(jy+jx,jy-jx);
-
-    /* if(joystick.getRawButton(1)){
-      robot.setShooterPowerPct(0.2, 0.2);
-    }*/
-
+    //robot PTO not on arms, give joystick carte blanche
+    if(robot.getPTOState() == false){
+      robot.drivePercent(
+              (jy+jx) * scaleFactor,
+              (jy-jx) * scaleFactor
+      );
+    }
 
     //note to self: buttons control mirrored joystick setting
     if(joystick.getRawButton(11)) {
@@ -157,82 +165,70 @@ public class Robot extends TimedRobot {
       robot.setIndexerIntakePercentage(0);
     }
 
-    if(joystick.getRawButton
-            (12)) robot.setTurretPowerPct(0.2);
-    else if(joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
-    else robot.setTurretPowerPct(0);
+    if      (joystick.getRawButton(12)) robot.setTurretPowerPct( 0.2);
+    else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
+    else                                robot.setTurretPowerPct( 0.0);
 
-    if(joystick.getRawButton(13)) robot.setShooterPowerPct(0.2, 0.2);
-    else if(joystick.getRawButton(14)) robot.setShooterPowerPct(-0.2, -0.2);
-    else robot.setShooterPowerPct(0, 0);
+    if      (joystick.getRawButton(13)) robot.setShooterPowerPct( 0.2,  0.2);
+    else if (joystick.getRawButton(14)) robot.setShooterPowerPct(-0.2, -0.2);
+    else                                robot.setShooterPowerPct( 0.0,  0.0);
 
-    if(joystick.getRawButton(7)) robot.raiseCollector();
-    if(joystick.getRawButton(8)) robot.lowerCollector();
+    if      (joystick.getRawButton( 7)) robot.raiseCollector();
+    if      (joystick.getRawButton( 8)) robot.lowerCollector();
 
-    if(joystick.getRawButton(6)) robot.turnOnPTO();
-    if(joystick.getRawButton(9)) robot.turnOffPTO();
+    if      (joystick.getRawButton( 6)) robot.turnOnPTO();
+    if      (joystick.getRawButton( 9)) robot.turnOffPTO();
 
-    if(joystick.getRawButton(5)) robot.setArmsForward();
-    if(joystick.getRawButton(10)) robot.setArmsBackward();
+    if      (joystick.getRawButton( 5)) robot.setArmsForward();
+    if      (joystick.getRawButton(10)) robot.setArmsBackward();
+
+    SmartDashboard.putNumber("XBOX AXIS DEBUG - 0 ", xbox.getRawAxis(0));
+    SmartDashboard.putNumber("XBOX AXIS DEBUG - 1 ", xbox.getRawAxis(1));
+    SmartDashboard.putNumber("XBOX AXIS DEBUG - 2 ", xbox.getRawAxis(2));
+    SmartDashboard.putNumber("XBOX AXIS DEBUG - 3 ", xbox.getRawAxis(3));
+
+
+
+    //currently Jack has no clue what axises these are supposed to be
+    int leftAxis = 0; int rightAxis = 1;
+    double tolerance = 0.8;
+    double drivePower = 0.2;
+
+    if(robot.getPTOState()){
+      if(xbox.getRawAxis(leftAxis) > tolerance && xbox.getRawAxis(rightAxis) > tolerance){
+        robot.drivePercent(drivePower, drivePower);
+      }
+      if(xbox.getRawAxis(leftAxis) < -tolerance && xbox.getRawAxis(rightAxis) < -tolerance){
+        robot.drivePercent(-drivePower, -drivePower);
+      }
+    }
+
 
 
     //Start of Daniel+Saiarun Turret test
-    double average = 0;
+    average = 0;
 
-    if(turretv !=0 ) {
-      averageTurretX[counter % averageTurretXSize] = turretx;
+    if(robot.isTargetFound()) {
+      counter = counter % averageTurretXSize;
+      averageX[counter] = robot.getTargetX();
       counter++;
     }
     average = 0;
-    for(double i: averageTurretX){
+    for(double i: averageX){
       average += i;
     }
     average /= averageTurretXSize;
     SmartDashboard.putNumber("Average", average);
 
-    double currentTurretPower = 0;
-
-    if(joystick.getRawButton(1) && turretv !=0){
-      /*double currentTurretPowerValue = -(Math.signum(average)*average*average)/30;
-      if(currentTurretPowerValue >.2){
-        currentTurretPowerValue = .2;
-      } else if(currentTurretPowerValue <-.2){
-        currentTurretPowerValue = -.2;
-      }
-
-      if(average< -1) {
-        currentTurretPower = currentTurretPowerValue;
-      }else if(average> 1) {
-        currentTurretPower = currentTurretPowerValue;
-      }else{
-        currentTurretPower = 0;
-      }*/
-
-      /*if (average > 0){
-        currentTurretPower = -0.2;
-      }
-      else{
-        currentTurretPower = 0.2;
-      }
-
-      if (Math.abs(average) <= 5){
-        currentTurretPower = currentTurretPower/2;
-      }*/
+    if (joystick.getRawButtonPressed(1)) turretPIDController.reset();
+    if (joystick.getRawButton(1) && turretv !=0){
       currentTurretPower = turretPIDController.calculate(average);
-
-
-    }else{
-      turretPIDController.reset();
-      if(joystick.getRawButton(3)){
-        currentTurretPower = -0.1;
-      }else if(joystick.getRawButton(4)){
-        currentTurretPower = 0.1;
-      }else{
-        currentTurretPower = 0;
-      }
+    } else {
+      if      (joystick.getRawButton(3))  currentTurretPower = -0.1;
+      else if (joystick.getRawButton(4))  currentTurretPower =  0.1;
+      else                                currentTurretPower =  0.0;
     }
 
-    SmartDashboard.putNumber("currentTurretPower", currentTurretPower);
     robot.setTurretPowerPct(currentTurretPower);
 
 
@@ -267,6 +263,11 @@ public class Robot extends TimedRobot {
   @Override public void disabledInit() {}
 
   @Override public void disabledPeriodic() {
+    if (joystick.getRawButton(1)){
+      robot.resetAttitude();
+      robot.resetEncoders();
+    }
+
     if (joystick.getRawButton(4)){
       autonomous = new autoArc();
 

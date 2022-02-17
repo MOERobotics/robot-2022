@@ -1,15 +1,12 @@
-package frc.robot;
+package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.generic.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball A, closest ball to the scoring table, and driving to the ball at terminal
 public class SimpleATerminal extends GenericAutonomous {
     double startingYaw;
-
-    int autonomousStep;
 
     double leftpower;
     double rightpower;
@@ -18,8 +15,14 @@ public class SimpleATerminal extends GenericAutonomous {
 
     double correction;
     double startTime;
-
     double startDistance;
+
+    double distanceA = 37;
+    double distanceB = 259.26;
+    double angleA = 87.74;
+
+    double rampDownDist = 10;
+
 
     PIDController PIDDriveStraight;
 
@@ -34,16 +37,14 @@ public class SimpleATerminal extends GenericAutonomous {
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
-        SmartDashboard.putNumber("Autonomous Step", autonomousStep);
-        SmartDashboard.putNumber("Position", robot.getDriveDistanceInchesLeft());
-        SmartDashboard.putNumber("Starting Yaw", startingYaw);
-        SmartDashboard.putNumber("Current Yaw", robot.getYaw());
 
         switch(autonomousStep){
             case 0: //reset
+                robot.lowerCollector();
                 PIDDriveStraight.reset();
                 PIDDriveStraight.enableContinuousInput(-180,180);
                 robot.resetEncoders();
+                robot.resetAttitude();
                 if (System.currentTimeMillis() - startTime > 100){
                     autonomousStep = 4;
                     startingYaw = robot.getYaw();
@@ -59,7 +60,10 @@ public class SimpleATerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= 37){
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceA - rampDownDist){
+                    defaultPower = (distanceA-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                }
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceA){
                     autonomousStep += 1;
                     startTime = System.currentTimeMillis();
                 } //has 3 inches of momentum with .25 power
@@ -78,17 +82,18 @@ public class SimpleATerminal extends GenericAutonomous {
             case 9: //shoot the second ball for funsies
             case 10: //miss the target and become sadge
             case 11: //copium
-            //will change these comments when they actually mean somthing
+            //will change these comments when they actually mean something
             case 12: //turn to go to ball @ terminal
                 leftpower = defaultTurnPower;
                 rightpower = -defaultTurnPower;
                 //turning right
 
-                if(robot.getYaw()- startingYaw > 87.74) {
-                    startingYaw = robot.getYaw();
+                if(robot.getYaw()- startingYaw > angleA) {
+                    startingYaw = startingYaw + angleA;
                     startDistance = robot.getDriveDistanceInchesLeft();
+                    PIDDriveStraight.reset();
                     autonomousStep += 1;
-                } //204.95
+                }
                 break;
             case 13: //drive towards the ball
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
@@ -96,7 +101,10 @@ public class SimpleATerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= 259.26) {
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB - rampDownDist){
+                    defaultPower = (distanceB-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                }
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB) {
                     autonomousStep += 1;
                     leftpower = 0;
                     rightpower = 0;

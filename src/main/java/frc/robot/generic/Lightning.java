@@ -2,6 +2,7 @@ package frc.robot.generic;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.*;
@@ -9,7 +10,7 @@ import edu.wpi.first.wpilibj.*;
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
 public class Lightning implements GenericRobot {
-    public static final double TICKS_PER_INCH_DRIVE = 116;
+    public static final double TICKS_PER_INCH_DRIVE = 0.96;
     public static final double TICKS_PER_DEGREE_TURRET = 116;
     public static final double TICKS_PER_REVOLUTION_SHOOTERA = 116;
     public static final double TICKS_PER_REVOLUTION_SHOOTERB = 116;
@@ -41,6 +42,11 @@ public class Lightning implements GenericRobot {
     SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
     SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
 
+    boolean isPTOonArms;
+
+    //shootReadyTimer is used to check if shooter ready
+    long shootReadyTimer;
+
     public Lightning(){
         boolean invertLeft = false;
         boolean invertRight = true;
@@ -53,6 +59,19 @@ public class Lightning implements GenericRobot {
         collector.setInverted(false);
         shooterB.setInverted(true);
         shooterA.setInverted(false);
+        shootReadyTimer = System.currentTimeMillis();
+
+        isPTOonArms = false;
+
+        rightMotorA.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).enableLimitSwitch(false);
+        rightMotorA.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).enableLimitSwitch(false);
+
+        leftMotorB.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).enableLimitSwitch(false);
+        leftMotorB.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).enableLimitSwitch(false);
+
+        indexer.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).enableLimitSwitch(false);
+        indexer.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).enableLimitSwitch(false);
+
     }
 
     @Override
@@ -121,11 +140,11 @@ public class Lightning implements GenericRobot {
 
     @Override
     public boolean getUpperCargo() {
-        return GenericRobot.super.getUpperCargo();
+        return indexer.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).isPressed();
     }
     @Override
     public boolean getLowerCargo() {
-        return GenericRobot.super.getLowerCargo();
+        return indexer.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).isPressed();
     }
 
 
@@ -274,6 +293,22 @@ public class Lightning implements GenericRobot {
     }
 
     @Override
+    public double getShooterTargetRPM(){
+        return 1000;
+    }
+
+    @Override
+    public boolean getFloorSensorLeft(){
+        return leftMotorB.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).isPressed();
+
+    }
+    @Override
+    public boolean getFloorSensorRight(){
+        return rightMotorA.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).isPressed();
+
+    }
+
+    @Override
     public void raiseCollector(){
         collectorPosition.set(true);
     }
@@ -283,13 +318,23 @@ public class Lightning implements GenericRobot {
         collectorPosition.set(false);
     }
 
+    //CONNECTS MOTORS TO CLIMB ARMS
     @Override
     public void turnOnPTO(){
+        isPTOonArms = true;
         PTO.set(DoubleSolenoid.Value.kForward);
     }
+
+    //CONNECTS MOTORS TO DRIVE
     @Override
     public void turnOffPTO(){
+        isPTOonArms = false;
         PTO.set(DoubleSolenoid.Value.kReverse);
+    }
+
+    @Override
+    public boolean getPTOState(){
+        return isPTOonArms;
     }
 
     @Override
@@ -299,6 +344,15 @@ public class Lightning implements GenericRobot {
     @Override
     public void setArmsBackward(){
         arms.set(DoubleSolenoid.Value.kForward);
+    }
+
+    @Override
+    public boolean getClimbSensorLeft(){
+        return leftMotorB.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).isPressed();
+    }
+    @Override
+    public boolean getClimbSensorRight(){
+        return rightMotorA.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyClosed).isPressed();
     }
 
     @Override
@@ -357,5 +411,15 @@ public class Lightning implements GenericRobot {
     @Override
     public double turretPIDgetD() {
         return GenericRobot.super.turretPIDgetD();
+    }
+
+
+    @Override
+    public long getShootReadyTimer(){
+        return shootReadyTimer;
+    }
+    @Override
+    public void shooterNotReady(){
+        shootReadyTimer = System.currentTimeMillis();
     }
 }

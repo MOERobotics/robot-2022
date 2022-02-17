@@ -1,9 +1,8 @@
-package frc.robot;
+package frc.robot.autonomous;
 
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.generic.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 
 public class autoArc extends GenericAutonomous {
@@ -13,78 +12,83 @@ public class autoArc extends GenericAutonomous {
     double innerRadius = radius - wheelBase/2;
     double outerRadius = radius + wheelBase/2;
     double outerArcDist = 180;
-
-    int autonomousStep = 0;
+    double defaultPower = .4;
+    double pivotDeg = 90;
+    double rampDownDist = 10;
 
     double startYaw;
     double currentYaw;
-    double pivotDeg = 90;
-
     double startInches;
     double currentDistInches;
-
     double startingTime;
-
     double leftPower;
     double rightPower;
-    double defaultPower = .4;
 
     double correction;
     PIDController PIDSteering;
     PIDController PIDPivot;
+    PIDController turretPIDController;
 
     boolean time = false;
     int counter;
     double[] averageX = new double [2];
     double currentTurretPower = 0;
-
     double average;
-    PIDController turretPIDController;
+    int averageTurretXSize = 2;
 
     @Override
     public void autonomousInit(GenericRobot robot) {
-        startingTime = System.currentTimeMillis();
-        PIDSteering = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
-        PIDPivot = new PIDController(robot.getPIDpivotP(), robot.getPIDpivotI(), robot.getPIDpivotD());
+        startingTime        = System.currentTimeMillis();
+        PIDSteering         = new PIDController(
+            robot.getPIDmaneuverP(),
+            robot.getPIDmaneuverI(),
+            robot.getPIDmaneuverD()
+        );
+        PIDPivot            = new PIDController(
+            robot.getPIDpivotP(),
+            robot.getPIDpivotI(),
+            robot.getPIDpivotD()
+        );
+        turretPIDController = new PIDController(
+            robot.turretPIDgetP(),
+            robot.turretPIDgetI(),
+            robot.turretPIDgetD()
+        );
         defaultPower = .4;
         autonomousStep = 0;
         time = false;
         counter = 0;
-        turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     }
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
         // Turret Auto Track
-        SmartDashboard.putNumber("autonomousStep", autonomousStep);
-        SmartDashboard.putNumber("correction", correction);
-        average = 0;
 
         if(robot.isTargetFound()) {
-            averageX[counter % 2] = robot.getTargetX();
+            //take a look at averaging function
+            //when we lose sight of target and then see it again.
+            counter = counter%averageTurretXSize;
+            averageX[counter] = robot.getTargetX();
             counter++;
         }
         average = 0;
         for(double i: averageX){
             average += i;
         }
-        average /= 2;
-        SmartDashboard.putNumber("Average", average);
+        average /= averageTurretXSize;
 
         if (robot.isTargetFound()){
             currentTurretPower = turretPIDController.calculate(average);
-
-
         }else{
             turretPIDController.reset();
             currentTurretPower = 0;
         }
-        SmartDashboard.putNumber("currentTurretPower", currentTurretPower);
 
         // Turret AutoTrack
 
         switch (autonomousStep){
             case 0: //reset
+                robot.lowerCollector();
                 PIDSteering.reset();
                 PIDPivot.reset();
                 PIDSteering.enableContinuousInput(-180,180);
@@ -104,8 +108,8 @@ public class autoArc extends GenericAutonomous {
                 correction = PIDSteering.calculate(currentYaw - startYaw);
                 leftPower = defaultPower + correction;
                 rightPower = defaultPower - correction;
-                if (currentDistInches - startInches >= rollout-10){ //slowdown
-                    defaultPower = (rollout-currentDistInches+startInches)*.04;
+                if (currentDistInches - startInches >= rollout-rampDownDist){ //slowdown
+                    defaultPower = (rollout-currentDistInches+startInches)*defaultPower/rampDownDist;
                 }
                 if (currentDistInches - startInches >= rollout){
                     defaultPower = .4;
@@ -137,7 +141,6 @@ public class autoArc extends GenericAutonomous {
                     autonomousStep += 1;
                     startingTime = System.currentTimeMillis();
                 }
-
                 break;
 
             case 3: //Pid reset
@@ -153,13 +156,6 @@ public class autoArc extends GenericAutonomous {
             case 4: //Pid Arc 10 ft Left
                 currentYaw = robot.getYaw();
                 currentDistInches = robot.getDriveDistanceInchesRight();
-                SmartDashboard.putNumber("startInches", startInches);
-                SmartDashboard.putNumber("currentInches", currentDistInches);
-                SmartDashboard.putNumber("outerRadius", outerRadius);
-                SmartDashboard.putNumber("startYaw", startYaw);
-                SmartDashboard.putNumber("currentYaw", currentYaw);
-                SmartDashboard.putNumber("InchtoDeg", Math.toDegrees((currentDistInches-startInches)/outerRadius));
-                SmartDashboard.putNumber("correction Measurement", Math.toDegrees((currentDistInches-startInches)/outerRadius) + (currentYaw-startYaw));
                 correction = PIDSteering.calculate(Math.toDegrees((currentDistInches-startInches)/outerRadius) + (currentYaw-startYaw));
                 double radiusRatio = outerRadius/innerRadius;
                 leftPower = 1/Math.sqrt(radiusRatio)*defaultPower + correction;

@@ -43,8 +43,8 @@ public class TurretBot implements GenericRobot {
 	SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
 
 	Solenoid shifter = new Solenoid(PneumaticsModuleType.CTREPCM,0);
-	Servo iuj = new Servo(0);
-	Servo       elevationRight = new Servo(1);
+	Servo elevationLeft  = new Servo(0);
+	Servo elevationRight = new Servo(1);
 
 	DigitalInput homeSensor = new DigitalInput(6);
 
@@ -83,11 +83,6 @@ public class TurretBot implements GenericRobot {
 		leftMotorB.set(leftPercent);
 		rightMotorA.set(rightPercent);
 		rightMotorB.set(rightPercent);
-	}
-
-	@Override
-	public void driveRPM(double leftRPM, double rightRPM) {
-
 	}
 
 
