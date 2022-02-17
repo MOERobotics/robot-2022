@@ -87,8 +87,14 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Rollll", robot.getRoll());
     SmartDashboard.putNumber("Linear speed", robot.getLinearVelocity());
 
-    SmartDashboard.putBoolean("Have upper cargo?", robot.getUpperCargo());
-    SmartDashboard.putBoolean("Have lower cargo?", robot.getLowerCargo());
+    SmartDashboard.putBoolean("Have upper cargo? (indexer reverse)", robot.getUpperCargo());
+    SmartDashboard.putBoolean("Have lower cargo? (indexer forward)", robot.getLowerCargo());
+
+    SmartDashboard.putBoolean("Trip left climb sensor? (leftB reverse)", robot.getClimbSensorLeft());
+    SmartDashboard.putBoolean("Trip right climb sensor? (rightA reverse)", robot.getClimbSensorRight());
+
+    SmartDashboard.putBoolean("Trip left floor sensor? (leftB forward)", robot.getFloorSensorLeft());
+    SmartDashboard.putBoolean("Trip right floor sensor? (rightA forward)", robot.getFloorSensorRight());
 
     //SmartDashboard.putBoolean("Has detected cargo?", robot.hasFoundCargo());
 
@@ -127,6 +133,7 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Shooter Ready Timer", robot.getShootReadyTimer());
     SmartDashboard.putBoolean("Shooter is Ready?", robot.isReadyToShoot());
+
   }
 
   @Override public void autonomousInit() {
