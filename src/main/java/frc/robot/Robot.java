@@ -98,32 +98,32 @@ public class Robot extends TimedRobot {
 
     //SmartDashboard.putBoolean("Has detected cargo?", robot.hasFoundCargo());
 
-    SmartDashboard.getNumber("Collector intake power", robot.getCollectorIntakePercentage());
+    SmartDashboard.putNumber("Collector intake power", robot.getCollectorIntakePercentage());
     //SmartDashboard.getBoolean("Sees target?", robot.isTargetFound());
 
-    SmartDashboard.getNumber("Vision target x", robot.getTargetX());
-    SmartDashboard.getNumber("Vision target y", robot.getTargetY());
-    SmartDashboard.getNumber("Vision target angle", robot.getTargetAngle());
-    SmartDashboard.getNumber("Vision target dist", robot.getTargetDistance());
+    SmartDashboard.putNumber("Vision target x", robot.getTargetX());
+    SmartDashboard.putNumber("Vision target y", robot.getTargetY());
+    SmartDashboard.putNumber("Vision target angle", robot.getTargetAngle());
+    SmartDashboard.putNumber("Vision target dist", robot.getTargetDistance());
 
-    SmartDashboard.getNumber("Turret direction angle ticks", robot.getTurretAngle());
-    SmartDashboard.getNumber("Turret direction angle degrees", robot.getTurretAngleDegrees());
-    SmartDashboard.getNumber("Alternate turret angle ticks", robot.getAlternateTurretAngleDegrees());
+    SmartDashboard.putNumber("Turret direction angle ticks", robot.getTurretAngle());
+    SmartDashboard.putNumber("Turret direction angle degrees", robot.getTurretAngleDegrees());
+    SmartDashboard.putNumber("Alternate turret angle ticks", robot.getAlternateTurretAngleDegrees());
 
 
-    SmartDashboard.getNumber("Turret direction motor pct", robot.getTurretPowerPct());
+    SmartDashboard.putNumber("Turret direction motor pct", robot.getTurretPowerPct());
 
-    SmartDashboard.getNumber("Turret pitch angle", robot.getTurretPitchAngle());
-    SmartDashboard.getNumber("Turret pitch motor pct", robot.getTurretPitchPowerPct());
+    SmartDashboard.putNumber("Turret pitch angle", robot.getTurretPitchAngle());
+    SmartDashboard.putNumber("Turret pitch motor pct", robot.getTurretPitchPowerPct());
 
-    SmartDashboard.getNumber("Shooter top motor pct", robot.getShooterPowerPctTop());
-    SmartDashboard.getNumber("Shooter bottom motor pct", robot.getShooterPowerPctBottom());
+    SmartDashboard.putNumber("Shooter top motor pct", robot.getShooterPowerPctTop());
+    SmartDashboard.putNumber("Shooter bottom motor pct", robot.getShooterPowerPctBottom());
 
-    SmartDashboard.getNumber("Shooter top motor rpm", robot.getShooterRPMTop());
-    SmartDashboard.getNumber("Shooter bottom motor rpm", robot.getShooterRPMBottom());
+    SmartDashboard.putNumber("Shooter top motor rpm", robot.getShooterRPMTop());
+    SmartDashboard.putNumber("Shooter bottom motor rpm", robot.getShooterRPMBottom());
 
-    SmartDashboard.getNumber("Shooter calculate distance", robot.getShooterTargetDistance());
-    SmartDashboard.getNumber("Shooter calculate height", robot.getShooterTargetHeight());
+    SmartDashboard.putNumber("Shooter calculate distance", robot.getShooterTargetDistance());
+    SmartDashboard.putNumber("Shooter calculate height", robot.getShooterTargetHeight());
     SmartDashboard.putNumber("Shooter target RPM", robot.getShooterTargetRPM());
 
     SmartDashboard.putNumber("Joystick raw X", joystick.getX());
