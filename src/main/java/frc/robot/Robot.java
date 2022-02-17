@@ -18,10 +18,19 @@ import frc.robot.generic.Lightning;
 
 public class Robot extends TimedRobot {
 
+  //Instantiate autonomous once, don't create unnecessary duplicates
+  //Add new Autos here when they're authored
+  public static final GenericAutonomous
+    autoArc         = new autoArc(),
+    simpleATerminal = new SimpleATerminal(),
+    simpleBTerminal = new SimpleBTerminal(),
+    simpleCTerminal = new SimpleCTerminal();
+
+
   GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = new autoArc();
+  GenericAutonomous autonomous = autoArc;
 
 
   int averageTurretXSize = 2;
@@ -78,35 +87,44 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Rollll", robot.getRoll());
     SmartDashboard.putNumber("Linear speed", robot.getLinearVelocity());
 
-    SmartDashboard.putBoolean("Have upper cargo?", robot.getUpperCargo());
-    SmartDashboard.putBoolean("Have lower cargo?", robot.getLowerCargo());
+    SmartDashboard.putBoolean("Have upper cargo? (indexer reverse)", robot.getUpperCargo());
+    SmartDashboard.putBoolean("Have lower cargo? (indexer forward)", robot.getLowerCargo());
+
+    SmartDashboard.putBoolean("Trip left climb sensor? (leftB reverse)", robot.getClimbSensorLeft());
+    SmartDashboard.putBoolean("Trip right climb sensor? (rightA reverse)", robot.getClimbSensorRight());
+
+    SmartDashboard.putBoolean("Trip left floor sensor? (leftB forward)", robot.getFloorSensorLeft());
+    SmartDashboard.putBoolean("Trip right floor sensor? (rightA forward)", robot.getFloorSensorRight());
 
     //SmartDashboard.putBoolean("Has detected cargo?", robot.hasFoundCargo());
 
-    SmartDashboard.getNumber("Collector intake power", robot.getCollectorIntakePercentage());
+    SmartDashboard.putNumber("Collector intake power", robot.getCollectorIntakePercentage());
     //SmartDashboard.getBoolean("Sees target?", robot.isTargetFound());
 
-    SmartDashboard.getNumber("Vision target x", robot.getTargetX());
-    SmartDashboard.getNumber("Vision target y", robot.getTargetY());
-    SmartDashboard.getNumber("Vision target angle", robot.getTargetAngle());
-    SmartDashboard.getNumber("Vision target dist", robot.getTargetDistance());
+    SmartDashboard.putNumber("Vision target x", robot.getTargetX());
+    SmartDashboard.putNumber("Vision target y", robot.getTargetY());
+    SmartDashboard.putNumber("Vision target angle", robot.getTargetAngle());
+    SmartDashboard.putNumber("Vision target dist", robot.getTargetDistance());
 
-    SmartDashboard.getNumber("Turret direction angle ticks", robot.getTurretAngle());
-    SmartDashboard.getNumber("Turret direction angle degrees", robot.getTurretAngleDegrees());
+    SmartDashboard.putNumber("Turret direction angle ticks", robot.getTurretAngle());
+    SmartDashboard.putNumber("Turret direction angle degrees", robot.getTurretAngleDegrees());
+    SmartDashboard.putNumber("Alternate turret angle ticks", robot.getAlternateTurretAngleDegrees());
 
-    SmartDashboard.getNumber("Turret direction motor pct", robot.getTurretPowerPct());
+    SmartDashboard.putNumber("Turret direction motor pct", robot.getTurretPowerPct());
 
-    SmartDashboard.getNumber("Turret pitch angle", robot.getTurretPitchAngle());
-    SmartDashboard.getNumber("Turret pitch motor pct", robot.getTurretPitchPowerPct());
+    SmartDashboard.putNumber("Turret direction motor pct", robot.getTurretPowerPct());
 
-    SmartDashboard.getNumber("Shooter top motor pct", robot.getShooterPowerPctTop());
-    SmartDashboard.getNumber("Shooter bottom motor pct", robot.getShooterPowerPctBottom());
+    SmartDashboard.putNumber("Turret pitch angle", robot.getTurretPitchAngle());
+    SmartDashboard.putNumber("Turret pitch motor pct", robot.getTurretPitchPowerPct());
 
-    SmartDashboard.getNumber("Shooter top motor rpm", robot.getShooterRPMTop());
-    SmartDashboard.getNumber("Shooter bottom motor rpm", robot.getShooterRPMBottom());
+    SmartDashboard.putNumber("Shooter top motor pct", robot.getShooterPowerPctTop());
+    SmartDashboard.putNumber("Shooter bottom motor pct", robot.getShooterPowerPctBottom());
 
-    SmartDashboard.getNumber("Shooter calculate distance", robot.getShooterTargetDistance());
-    SmartDashboard.getNumber("Shooter calculate height", robot.getShooterTargetHeight());
+    SmartDashboard.putNumber("Shooter top motor rpm", robot.getShooterRPMTop());
+    SmartDashboard.putNumber("Shooter bottom motor rpm", robot.getShooterRPMBottom());
+
+    SmartDashboard.putNumber("Shooter calculate distance", robot.getShooterTargetDistance());
+    SmartDashboard.putNumber("Shooter calculate height", robot.getShooterTargetHeight());
     SmartDashboard.putNumber("Shooter target RPM", robot.getShooterTargetRPM());
 
     SmartDashboard.putNumber("Joystick raw X", joystick.getX());
@@ -116,6 +134,7 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Shooter Ready Timer", robot.getShootReadyTimer());
     SmartDashboard.putBoolean("Shooter is Ready?", robot.isReadyToShoot());
+
   }
 
   @Override public void autonomousInit() {
@@ -194,14 +213,26 @@ public class Robot extends TimedRobot {
     double tolerance = 0.8;
     double drivePower = 0.2;
 
+    double driveLeft = 0;
+    double driveRight = 0;
+
     if(robot.getPTOState()){
-      if(xbox.getRawAxis(leftAxis) > tolerance && xbox.getRawAxis(rightAxis) > tolerance){
-        robot.drivePercent(drivePower, drivePower);
+      if(xbox.getRawAxis(leftAxis) > tolerance){
+        driveLeft = drivePower;
       }
-      if(xbox.getRawAxis(leftAxis) < -tolerance && xbox.getRawAxis(rightAxis) < -tolerance){
-        robot.drivePercent(-drivePower, -drivePower);
+      else if(xbox.getRawAxis(leftAxis) < -tolerance){
+        driveLeft = -drivePower;
       }
+
+      if(xbox.getRawAxis(rightAxis) > tolerance){
+        driveRight = drivePower;
+      }
+      else if(xbox.getRawAxis(rightAxis) < -tolerance){
+        driveRight = -drivePower;
+      }
+
     }
+    robot.drivePercent(driveLeft, driveRight);
 
 
 
@@ -268,23 +299,53 @@ public class Robot extends TimedRobot {
       robot.resetEncoders();
     }
 
-    if (joystick.getRawButton(4)){
-      autonomous = new autoArc();
-
-    }
-    if (joystick.getRawButton(5)){
-      autonomous = new SimpleATerminal();
-    }
-    if (joystick.getRawButton(6)){
-      autonomous = new SimpleBTerminal();
-    }
-    if (joystick.getRawButton(7)){
-      autonomous = new SimpleCTerminal();
-    }
+    if (joystick.getRawButton(4)) autonomous = autoArc;
+    if (joystick.getRawButton(5)) autonomous = simpleATerminal;
+    if (joystick.getRawButton(6)) autonomous = simpleBTerminal;
+    if (joystick.getRawButton(7)) autonomous = simpleCTerminal;
 
   }
 
   @Override public void testInit() {}
 
-  @Override public void testPeriodic() {}
+  @Override public void testPeriodic() {
+    double driveX =  joystick.getX();
+    double driveY = -joystick.getY();
+
+    //joystick deaden: yeet smol/weird joystick values when joystick is at rest
+    double cutoff = 0.05;
+    if(driveX > -cutoff && driveX < cutoff) driveX = 0;
+    if(driveY > -cutoff && driveY < cutoff) driveY = 0;
+
+    //moved this to after joystick deaden because deaden should be focused on the raw joystick values
+    double scaleFactor = 1.0;
+
+    robot.drivePercent(
+        (driveY+driveX) * scaleFactor,
+        (driveY-driveX) * scaleFactor
+    );
+
+    //note to self: buttons currently assume mirrored joystick setting
+    if      (joystick.getRawButton(11)) robot.setCollectorIntakePercentage( 1.0);
+    else if (joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-1.0);
+    else                                robot.setCollectorIntakePercentage( 0.0);
+
+    if      (joystick.getRawButton(12)) robot.setTurretPowerPct( 0.2);
+    else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
+    else                                robot.setTurretPowerPct( 0.0);
+
+    if      (joystick.getRawButton(13)) robot.setShooterPowerPct( 0.2,  0.2);
+    else if (joystick.getRawButton(14)) robot.setShooterPowerPct(-0.2, -0.2);
+    else                                robot.setShooterPowerPct( 0.0,  0.0);
+
+    if      (joystick.getRawButton( 7)) robot.raiseCollector();
+    if      (joystick.getRawButton( 8)) robot.lowerCollector();
+
+    if      (joystick.getRawButton( 6)) robot.turnOnPTO();
+    if      (joystick.getRawButton( 9)) robot.turnOffPTO();
+
+    if      (joystick.getRawButton( 5)) robot.setArmsForward();
+    if      (joystick.getRawButton(10)) robot.setArmsBackward();
+
+  }
 }
