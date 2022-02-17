@@ -19,6 +19,7 @@ import frc.robot.generic.TurretBot;
 
 public class Robot extends TimedRobot {
 
+
   GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
   GenericAutonomous autonomous = new SimpleBTerminal();
@@ -148,7 +149,8 @@ public class Robot extends TimedRobot {
     //note to self: buttons currently assume mirrored joystick setting
     if      (joystick.getRawButton(11)) robot.setCollectorIntakePercentage( 1.0);
     else if (joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-1.0);
-    else                                robot.setCollectorIntakePercentage( 0);
+    else                                robot.setCollectorIntakePercentage( 0.0);
+
 
     if      (joystick.getRawButton(12)) robot.setTurretPowerPct( 0.2);
     else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
@@ -204,23 +206,53 @@ public class Robot extends TimedRobot {
       robot.resetEncoders();
     }
 
-    if (joystick.getRawButton(4)){
-      autonomous = new autoArc();
-
-    }
-    if (joystick.getRawButton(5)){
-      autonomous = new SimpleATerminal();
-    }
-    if (joystick.getRawButton(6)){
-      autonomous = new SimpleBTerminal();
-    }
-    if (joystick.getRawButton(7)){
-      autonomous = new SimpleCTerminal();
-    }
+    if (joystick.getRawButton(4)) autonomous = autoArc;
+    if (joystick.getRawButton(5)) autonomous = simpleATerminal;
+    if (joystick.getRawButton(6)) autonomous = simpleBTerminal;
+    if (joystick.getRawButton(7)) autonomous = simpleCTerminal;
 
   }
 
   @Override public void testInit() {}
 
-  @Override public void testPeriodic() {}
+  @Override public void testPeriodic() {
+    double driveX =  joystick.getX();
+    double driveY = -joystick.getY();
+
+    //joystick deaden: yeet smol/weird joystick values when joystick is at rest
+    double cutoff = 0.05;
+    if(driveX > -cutoff && driveX < cutoff) driveX = 0;
+    if(driveY > -cutoff && driveY < cutoff) driveY = 0;
+
+    //moved this to after joystick deaden because deaden should be focused on the raw joystick values
+    double scaleFactor = 1.0;
+
+    robot.drivePercent(
+        (driveY+driveX) * scaleFactor,
+        (driveY-driveX) * scaleFactor
+    );
+
+    //note to self: buttons currently assume mirrored joystick setting
+    if      (joystick.getRawButton(11)) robot.setCollectorIntakePercentage( 1.0);
+    else if (joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-1.0);
+    else                                robot.setCollectorIntakePercentage( 0.0);
+
+    if      (joystick.getRawButton(12)) robot.setTurretPowerPct( 0.2);
+    else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
+    else                                robot.setTurretPowerPct( 0.0);
+
+    if      (joystick.getRawButton(13)) robot.setShooterPowerPct( 0.2,  0.2);
+    else if (joystick.getRawButton(14)) robot.setShooterPowerPct(-0.2, -0.2);
+    else                                robot.setShooterPowerPct( 0.0,  0.0);
+
+    if      (joystick.getRawButton( 7)) robot.raiseCollector();
+    if      (joystick.getRawButton( 8)) robot.lowerCollector();
+
+    if      (joystick.getRawButton( 6)) robot.turnOnPTO();
+    if      (joystick.getRawButton( 9)) robot.turnOffPTO();
+
+    if      (joystick.getRawButton( 5)) robot.setArmsForward();
+    if      (joystick.getRawButton(10)) robot.setArmsBackward();
+
+  }
 }
