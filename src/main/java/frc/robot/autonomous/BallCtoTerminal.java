@@ -5,16 +5,21 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball C, closest ball to the hangar, and driving to the ball at terminal
-public class SimpleCTerminal extends GenericAutonomous {
+public class BallCtoTerminal extends GenericAutonomous {
     double startingYaw;
+
     double startDistance;
     double leftpower;
     double rightpower;
-    double defaultPower = .25;
-    double defaultTurnPower = .25;
-
+    double defaultPower = .4;
+    double defaultTurnPower = .4;
     double correction;
     double startTime;
+
+    double distanceC = 40.44;
+    double distanceTerminal = 251;
+    double angleC = 84.54;
+    double rampDownDist = 10;
 
     PIDController PIDDriveStraight;
 
@@ -52,16 +57,20 @@ public class SimpleCTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= 37) {
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC - rampDownDist){
+                    defaultPower = (distanceC-robot.getDriveDistanceInchesLeft()+startDistance)
+                            *defaultPower/rampDownDist;
+                }
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC){
                     autonomousStep += 1;
-                } //has 3 inches of momentum with .25 power
+                    startTime = System.currentTimeMillis();
+                }
                 break;
             case 5: //stop
                 leftpower = 0;
                 rightpower = 0;
                 startDistance = robot.getDriveDistanceInchesLeft();
                 autonomousStep = 12;
-                //autonomousStep = 8;
                 break;
             case 6: //collector to collect ball
             case 7: //collection part 2 not electric nor boogaloo
@@ -75,8 +84,8 @@ public class SimpleCTerminal extends GenericAutonomous {
                 rightpower = defaultTurnPower;
                 //turning left
 
-                if(robot.getYaw() - startingYaw < -84.54) {
-                    startingYaw = startingYaw - 84.54;
+                if(robot.getYaw() - startingYaw < -angleC) {
+                    startingYaw = startingYaw - angleC;
                     startDistance = robot.getDriveDistanceInchesLeft();
                     PIDDriveStraight.reset();
                     autonomousStep += 1;
@@ -88,11 +97,14 @@ public class SimpleCTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= 251) {
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal - rampDownDist){
+                    defaultPower = (distanceTerminal-robot.getDriveDistanceInchesLeft()+startDistance)
+                            *defaultPower/rampDownDist;
+                }
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal){
                     autonomousStep += 1;
-                    leftpower = 0;
-                    rightpower = 0;
-                } //might need to tune for momentum
+                    startTime = System.currentTimeMillis();
+                }
                 break;
             case 14:
                 leftpower = 0;

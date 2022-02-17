@@ -13,14 +13,15 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
+import frc.robot.generic.Falcon;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
 
 public class Robot extends TimedRobot {
 
-  GenericRobot robot = new Lightning();
+  GenericRobot robot = new Falcon();
   Joystick joystick = new Joystick(0);
-  GenericAutonomous autonomous = new autoArc();
+  GenericAutonomous autonomous = new BallCtoTerminal();
 
 
   int averageTurretXSize = 2;
@@ -208,13 +209,13 @@ public class Robot extends TimedRobot {
 
     }
     if (joystick.getRawButton(5)){
-      autonomous = new SimpleATerminal();
+      autonomous = new BallAtoTerminal();
     }
     if (joystick.getRawButton(6)){
-      autonomous = new SimpleBTerminal();
+      autonomous = new BallBtoTerminal();
     }
     if (joystick.getRawButton(7)){
-      autonomous = new SimpleCTerminal();
+      autonomous = new BallCtoTerminal();
     }
 
   }

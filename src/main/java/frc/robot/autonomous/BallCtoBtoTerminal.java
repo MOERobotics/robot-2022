@@ -3,8 +3,8 @@ package frc.robot.autonomous;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.generic.GenericRobot;
 
-//Simple autonomous code for ball A, and then driving to the ball B, and finally to ball at terminal
-public class SimpleAtoBtoTerminal extends GenericAutonomous {
+//Simple autonomous code
+public class BallCtoBtoTerminal extends GenericAutonomous{
     double startingYaw;
     double startTime;
     double startDistance;
@@ -15,11 +15,11 @@ public class SimpleAtoBtoTerminal extends GenericAutonomous {
     double defaultTurnPower = .25;
     double correction;
 
-    double distanceA = 37;
-    double distanceB = 117.1;
-    double distanceC = 160.6;
-    double angleA = 87.74;
-    double angleB = 0; //NEED TO ASK CAD FOR ANGLE
+    double distnacetoC = 37;
+    double distancetoB = 169.95;
+    double distancetoTerminal = 160.6;
+    double angleC = 56.25;
+    double angleB = 81.27;
     double rampDownDist = 10;
 
     PIDController PIDDriveStraight;
@@ -35,13 +35,13 @@ public class SimpleAtoBtoTerminal extends GenericAutonomous {
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
 
-        switch(autonomousStep){
+        switch (autonomousStep) {
             case 0: //reset
                 robot.lowerCollector();
                 PIDDriveStraight.reset();
-                PIDDriveStraight.enableContinuousInput(-180,180);
+                PIDDriveStraight.enableContinuousInput(-180, 180);
                 robot.resetEncoders();
-                if (System.currentTimeMillis() - startTime > 100){
+                if (System.currentTimeMillis() - startTime > 100) {
                     autonomousStep = 4;
                     startingYaw = robot.getYaw();
                     startDistance = robot.getDriveDistanceInchesLeft();
@@ -56,10 +56,10 @@ public class SimpleAtoBtoTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceA - rampDownDist){
-                    defaultPower = (distanceA-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= distnacetoC - rampDownDist) {
+                    defaultPower = (distnacetoC - robot.getDriveDistanceInchesLeft() + startDistance) * defaultPower / rampDownDist;
                 }
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceA){
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= distnacetoC) {
                     autonomousStep += 1;
                     startTime = System.currentTimeMillis();
                 }
@@ -67,7 +67,7 @@ public class SimpleAtoBtoTerminal extends GenericAutonomous {
             case 5: //stop
                 leftpower = 0;
                 rightpower = 0;
-                if (System.currentTimeMillis() - startTime > 1000){
+                if (System.currentTimeMillis() - startTime > 1000) {
                     autonomousStep = 12;
                 }
                 break;
@@ -83,8 +83,8 @@ public class SimpleAtoBtoTerminal extends GenericAutonomous {
                 rightpower = -defaultTurnPower;
                 //turning right
 
-                if(robot.getYaw() - startingYaw > angleA) {
-                    startingYaw = startingYaw + angleA;
+                if (robot.getYaw() - startingYaw > angleC) {
+                    startingYaw = startingYaw + angleC;
                     startDistance = robot.getDriveDistanceInchesLeft();
                     PIDDriveStraight.reset();
                     autonomousStep += 1;
@@ -96,10 +96,10 @@ public class SimpleAtoBtoTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB - rampDownDist){
-                    defaultPower = (distanceB-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= distancetoB - rampDownDist) {
+                    defaultPower = (distancetoB - robot.getDriveDistanceInchesLeft() + startDistance) * defaultPower / rampDownDist;
                 }
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB) {
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= distancetoB) {
                     autonomousStep += 1;
                     leftpower = 0;
                     rightpower = 0;
@@ -113,11 +113,11 @@ public class SimpleAtoBtoTerminal extends GenericAutonomous {
             case 19:
             case 20:
             case 21: //turn to ball Terminal
-                leftpower  = -defaultTurnPower;
+                leftpower = -defaultTurnPower;
                 rightpower = defaultTurnPower;
                 //turning ???
 
-                if(robot.getYaw() - startingYaw > angleB) {
+                if (robot.getYaw() - startingYaw > angleB) {
                     startingYaw = robot.getYaw();
                     startDistance = robot.getDriveDistanceInchesLeft();
                     autonomousStep += 1;
@@ -129,10 +129,10 @@ public class SimpleAtoBtoTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC - rampDownDist){
-                    defaultPower = (distanceC-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= distancetoTerminal - rampDownDist) {
+                    defaultPower = (distancetoTerminal - robot.getDriveDistanceInchesLeft() + startDistance) * defaultPower / rampDownDist;
                 }
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC) {
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= distancetoTerminal) {
                     autonomousStep += 1;
                     leftpower = 0;
                     rightpower = 0;
@@ -145,7 +145,6 @@ public class SimpleAtoBtoTerminal extends GenericAutonomous {
             case 24:
             case 25:
         }
-        robot.drivePercent(leftpower, rightpower);
-
     }
 }
+
