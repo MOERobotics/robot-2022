@@ -176,6 +176,8 @@ public class autoArcDifferent extends GenericAutonomous {
         robot.drivePercent(leftPower, rightPower);
         robot.setTurretPowerPct(currentTurretPower);
 
+
+
     }
 
 }

@@ -72,6 +72,4 @@ public class BallSimple extends GenericAutonomous {
         }
         robot.drivePercent(leftpower, rightpower);
     }
-
-
 }
