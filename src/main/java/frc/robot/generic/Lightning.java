@@ -78,6 +78,8 @@ public class Lightning implements GenericRobot {
         isPTOonArms = false;
         isActivelyShooting = false;
 
+        indexer.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
         limitSwitchIndexerForward.enableLimitSwitch(false);
         limitSwitchIndexerReverse.enableLimitSwitch(false);
         limitSwitchRightAForward.enableLimitSwitch(false);
