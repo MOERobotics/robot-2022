@@ -21,8 +21,9 @@ public class BallAtoTerminal extends GenericAutonomous {
     double angleA = 87.74;
     double rampDownDist = 10;
 
-
     PIDController PIDDriveStraight;
+
+    TurretTracker tracker = new TurretTracker();
 
     @Override
     public void autonomousInit(GenericRobot robot) {
@@ -30,10 +31,12 @@ public class BallAtoTerminal extends GenericAutonomous {
         startingYaw = robot.getYaw();
         startTime = System.currentTimeMillis();
         PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDpivotD());
+        tracker.turretInit(robot);
     }
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
+        tracker.turretUpdate(robot);
 
         switch(autonomousStep){
             case 0: //reset
@@ -112,6 +115,7 @@ public class BallAtoTerminal extends GenericAutonomous {
                 break;
         }
         robot.drivePercent(leftpower, rightpower);
+        tracker.turretMove(robot);
 
     }
 }
