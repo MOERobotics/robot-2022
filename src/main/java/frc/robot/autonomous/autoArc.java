@@ -109,7 +109,9 @@ public class autoArc extends GenericAutonomous {
                 leftPower = defaultPower + correction;
                 rightPower = defaultPower - correction;
                 if (currentDistInches - startInches >= rollout-rampDownDist){ //slowdown
-                    defaultPower = (rollout-currentDistInches+startInches)*defaultPower/rampDownDist;
+                    double a = rampDown(defaultPower, 0, startInches, rampDownDist, currentDistInches, rollout);
+                    leftPower = a;
+                    rightPower = a;
                 }
                 if (currentDistInches - startInches >= rollout){
                     defaultPower = .4;
