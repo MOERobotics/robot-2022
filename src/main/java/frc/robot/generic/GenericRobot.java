@@ -108,6 +108,10 @@ public interface GenericRobot {
 		System.out.println("I don't have a navx");
 	}
 
+	boolean getTapeSensorOne();
+
+	boolean getTapeSensorTwo();
+
 	public enum TeamColor {
 		RED,
 		BLUE,
@@ -282,4 +286,28 @@ public interface GenericRobot {
 	public default void setArmsBackward() {
 		//System.out.println("I don't have a climber");
 	}
+	public default void raiseClimberArms(){
+		//System.out.println("I don't have a climber");
+	}
+	public default void lowerClimberArms(){
+		//System.out.println("I don't have a climber");
+	}
+	public default void armPower(double power){
+		//System.out.println("Elbow Grease");
+	}
+	public default double armHeight(){
+		return 0.0;
+		//System.out.println("I don't have a climber");
+	}
+
+	public default boolean armInContact(){
+		return false;
+		//System.out.println("I don't have a climber");
+	}
+
+	public default boolean inTheRightPlace(){
+		return false;
+		//System.out.println("I don't have a climber");
+	}
+
 }

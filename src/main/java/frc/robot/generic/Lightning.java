@@ -14,6 +14,11 @@ public class Lightning implements GenericRobot {
     public static final double TICKS_PER_REVOLUTION_SHOOTERA = 116;
     public static final double TICKS_PER_REVOLUTION_SHOOTERB = 116;
 
+    public static  final double LEFTATOLERANCE = 0;
+    public static  final double LEFTBTOLERANCE = 0;
+    public static  final double RIGHTATOLERANCE = 0;
+    public static  final double RIGHTBTOLERANCE = 0;
+
     AHRS navx = new AHRS(SPI.Port.kMXP, (byte) 50);
 
     CANSparkMax collector         = new CANSparkMax( 3, kBrushless);
@@ -293,6 +298,55 @@ public class Lightning implements GenericRobot {
     }
 
     @Override
+    public void raiseClimberArms() {
+        leftMotorB.set(.1);
+        leftMotorA.set(.1);
+        rightMotorA.set(.1);
+        rightMotorB.set(.1);
+    }
+
+    @Override
+    public void lowerClimberArms() {
+        leftMotorB.set(-.1);
+        leftMotorA.set(-.1);
+        rightMotorA.set(-.1);
+        rightMotorB.set(-.1);
+    }
+
+    @Override
+    public void armPower(double power) {
+        leftMotorB.set(power);
+        leftMotorA.set(power);
+        rightMotorA.set(power);
+        rightMotorB.set(power);
+    }
+
+    @Override
+    public double armHeight() {
+        //TODO
+        //Maybe use some sensor. Do NOT want to use encoders for this.
+        return GenericRobot.super.armHeight();
+    }
+
+    @Override
+    public boolean armInContact() {
+        //TODO: find tolerances
+        if (leftMotorA.getOutputCurrent() > LEFTATOLERANCE && leftMotorB.getOutputCurrent() > LEFTBTOLERANCE
+                && rightMotorA.getOutputCurrent() > RIGHTATOLERANCE && rightMotorB.getOutputCurrent() > RIGHTBTOLERANCE){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    @Override
+    public boolean inTheRightPlace(){
+        //TODO: maybe a sensor??
+        return false;
+    }
+
+    @Override
     public double getPIDmaneuverP() {
         return GenericRobot.super.getPIDmaneuverP();
     }
@@ -333,6 +387,16 @@ public class Lightning implements GenericRobot {
     @Override
     public void resetAttitude() {
         navx.reset();
+    }
+
+    @Override
+    public boolean getTapeSensorOne() {
+        return false;
+    }
+
+    @Override
+    public boolean getTapeSensorTwo() {
+        return false;
     }
 
     @Override

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
+import frc.robot.command.*;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
 import frc.robot.generic.TurretBot;
@@ -22,6 +23,7 @@ public class Robot extends TimedRobot {
   GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
   GenericAutonomous autonomous = new SimpleBTerminal();
+  GenericCommand command = new Hang();
 
 
   int averageTurretXSize = 2;
@@ -34,6 +36,9 @@ public class Robot extends TimedRobot {
   int counter = 0;
   double average;
   double currentTurretPower;
+  boolean hang = false;
+  int count = 0;
+  boolean reset = true;
 
 
   PIDController turretPIDController;
@@ -125,7 +130,8 @@ public class Robot extends TimedRobot {
 
   @Override public void teleopInit() {
       turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
-
+      hang = false;
+      count = 0;
   }
 
   @Override public void teleopPeriodic() {
@@ -146,26 +152,46 @@ public class Robot extends TimedRobot {
     );
 
     //note to self: buttons currently assume mirrored joystick setting
-    if      (joystick.getRawButton(11)) robot.setCollectorIntakePercentage( 1.0);
-    else if (joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-1.0);
-    else                                robot.setCollectorIntakePercentage( 0);
+    if (joystick.getRawButtonPressed(2)){
+      count = (count+1)%2;
+    }
+    if (count == 1){
+      hang = true;
+    }
+    else{
+      hang = false;
+    }
 
-    if      (joystick.getRawButton(12)) robot.setTurretPowerPct( 0.2);
-    else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
-    else                                robot.setTurretPowerPct( 0.0);
+    if (!hang) {
+      reset = true;
+      if (joystick.getRawButton(11)) robot.setCollectorIntakePercentage(1.0);
+      else if (joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-1.0);
+      else robot.setCollectorIntakePercentage(0);
 
-    if      (joystick.getRawButton(13)) robot.setShooterPowerPct( 0.2,  0.2);
-    else if (joystick.getRawButton(14)) robot.setShooterPowerPct(-0.2, -0.2);
-    else                                robot.setShooterPowerPct( 0.0,  0.0);
+      if (joystick.getRawButton(12)) robot.setTurretPowerPct(0.2);
+      else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
+      else robot.setTurretPowerPct(0.0);
 
-    if      (joystick.getRawButton( 7)) robot.raiseCollector();
-    if      (joystick.getRawButton( 8)) robot.lowerCollector();
+      if (joystick.getRawButton(13)) robot.setShooterPowerPct(0.2, 0.2);
+      else if (joystick.getRawButton(14)) robot.setShooterPowerPct(-0.2, -0.2);
+      else robot.setShooterPowerPct(0.0, 0.0);
 
-    if      (joystick.getRawButton( 6)) robot.turnOnPTO();
-    if      (joystick.getRawButton( 9)) robot.turnOffPTO();
+      if (joystick.getRawButton(7)) robot.raiseCollector();
+      if (joystick.getRawButton(8)) robot.lowerCollector();
 
-    if      (joystick.getRawButton( 5)) robot.setArmsForward();
-    if      (joystick.getRawButton(10)) robot.setArmsBackward();
+      if (joystick.getRawButton(6)) robot.turnOnPTO();
+      if (joystick.getRawButton(9)) robot.turnOffPTO();
+
+      if (joystick.getRawButton(5)) robot.setArmsForward();
+      if (joystick.getRawButton(10)) robot.setArmsBackward();
+    }
+    else{
+      if (reset){
+        command.begin(robot);
+        reset = false;
+      }
+      command.step(robot);
+    }
 
 
     //Start of Daniel+Saiarun Turret test
