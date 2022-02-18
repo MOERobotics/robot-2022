@@ -127,13 +127,16 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Shooter calculate height", robot.getShooterTargetHeight());
     SmartDashboard.putNumber("Shooter target RPM", robot.getShooterTargetRPM());
 
+    SmartDashboard.putNumber("Shooter Ready Timer", robot.getShootReadyTimer());
+    SmartDashboard.putBoolean("Shooter is Ready?", robot.isReadyToShoot());
+
+    SmartDashboard.putBoolean("Is PTO set to climb arms?", robot.getPTOState());
+
+
     SmartDashboard.putNumber("Joystick raw X", joystick.getX());
     SmartDashboard.putNumber("Joystick raw Y", joystick.getY());
 
     SmartDashboard.putNumber("Autonomous Step", autonomous.autonomousStep);
-
-    SmartDashboard.putNumber("Shooter Ready Timer", robot.getShootReadyTimer());
-    SmartDashboard.putBoolean("Shooter is Ready?", robot.isReadyToShoot());
 
   }
 
