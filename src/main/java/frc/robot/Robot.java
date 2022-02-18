@@ -133,6 +133,9 @@ public class Robot extends TimedRobot {
   @Override public void teleopPeriodic() {
     double jx =  joystick.getX();
     double jy = -joystick.getY();
+    double wheelBase = 28.0;
+    double leftPower;
+    double rightPower;
 
     //joystick deaden: yeet smol/weird joystick values when joystick is at rest
     double cutoff = 0.05;
@@ -141,10 +144,26 @@ public class Robot extends TimedRobot {
 
     //moved this to after joystick deaden because deaden should be focused on the raw joystick values
     double scaleFactor = 1.0;
+    double R;
+
+    if (jx >0){
+      R = 10*jx*(1-jx)/((Math.pow(jx, 2)+1.0e-10));
+      leftPower = -jy;
+      rightPower = -jy*(R - wheelBase/2)/(R + wheelBase/2);
+    } else{
+      R = -10*jx*(1+jx)/((Math.pow(jx, 2)+1.0e-10));
+      leftPower = -jy/(R + wheelBase/2)*(R - wheelBase/2);
+      rightPower = -jy;
+    }
+
+    if (Math.abs(jx)<cutoff) {
+      leftPower = -jy;
+      rightPower = -jy;
+    }
 
     robot.drivePercent(
-        (jy+jx) * scaleFactor,
-        (jy-jx) * scaleFactor
+        leftPower * scaleFactor,
+        rightPower * scaleFactor
     );
 
     //note to self: buttons currently assume mirrored joystick setting
