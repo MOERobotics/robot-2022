@@ -340,4 +340,11 @@ public interface GenericRobot {
 		if(System.currentTimeMillis() - getShootReadyTimer() > time) return true;
 		return false;
 	}
+
+	public default boolean isActivelyShooting(){
+		return false;
+	}
+	public default void setActivelyShooting(boolean isShooting){
+
+	}
 }

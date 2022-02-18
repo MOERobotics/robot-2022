@@ -52,11 +52,11 @@ public class Lightning implements GenericRobot {
     SparkMaxLimitSwitch limitSwitchRightAReverse = rightMotorA.getReverseLimitSwitch(lstype);
 
     SparkMaxLimitSwitch limitSwitchLeftBForward = leftMotorB.getForwardLimitSwitch(lstype);
-    SparkMaxLimitSwitch limitSwitchleftBReverse = leftMotorB.getReverseLimitSwitch(lstype);
-
-
+    SparkMaxLimitSwitch limitSwitchLeftBReverse = leftMotorB.getReverseLimitSwitch(lstype);
 
     boolean isPTOonArms;
+    //True = robot is in the process of and committed to shooting a cargo at mach 12
+    boolean isActivelyShooting;
 
     //shootReadyTimer is used to check if shooter ready
     long shootReadyTimer;
@@ -76,6 +76,7 @@ public class Lightning implements GenericRobot {
         shootReadyTimer = System.currentTimeMillis();
 
         isPTOonArms = false;
+        isActivelyShooting = false;
 
         limitSwitchIndexerForward.enableLimitSwitch(false);
         limitSwitchIndexerReverse.enableLimitSwitch(false);
@@ -83,7 +84,7 @@ public class Lightning implements GenericRobot {
         limitSwitchRightAReverse.enableLimitSwitch(false);
 
         limitSwitchLeftBForward.enableLimitSwitch(false);
-        limitSwitchleftBReverse.enableLimitSwitch(false);
+        limitSwitchLeftBReverse.enableLimitSwitch(false);
 
     }
 
@@ -366,7 +367,7 @@ public class Lightning implements GenericRobot {
 
     @Override
     public boolean getClimbSensorLeft(){
-        return limitSwitchleftBReverse.isPressed();
+        return limitSwitchLeftBReverse.isPressed();
     }
     @Override
     public boolean getClimbSensorRight(){
@@ -439,5 +440,16 @@ public class Lightning implements GenericRobot {
     @Override
     public void shooterNotReady(){
         shootReadyTimer = System.currentTimeMillis();
+    }
+
+    @Override
+    public boolean isActivelyShooting(){
+        return isActivelyShooting;
+    }
+
+    //TODO: Add check using isReadyToShoot() function?
+    @Override
+    public void setActivelyShooting(boolean isShooting){
+        isActivelyShooting = isShooting;
     }
 }

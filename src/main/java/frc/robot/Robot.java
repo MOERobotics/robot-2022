@@ -99,6 +99,8 @@ public class Robot extends TimedRobot {
     //SmartDashboard.putBoolean("Has detected cargo?", robot.hasFoundCargo());
 
     SmartDashboard.putNumber("Collector intake power", robot.getCollectorIntakePercentage());
+    SmartDashboard.putNumber("Indexer   intake power", robot.getIndexerIntakePercentage());
+
     //SmartDashboard.getBoolean("Sees target?", robot.isTargetFound());
 
     SmartDashboard.putNumber("Vision target x", robot.getTargetX());
@@ -129,9 +131,10 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Shooter Ready Timer", robot.getShootReadyTimer());
     SmartDashboard.putBoolean("Shooter is Ready?", robot.isReadyToShoot());
+    SmartDashboard.putBoolean("Shooter is Actively Firing?", robot.isActivelyShooting());
+
 
     SmartDashboard.putBoolean("Is PTO set to climb arms?", robot.getPTOState());
-
 
     SmartDashboard.putNumber("Joystick raw X", joystick.getX());
     SmartDashboard.putNumber("Joystick raw Y", joystick.getY());
@@ -173,36 +176,6 @@ public class Robot extends TimedRobot {
       );
     }
 
-    //note to self: buttons control mirrored joystick setting
-    if(joystick.getRawButton(11)) {
-      robot.setCollectorIntakePercentage(1);
-      robot.setIndexerIntakePercentage(1);
-    }
-    else if(joystick.getRawButton(16)){
-      robot.setCollectorIntakePercentage(-1);
-      robot.setIndexerIntakePercentage(-1);
-    }
-    else{
-      robot.setCollectorIntakePercentage(0);
-      robot.setIndexerIntakePercentage(0);
-    }
-
-    if      (joystick.getRawButton(12)) robot.setTurretPowerPct( 0.2);
-    else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
-    else                                robot.setTurretPowerPct( 0.0);
-
-    if      (joystick.getRawButton(13)) robot.setShooterPowerPct( 0.2,  0.2);
-    else if (joystick.getRawButton(14)) robot.setShooterPowerPct(-0.2, -0.2);
-    else                                robot.setShooterPowerPct( 0.0,  0.0);
-
-    if      (joystick.getRawButton( 7)) robot.raiseCollector();
-    if      (joystick.getRawButton( 8)) robot.lowerCollector();
-
-    if      (joystick.getRawButton( 6)) robot.turnOnPTO();
-    if      (joystick.getRawButton( 9)) robot.turnOffPTO();
-
-    if      (joystick.getRawButton( 5)) robot.setArmsForward();
-    if      (joystick.getRawButton(10)) robot.setArmsBackward();
 
     SmartDashboard.putNumber("XBOX AXIS DEBUG - 0 ", xbox.getRawAxis(0));
     SmartDashboard.putNumber("XBOX AXIS DEBUG - 1 ", xbox.getRawAxis(1));
@@ -267,8 +240,8 @@ public class Robot extends TimedRobot {
 
 
     //Collector indexer logic based on cargo already in sensors (from jack)
-    double defCollectorPower = 0.5;
-    double defIndexerPower = 0.4;
+    double defCollectorPower = 1;
+    double defIndexerPower = 1;
     double curCollector = 0;
     double curIndexer = 0;
 
@@ -287,6 +260,11 @@ public class Robot extends TimedRobot {
           curCollector = 0;
         }
       }
+    }
+
+    //Cargo is on upper sensor and we want to yeet it: indexer needs to push it past sensor
+    if(robot.isActivelyShooting() && robot.getUpperCargo()){
+      curIndexer = defIndexerPower;
     }
 
     robot.setCollectorIntakePercentage(curCollector);
@@ -328,18 +306,38 @@ public class Robot extends TimedRobot {
         (driveY-driveX) * scaleFactor
     );
 
-    //note to self: buttons currently assume mirrored joystick setting
-    if      (joystick.getRawButton(11)) robot.setCollectorIntakePercentage( 1.0);
-    else if (joystick.getRawButton(16)) robot.setCollectorIntakePercentage(-1.0);
-    else                                robot.setCollectorIntakePercentage( 0.0);
+    //note to self: buttons control mirrored joystick setting
+    if(joystick.getRawButton(11)) {
+      robot.setCollectorIntakePercentage(1);
+      robot.setIndexerIntakePercentage(1);
+    }
+    else if(joystick.getRawButton(16)){
+      robot.setCollectorIntakePercentage(-1);
+      robot.setIndexerIntakePercentage(-1);
+    }
+    else{
+      robot.setCollectorIntakePercentage(0);
+      robot.setIndexerIntakePercentage(0);
+    }
 
     if      (joystick.getRawButton(12)) robot.setTurretPowerPct( 0.2);
     else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
     else                                robot.setTurretPowerPct( 0.0);
 
-    if      (joystick.getRawButton(13)) robot.setShooterPowerPct( 0.2,  0.2);
-    else if (joystick.getRawButton(14)) robot.setShooterPowerPct(-0.2, -0.2);
-    else                                robot.setShooterPowerPct( 0.0,  0.0);
+
+    if      (joystick.getRawButton(13)){
+      robot.setShooterPowerPct( 0.2,  0.2);
+      robot.setActivelyShooting(true);
+    }
+    else if (joystick.getRawButton(14)){
+      robot.setShooterPowerPct(-0.2, -0.2);
+      robot.setActivelyShooting(false);
+    }
+    else                               {
+      robot.setShooterPowerPct( 0.0,  0.0);
+      robot.setActivelyShooting(false);
+
+    }
 
     if      (joystick.getRawButton( 7)) robot.raiseCollector();
     if      (joystick.getRawButton( 8)) robot.lowerCollector();
