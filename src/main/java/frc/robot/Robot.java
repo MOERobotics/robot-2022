@@ -185,7 +185,7 @@ public class Robot extends TimedRobot {
 
 
     //currently Jack has no clue what axises these are supposed to be
-    int leftAxis = 0; int rightAxis = 1;
+    int leftAxis = 1; int rightAxis = 5;
     double tolerance = 0.8;
     double drivePower = 0.2;
 
@@ -261,6 +261,14 @@ public class Robot extends TimedRobot {
         }
       }
     }
+    else if (joystick.getRawButton(5)){
+      curCollector = -defCollectorPower;
+      curIndexer = -defIndexerPower;
+    }
+    else{
+      curCollector = 0;
+      curIndexer = 0;
+    }
 
     //Cargo is on upper sensor and we want to yeet it: indexer needs to push it past sensor
     if(robot.isActivelyShooting() && robot.getUpperCargo()){
@@ -290,6 +298,17 @@ public class Robot extends TimedRobot {
   @Override public void testInit() {}
 
   @Override public void testPeriodic() {
+
+    if (xbox.getRawButton(1)){
+      robot.setTurretPitchPowerPct(1);
+    }
+    else if (xbox.getRawButton(2)){
+      robot.setTurretPitchPowerPct(-1);
+    }
+    else{
+      robot.setTurretPitchPowerPct(0);
+    }
+
     double driveX =  joystick.getX();
     double driveY = -joystick.getY();
 

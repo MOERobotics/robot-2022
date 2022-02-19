@@ -225,10 +225,11 @@ public interface GenericRobot {
 	public default double getTurretPitchPowerPct(){
 		return 0;
 	}
+
 	public default void setTurretPitchAngle(){
 		//System.out.println("I don't have a turret");
 	}
-	public default void setTurretPitchPowerPct(){
+	public default void setTurretPitchPowerPct(double speed){
 		//System.out.println("I don't have a collector");
 	}
 

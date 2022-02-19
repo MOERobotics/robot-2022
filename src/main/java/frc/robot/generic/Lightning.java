@@ -28,6 +28,8 @@ public class Lightning implements GenericRobot {
     CANSparkMax rightMotorA       = new CANSparkMax(18, kBrushless);
     CANSparkMax rightMotorB       = new CANSparkMax(19, kBrushless);
 
+    Servo       elevationLeft     = new Servo(9);
+
     RelativeEncoder encoderRight  = rightMotorA.getEncoder();
     RelativeEncoder encoderLeft   = leftMotorA.getEncoder();
     RelativeEncoder encoderTurret = turretRotator.getEncoder();
@@ -71,8 +73,11 @@ public class Lightning implements GenericRobot {
 
         indexer.setInverted(true);
         collector.setInverted(false);
-        shooterB.setInverted(true);
-        shooterA.setInverted(false);
+        shooterB.setInverted(false);
+        shooterA.setInverted(true);
+
+        elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+
         shootReadyTimer = System.currentTimeMillis();
 
         isPTOonArms = false;
@@ -237,6 +242,11 @@ public class Lightning implements GenericRobot {
     @Override
     public double getTurretPowerPct() {
         return turretRotator.get();
+    }
+
+    @Override
+    public void setTurretPitchPowerPct(double speed){
+        elevationLeft.setSpeed(speed);
     }
 
 
