@@ -169,7 +169,7 @@ public class Robot extends TimedRobot {
     double scaleFactor = 1.0;
 
     //robot PTO not on arms, give joystick carte blanche
-    if(robot.getPTOState() == false){
+    if(!robot.getPTOState()){
       robot.drivePercent(
               (jy+jx) * scaleFactor,
               (jy-jx) * scaleFactor
@@ -206,9 +206,9 @@ public class Robot extends TimedRobot {
       else if(xbox.getRawAxis(rightAxis) < -tolerance){
         driveRight = -drivePower;
       }
-
+      robot.drivePercent(driveLeft, driveRight);
     }
-    robot.drivePercent(driveLeft, driveRight);
+
 
 
 
