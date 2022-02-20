@@ -13,9 +13,18 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
-import frc.robot.generic.GenericRobot;
-import frc.robot.generic.Lightning;
-import frc.robot.generic.TurretBot;
+import frc.robot.generic.*;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static frc.robot.Robot.ArmsState.*;
+import static frc.robot.Robot.CollectorState.*;
+import static frc.robot.Robot.ClimberState.*;
+import static frc.robot.Robot.ShooterState.*;
+import static frc.robot.Robot.TurretState.*;
 
 public class Robot extends TimedRobot {
 
@@ -44,8 +53,16 @@ public class Robot extends TimedRobot {
   double average;
   double currentTurretPower;
 
+  double turretPitch = 0;
+  int targetRPM = 500;
 
   PIDController turretPIDController;
+
+  TurretState        turretState = TURRET_INACTIVE;
+  ClimberState      climberState = CLIMBER_INACTIVE;
+  ShooterState      shooterState = SHOOTER_INACTIVE;
+  CollectorState  collectorState = COLLECTOR_INACTIVE;
+  ArmsState            armsState = ARMS_UP;
 
 
 
@@ -59,7 +76,7 @@ public class Robot extends TimedRobot {
     NetworkTableEntry ta = table.getEntry("ta");
     NetworkTableEntry tv = table.getEntry("tv");
 
-//read values periodically
+    //read values periodically
     turretx = tx.getDouble(0.0);
     turrety = ty.getDouble(0.0);
     turretarea = ta.getDouble(0.0);
@@ -141,6 +158,25 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Autonomous Step", autonomous.autonomousStep);
 
+
+    SmartDashboard.putNumber("Target RPM", targetRPM);
+    SmartDashboard.putNumber("Turret Hood Pitch", turretPitch);
+
+    SmartDashboard.putStringArray("State", new String[]{
+        climberState.name(),
+        shooterState.name(),
+        turretState.name(),
+        collectorState.name(),
+        armsState.name()
+    });
+    //SmartDashboard.putStringArray("State", new String[]{
+    SmartDashboard.putString("climberState", climberState.name());
+    SmartDashboard.putString("shooterState", shooterState.name());
+    SmartDashboard.putString("turretState", turretState.name());
+    SmartDashboard.putString("collectorState", collectorState.name());
+    SmartDashboard.putString("armsState", armsState.name());
+    //});
+
   }
 
   @Override public void autonomousInit() {
@@ -153,134 +189,245 @@ public class Robot extends TimedRobot {
 
   @Override public void teleopInit() {
       turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
-
   }
 
+
+
+  public static final double deadzone = 0.05;
   @Override public void teleopPeriodic() {
-    double jx =  joystick.getX();
-    double jy = -joystick.getY();
+    double
+        driveLPower = 0,
+        driveRPower = 0,
+        turretPower = 0,
+        collectorPower = 0,
+        indexerPower = 0;
 
-    //joystick deaden: yeet smol/weird joystick values when joystick is at rest
-    double cutoff = 0.05;
-    if(jy > -cutoff && jy < cutoff) jy = 0;
-    if(jx > -cutoff && jx < cutoff) jx = 0;
+    /**
+     * Miscellanea
+     */
 
-    //moved this to after joystick deaden because deaden should be focused on the raw joystick values
-    double scaleFactor = 1.0;
-
-    //robot PTO not on arms, give joystick carte blanche
-    if(!robot.getPTOState()){
-      robot.drivePercent(
-              (jy+jx) * scaleFactor,
-              (jy-jx) * scaleFactor
-      );
+    switch (POVDirection.getDirection(xbox.getPOV())) {
+      case NORTH: targetRPM =  250; turretPitch = 0.00; break;
+      case EAST : targetRPM =  500; turretPitch = 0.00; break;
+      case SOUTH: targetRPM = 1000; turretPitch = 0.00; break;
+      case WEST : targetRPM = 1500; turretPitch = 0.00; break;
     }
 
+    //Fine Tune turret hood position
+    double rJoyRY = xbox.getRawAxis( 5);
+    if (rJoyRY > -deadzone && rJoyRY < deadzone) rJoyRY = 0;
+    turretPitch += rJoyRY * 0.05;
+    if (turretPitch < -1) turretPitch = -1;
+    if (turretPitch >  1) turretPitch =  1;
+    robot.setTurretPitchPowerPct(turretPitch);
 
-    SmartDashboard.putNumber("XBOX AXIS DEBUG - 0 ", xbox.getRawAxis(0));
-    SmartDashboard.putNumber("XBOX AXIS DEBUG - 1 ", xbox.getRawAxis(1));
-    SmartDashboard.putNumber("XBOX AXIS DEBUG - 2 ", xbox.getRawAxis(2));
-    SmartDashboard.putNumber("XBOX AXIS DEBUG - 3 ", xbox.getRawAxis(3));
+    //Fine Tune shooter speed
+    double rJoyLY = xbox.getRawAxis( 1);
+    if (rJoyLY > -deadzone && rJoyLY < deadzone) rJoyLY = 0;
+    targetRPM += rJoyLY * 0.5;
+    if (targetRPM <  250) targetRPM =  250;
+    if (targetRPM > 4000) targetRPM = 4000;
 
 
-
-    //currently Jack has no clue what axises these are supposed to be
-    int leftAxis = 1; int rightAxis = 5;
-    double tolerance = 0.8;
-    double drivePower = 0.2;
-
-    if      (joystick.getRawButton(12)) robot.setTurretPowerPct( 0.2);
-    else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
-    else                                robot.setTurretPowerPct( 0.0);
-
-    double driveLeft = 0;
-    double driveRight = 0;
-
-    if(robot.getPTOState()){
-      if(xbox.getRawAxis(leftAxis) > tolerance){
-        driveLeft = drivePower;
-      }
-      else if(xbox.getRawAxis(leftAxis) < -tolerance){
-        driveLeft = -drivePower;
-      }
-
-      if(xbox.getRawAxis(rightAxis) > tolerance){
-        driveRight = drivePower;
-      }
-      else if(xbox.getRawAxis(rightAxis) < -tolerance){
-        driveRight = -drivePower;
-      }
-      robot.drivePercent(driveLeft, driveRight);
-    }
+    if (joystick.getRawButton( 2)) robot.raiseCollector();
+    else robot.lowerCollector();
 
 
 
 
-    //Start of Daniel+Saiarun Turret test
-    average = 0;
+    /**
+     * Drive/Climb
+     */
 
-    if(robot.isTargetFound()) {
-      counter = counter % averageTurretXSize;
-      averageX[counter] = robot.getTargetX();
-      counter++;
-    }
-    average = 0;
-    for(double i: averageX){
-      average += i;
-    }
-    average /= averageTurretXSize;
-    SmartDashboard.putNumber("Average", average);
+    if (joystick.getRawButton(13)) climberState = CLIMBER_MANUAL;
+    if (    xbox.getRawButton( 7)) climberState = CLIMBER_ACTIVE;
+    if (    xbox.getRawButton( 8)) climberState = CLIMBER_INACTIVE;
+    if (joystick.getRawButton(14)) climberState = CLIMBER_INACTIVE;
 
-    if (joystick.getRawButtonPressed(1)) turretPIDController.reset();
-    if (joystick.getRawButton(1) && turretv !=0){
-      currentTurretPower = turretPIDController.calculate(average);
-    } else {
-      if      (joystick.getRawButton(3))  currentTurretPower = -0.1;
-      else if (joystick.getRawButton(4))  currentTurretPower =  0.1;
-      else                                currentTurretPower =  0.0;
-    }
+    switch (climberState) {
 
-    robot.setTurretPowerPct(currentTurretPower);
+      case CLIMBER_MANUAL:
+        robot.turnOnPTO();
+        if (joystick.getRawButton( 6)) driveLPower =  0.5;
+        if (joystick.getRawButton( 9)) driveLPower = -0.5;
+        if (joystick.getRawButton( 7)) driveRPower =  0.5;
+        if (joystick.getRawButton( 8)) driveRPower = -0.5;
 
+        if      (joystick.getRawButton( 5)) armsState = ARMS_UP;
+        else if (joystick.getRawButton(10)) armsState = ARMS_BACK;
 
-    //Collector indexer logic based on cargo already in sensors (from jack)
-    double defCollectorPower = 1;
-    double defIndexerPower = 1;
-    double curCollector = 0;
-    double curIndexer = 0;
+        break;
 
-    //button 2 = bottom center button
-    if(joystick.getRawButton(2)){
-      if(!robot.getUpperCargo()){
-        curCollector = defCollectorPower;
-        curIndexer = defIndexerPower;
-      }
-      else{
-        curIndexer = 0;
-        if(!robot.getLowerCargo()){
-          curCollector = defCollectorPower;
+      case CLIMBER_ACTIVE:
+        robot.turnOnPTO();
+        //Do cool things
+        break;
+
+      default:
+      case CLIMBER_INACTIVE:
+        robot.turnOffPTO();
+        armsState = ARMS_UP;
+
+        double
+            lJoyY = -joystick.getY(),
+            lJoyX =  joystick.getX();
+
+        if (lJoyY > -deadzone && lJoyY < deadzone) lJoyY = 0;
+        if (lJoyX > -deadzone && lJoyX < deadzone) lJoyX = 0;
+
+        double scaleFactor = 1.0;
+        lJoyY *= scaleFactor;
+        lJoyX *= scaleFactor;
+
+        driveLPower = lJoyY - lJoyX;
+        driveRPower = lJoyY + lJoyX;
+
+        if (joystick.getRawButton(11)) driveLPower = driveRPower =  0.30;
+        if (joystick.getRawButton(16)) driveLPower = driveRPower = -0.30;
+        break;
+
+    } //switch (climberState)
+
+    /**
+     * Turret
+     */
+    if (xbox.getRawAxis(3) > 0.80) turretState = TURRET_ACTIVE;
+    else                           turretState = TURRET_MANUAL;
+
+    switch (turretState) {
+      case TURRET_MANUAL:
+        if (xbox.getRawButton( 6)) turretPower = -0.5;
+        if (xbox.getRawButton( 5)) turretPower =  0.5;
+        //Leave the tracking array empty for the next autotrack
+        turretPIDController.reset();
+        for (int i = 0; i < averageTurretXSize; i++)
+          averageX[i] = 0;
+        break;
+
+      case TURRET_ACTIVE:
+        //If I can't see, don't move
+        if(!robot.isTargetFound()) break;
+
+        counter = (counter + 1) % averageTurretXSize;
+        averageX[counter] = robot.getTargetX();
+        turretPIDController.calculate(average);
+
+        double average = 0;
+        for (int i = 0; i < averageTurretXSize; i++)
+          average += averageX[i];
+        average /= averageTurretXSize;
+        turretPower = turretPIDController.calculate(average);
+        break;
+
+      default:
+      case TURRET_INACTIVE:
+        //IDK?
+        break;
+    } //switch (turretState)
+
+    /**
+     * Collector
+     */
+
+    collectorState = COLLECTOR_INACTIVE;
+    if (joystick.getRawButton( 1)) collectorState = COLLECTOR_COLLECTING;
+    if (    xbox.getRawButton( 3)) collectorState = COLLECTOR_EJECTING;
+    if (    xbox.getRawButton( 4)) collectorState = COLLECTOR_COLLECTING;
+
+    switch (collectorState) {
+      case COLLECTOR_COLLECTING:
+        if (
+            !robot.getUpperCargo()
+        ) {
+          indexerPower = 1.00;
+          collectorPower = 1.00;
+        } else if (
+            !robot.getLowerCargo()
+        ) {
+          collectorPower = 1.00;
         }
-        else{
-          curCollector = 0;
+        break;
+
+      case COLLECTOR_EJECTING:
+        indexerPower = -1.00;
+        collectorPower = -1.00;
+        break;
+
+      default:
+      case COLLECTOR_INACTIVE:
+        break;
+    } // switch (collectorState)
+
+
+    /**
+     * Shooter
+     */
+
+    if (    xbox.getRawButton( 1)) shooterState = SHOOTER_ACTIVE;
+    else                           shooterState = SHOOTER_INACTIVE;
+
+    switch (shooterState) {
+      case SHOOTER_ACTIVE:
+        robot.setActivelyShooting(true);
+        robot.setShooterRPM(targetRPM,targetRPM);
+        if (
+            robot.isReadyToShoot() &&
+            xbox.getRawButton( 2)
+        ) {
+          indexerPower = 1.00;
         }
-      }
-    }
-    else if (joystick.getRawButton(5)){
-      curCollector = -defCollectorPower;
-      curIndexer = -defIndexerPower;
-    }
-    else{
-      curCollector = 0;
-      curIndexer = 0;
+        break;
+
+      default:
+      case SHOOTER_INACTIVE:
+        robot.setActivelyShooting(false);
+        robot.setShooterPowerPct(0,0);
+        break;
+    } //switch (shooterState)
+
+    /**
+     * Arms
+     */
+
+    switch (armsState) {
+      case ARMS_BACK:
+        robot.setArmsBackward();
+        break;
+      case ARMS_UP:
+        robot.setArmsForward();
+        break;
+      default:
+      case ARMS_UNKNOWN:
+        break;
     }
 
-    //Cargo is on upper sensor and we want to yeet it: indexer needs to push it past sensor
-    if(robot.isActivelyShooting() && robot.getUpperCargo()){
-      curIndexer = defIndexerPower;
-    }
+    /**
+     * Safety
+     */
 
-    robot.setCollectorIntakePercentage(curCollector);
-    robot.setIndexerIntakePercentage(curIndexer);
+    if (
+        turretPower < 0 && //todo: degrees
+        robot.getAlternateTurretAngle() < 120
+    ) turretPower = 0;
+
+    if (
+        turretPower > 0 &&
+        robot.getAlternateTurretAngle() > 240
+    ) turretPower = 0;
+
+
+    /**
+     * Send powers
+     */
+
+
+    robot.drivePercent(
+        driveLPower,
+        driveRPower
+    );
+    robot.setTurretPowerPct(turretPower);
+    robot.setCollectorIntakePercentage(collectorPower);
+    robot.setIndexerIntakePercentage(indexerPower);
 
   }
 
@@ -312,22 +459,6 @@ public class Robot extends TimedRobot {
     else{
       robot.setTurretPitchPowerPct(0);
     }
-
-    double driveX =  joystick.getX();
-    double driveY = -joystick.getY();
-
-    //joystick deaden: yeet smol/weird joystick values when joystick is at rest
-    double cutoff = 0.05;
-    if(driveX > -cutoff && driveX < cutoff) driveX = 0;
-    if(driveY > -cutoff && driveY < cutoff) driveY = 0;
-
-    //moved this to after joystick deaden because deaden should be focused on the raw joystick values
-    double scaleFactor = 1.0;
-
-    robot.drivePercent(
-        (driveY+driveX) * scaleFactor,
-        (driveY-driveX) * scaleFactor
-    );
 
     //note to self: buttons control mirrored joystick setting
     if(joystick.getRawButton(11)) {
@@ -371,5 +502,108 @@ public class Robot extends TimedRobot {
     if      (joystick.getRawButton( 5)) robot.setArmsForward();
     if      (joystick.getRawButton(10)) robot.setArmsBackward();
 
+
+    //currently Jack has no clue what axises these are supposed to be
+    int leftAxis = 1; int rightAxis = 5;
+    double tolerance = 0.8;
+    double drivePower = 0.2;
+
+    double driveLeft = 0;
+    double driveRight = 0;
+    if(robot.getPTOState()){
+      if(xbox.getRawAxis(leftAxis) > tolerance){
+        driveLeft = drivePower;
+      }
+      else if(xbox.getRawAxis(leftAxis) < -tolerance){
+        driveLeft = -drivePower;
+      }
+
+      if(xbox.getRawAxis(rightAxis) > tolerance){
+        driveRight = drivePower;
+      }
+      else if(xbox.getRawAxis(rightAxis) < -tolerance){
+        driveRight = -drivePower;
+      }
+    } else {
+
+      double driveX =  joystick.getX();
+      double driveY = -joystick.getY();
+
+      //joystick deaden: yeet smol/weird joystick values when joystick is at rest
+      double cutoff = 0.05;
+      if(driveX > -cutoff && driveX < cutoff) driveX = 0;
+      if(driveY > -cutoff && driveY < cutoff) driveY = 0;
+
+      //moved this to after joystick deaden because deaden should be focused on the raw joystick values
+      double scaleFactor = 1.0;
+
+      driveLeft = (driveY+driveX) * scaleFactor;
+      driveRight = (driveY-driveX) * scaleFactor;
+    }
+    robot.drivePercent(driveLeft, driveRight);
+  }
+
+
+  public static enum CollectorState {
+    COLLECTOR_COLLECTING,
+    COLLECTOR_EJECTING,
+    COLLECTOR_INACTIVE
+  }
+
+  public static enum ShooterState {
+    SHOOTER_ACTIVE,
+    SHOOTER_INACTIVE
+  }
+
+  public static enum ClimberState {
+    CLIMBER_ACTIVE,
+    CLIMBER_INACTIVE,
+    CLIMBER_MANUAL
+  }
+
+  public static enum TurretState {
+    TURRET_ACTIVE,
+    TURRET_INACTIVE,
+    TURRET_MANUAL
+  }
+
+  public static enum ArmsState {
+    ARMS_UP,
+    ARMS_BACK,
+    ARMS_UNKNOWN
+  }
+  public enum POVDirection {
+    NORTH     (   0),
+    NORTHEAST (  45),
+    EAST      (  90),
+    SOUTHEAST ( 135),
+    SOUTH     ( 180),
+    SOUTHWEST ( 225),
+    WEST      ( 270), //best
+    NORTHWEST ( 315),
+    NULL      (  -1);
+
+    private final int angle;
+
+    POVDirection(int angle) {
+        this.angle = angle;
+    }
+
+    public int getAngle() {
+        return angle;
+    }
+
+    //Kevin voodoo to turn ints into directions
+    public static final Map<Integer, POVDirection> directionMap =
+        Arrays.stream(POVDirection.values()).collect(
+            Collectors.toMap(
+                POVDirection::getAngle,
+                Function.identity()
+            )
+        );
+
+    public static POVDirection getDirection(int angle) {
+        return directionMap.getOrDefault(angle, POVDirection.NULL);
+    }
   }
 }
