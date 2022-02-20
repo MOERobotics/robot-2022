@@ -23,9 +23,9 @@ public class Robot extends TimedRobot {
   //Add new Autos here when they're authored
   public static final GenericAutonomous
       autoArc         = new autoArc(),
-      simpleATerminal = new SimpleATerminal(),
-      simpleBTerminal = new SimpleBTerminal(),
-      simpleCTerminal = new SimpleCTerminal();
+      simpleATerminal = new BallAtoTerminal(),
+      simpleBTerminal = new BallBtoTerminal(),
+      simpleCTerminal = new BallCtoTerminal();
 
   GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
@@ -246,8 +246,8 @@ public class Robot extends TimedRobot {
     //Collector indexer logic based on cargo already in sensors (from jack)
     double defCollectorPower = 1;
     double defIndexerPower = 1;
-    double curCollector = 0;
-    double curIndexer = 0;
+    double curCollector;
+    double curIndexer;
 
     //button 2 = bottom center button
     if(joystick.getRawButton(2)){
@@ -293,9 +293,9 @@ public class Robot extends TimedRobot {
     }
 
     if (joystick.getRawButton(4)) autonomous = autoArc;
-    if (joystick.getRawButton(5)) autonomous = BallAtoTerminal;
-    if (joystick.getRawButton(6)) autonomous = BallBtoTerminal;
-    if (joystick.getRawButton(7)) autonomous = BallCtoTerminal;
+    if (joystick.getRawButton(5)) autonomous = simpleATerminal;
+    if (joystick.getRawButton(6)) autonomous = simpleBTerminal;
+    if (joystick.getRawButton(7)) autonomous = simpleCTerminal;
 
   }
 

@@ -124,6 +124,5 @@ public class BallCtoTerminal extends GenericAutonomous {
         }
         robot.drivePercent(leftpower, rightpower);
         tracker.turretMove(robot);
-
     }
 }
