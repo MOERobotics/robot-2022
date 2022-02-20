@@ -244,7 +244,7 @@ public class Robot extends TimedRobot {
     robot.setTurretPowerPct(currentTurretPower);
 
     double shooterTargetRPM = 0;
-    if      (joystick.getRawButton(10)){
+    if      (xboxJoystick.getXButton()){
       shooterTargetRPM = robot.getShooterTargetRPM();
     }else{
       shooterTargetRPM = 0;
@@ -252,7 +252,7 @@ public class Robot extends TimedRobot {
 
     robot.setShooterRPM(shooterTargetRPM, shooterTargetRPM);
 
-    if(joystick.getRawButton(16)){
+    if(xboxJoystick.getBButton()){
       if(robot.isReadyToShoot()){
         robot.setActivelyShooting(true);
       }
@@ -271,8 +271,7 @@ public class Robot extends TimedRobot {
     double curCollector = 0;
     double curIndexer = 0;
 
-    //button 2 = bottom center button
-    if(joystick.getRawButton(2)){
+    if(xboxJoystick.getYButton()){
       if(!robot.getUpperCargo()){
         curCollector = defCollectorPower;
         curIndexer = defIndexerPower;
@@ -287,7 +286,7 @@ public class Robot extends TimedRobot {
         }
       }
     }
-    else if (joystick.getRawButton(5)){
+    else if (xboxJoystick.getAButton()){
       curCollector = -defCollectorPower;
       curIndexer = -defIndexerPower;
     }
@@ -410,9 +409,9 @@ public class Robot extends TimedRobot {
     if (xboxJoystick.getBButton()) {
       //robot.shooter
     }
-    if(xboxJoystick.getPOV() >= 0){
-      robot.setShooterPowerPct(.5,.5);
-    }
+    /*if (xboxJoystick.getPOV()) {
+      //robot.shooter
+    }*/
     //</Xbox Controller temp>
 
   }
