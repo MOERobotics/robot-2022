@@ -33,7 +33,7 @@ public class Lightning implements GenericRobot {
     RelativeEncoder encoderRight  = rightMotorA.getEncoder();
     RelativeEncoder encoderLeft   = leftMotorA.getEncoder();
     RelativeEncoder encoderTurret = turretRotator.getEncoder();
-    RelativeEncoder encoderTurretAlt = turretRotator.getAlternateEncoder(1);
+    SparkMaxAnalogSensor encoderTurretAlt = turretRotator.getAnalog(SparkMaxAnalogSensor.Mode.kAbsolute);
     RelativeEncoder encoderShootA = shooterA.getEncoder();
     RelativeEncoder encoderShootB = shooterB.getEncoder();
 
@@ -215,9 +215,16 @@ public class Lightning implements GenericRobot {
         return TICKS_PER_DEGREE_TURRET;
     }
 
+    //Measured range 0.042 - 2.68
     @Override
     public double getAlternateTurretAngle(){
-        return encoderTurretAlt.getPosition();
+        double raw = encoderTurretAlt.getPosition();
+        SmartDashboard.putNumber("Raw Turret", raw);
+        raw *= 136.467;
+        SmartDashboard.putNumber("Scaled Turret Value",raw);
+        raw -= 5.73;
+        SmartDashboard.putNumber("Final Turret Value", raw);
+        return raw;
     }
 
     @Override
