@@ -74,6 +74,11 @@ public class Lightning implements GenericRobot {
         rightMotorA.setInverted(invertRight);
         rightMotorB.setInverted(invertRight);
 
+        leftMotorA.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        leftMotorB.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        rightMotorA.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        rightMotorB.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
         indexer.setInverted(true);
         collector.setInverted(false);
         shooterB.setInverted(false);
@@ -126,6 +131,25 @@ public class Lightning implements GenericRobot {
         return encoderRight.getVelocity()/encoderRightDriveTicksPerInch();
     }
 
+    @Override
+    public double getLeftACurrent(){
+        return leftMotorA.getOutputCurrent();
+    }
+
+    @Override
+    public double getLeftBCurrent(){
+        return leftMotorB.getOutputCurrent();
+    }
+
+    @Override
+    public double getRightACurrent(){
+        return rightMotorA.getOutputCurrent();
+    }
+
+    @Override
+    public double getRightBCurrent(){
+        return rightMotorB.getOutputCurrent();
+    }
 
     @Override
     public double encoderLeftDriveTicksPerInch() {
@@ -383,47 +407,39 @@ public class Lightning implements GenericRobot {
     }
 
     @Override
-    public void raiseClimberArms() {
-        leftMotorB.set(.1);
-        leftMotorA.set(.1);
-        rightMotorA.set(.1);
-        rightMotorB.set(.1);
+    public void armPower(double leftPower, double rightPower) {
+        leftMotorB.set(leftPower);
+        leftMotorA.set(leftPower);
+        rightMotorA.set(rightPower);
+        rightMotorB.set(rightPower);
     }
 
     @Override
-    public void lowerClimberArms() {
-        leftMotorB.set(-.1);
-        leftMotorA.set(-.1);
-        rightMotorA.set(-.1);
-        rightMotorB.set(-.1);
-    }
-
-    @Override
-    public void armPower(double power) {
-        leftMotorB.set(power);
-        leftMotorA.set(power);
-        rightMotorA.set(power);
-        rightMotorB.set(power);
-    }
-
-    @Override
-    public double armHeight() {
-        //TODO
+    public double armHeightLeft() {
+        //TODO: put in coversion
         //Maybe use some sensor. Do NOT want to use encoders for this.
-        return GenericRobot.super.armHeight();
+        return encoderTicksLeftDrive();
+    }
+
+    @Override
+    public double armHeightRight(){
+        return encoderTicksRightDrive();
     }
 
     @Override
     public boolean armInContact() {
         //TODO: find tolerances
-        if (leftMotorA.getOutputCurrent() > LEFTATOLERANCE && leftMotorB.getOutputCurrent() > LEFTBTOLERANCE
+       /* if (leftMotorA.getOutputCurrent() > LEFTATOLERANCE && leftMotorB.getOutputCurrent() > LEFTBTOLERANCE
                 && rightMotorA.getOutputCurrent() > RIGHTATOLERANCE && rightMotorB.getOutputCurrent() > RIGHTBTOLERANCE){
             return true;
         }
         else{
             return false;
-        }
+        }*/
+        return true;
     }
+
+
 
     @Override
     public boolean inTheRightPlace(){
@@ -483,15 +499,6 @@ public class Lightning implements GenericRobot {
         navx.reset();
     }
 
-    @Override
-    public boolean getTapeSensorOne() {
-        return false;
-    }
-
-    @Override
-    public boolean getTapeSensorTwo() {
-        return false;
-    }
 
     @Override
     public double turretPIDgetP() {

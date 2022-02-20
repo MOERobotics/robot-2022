@@ -1,6 +1,7 @@
 package frc.robot.command;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
 public class Hang extends GenericCommand{
@@ -40,9 +41,18 @@ public class Hang extends GenericCommand{
     //////////////Now the real stuff
     double desiredHeight;
     double lowHeight;
-    double escapeHeight;
+    double escapeHeight = 10;///TODO:what is this??
     double getToBarHeight;
     boolean firstTime = true;
+    int countLeft = 0;
+    int countRight = 0;
+    double leftArmPower = 0;
+    double rightArmPower = 0;
+    double defaultClimbPower = .1;
+    boolean leftArrived = false;
+    boolean rightArrived = false;
+    double startHeightLeft = 0;
+    double startHeightRight = 0;
 
 
     public void begin(GenericRobot robot){
@@ -51,13 +61,22 @@ public class Hang extends GenericCommand{
         leftSensor = false;
         rightSensor = false;
         lTraveled = 0;
-        fwd = 48;
+        fwd = 75.6;
         PIDSteering = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
         tapeAlign = true;
         firstTime = true;
     }
 
     public void step(GenericRobot robot){
+        SmartDashboard.putNumber("leftEncoderRaw", robot.encoderTicksLeftDrive());
+        SmartDashboard.putNumber("rightEncoderRaw", robot.encoderTicksRightDrive());
+        SmartDashboard.putBoolean("leftTapeSensor", robot.getFloorSensorLeft());
+        SmartDashboard.putBoolean("rightTapeSensor", robot.getFloorSensorRight());
+        SmartDashboard.putBoolean("leftCLimberSensor", robot.getClimbSensorLeft());
+        SmartDashboard.putBoolean("rightClimberSensor", robot.getClimbSensorRight());
+        SmartDashboard.putNumber("countLeft", countLeft);
+        SmartDashboard.putNumber("countRight", countRight);
+
         if (tapeAlign) {
             switch (commandStep) { /////////////tapeAlign Code
                 case -1:
@@ -79,11 +98,11 @@ public class Hang extends GenericCommand{
                     leftPower = defaultPower + correction; //didn't we stop doing this?
                     rightPower = defaultPower - correction;
 
-                    if (!robot.getTapeSensorOne()) {
+                    if (!robot.getFloorSensorLeft()) {
                         startDistance = robot.getDriveDistanceInchesLeft();
                         leftSensor = true;
                         commandStep += 1;
-                    } else if (!robot.getTapeSensorTwo()) {
+                    } else if (!robot.getFloorSensorRight()) {
                         startDistance = robot.getDriveDistanceInchesLeft();
                         rightSensor = true;
                         commandStep += 1;
@@ -94,37 +113,19 @@ public class Hang extends GenericCommand{
                     leftPower = defaultPower + correction; //confusion
                     rightPower = defaultPower - correction;
 
-                    if (!rightSensor && !robot.getTapeSensorTwo()) {
+                    if (!rightSensor && !robot.getFloorSensorRight()) {
                         differenceDistance = Math.abs(robot.getDriveDistanceInchesLeft() - startDistance);
                         Tapetheta = Math.atan(differenceDistance / sensorDist) * 180 / Math.PI;
                         outerDistArc = robot.getDriveDistanceInchesRight();
                         commandStep += 1;
-                    } else if (!leftSensor && !robot.getTapeSensorOne()) {
+                    } else if (!leftSensor && !robot.getFloorSensorLeft()) {
                         differenceDistance = Math.abs(robot.getDriveDistanceInchesLeft() - startDistance);
                         Tapetheta = Math.atan(differenceDistance / sensorDist) * 180 / Math.PI;
                         outerDistArc = robot.getDriveDistanceInchesLeft();
                         commandStep = 4;
                     }
                     break;
-                case 3://///////////////////////////////////////////////////////////////////skip this step
-                    if (leftSensor) {
-                        leftPower = defaultPower * .5;
-                        rightPower = defaultPower * 2;
-                    } else {
-                        rightPower = defaultPower * .5;
-                        leftPower = defaultPower * 2;
-                    }
-                    currentYaw = robot.getYaw();
-                    if (Math.abs(Math.signum(currentYaw - startAngle) * (((Math.abs(currentYaw - startAngle) + 180) % 360) - 180)) >= Math.abs(Tapetheta)) {
-                        if (rightSensor) {
-                            outerDistArc = robot.getDriveDistanceInchesLeft() - outerDistArc;
-                        } else {
-                            outerDistArc = robot.getDriveDistanceInchesRight() - outerDistArc;
-                        }
-                        lTraveled = Math.abs(outerDistArc / (Tapetheta * Math.PI / 180) * Math.sin(Math.abs(Tapetheta * Math.PI / 180)));
-                        commandStep += 1;
-                    }///////////////////////////////////////this step is skipped
-                    break;
+
                 case 4:
                     if (leftSensor) {
                         currentYaw = startAngle - Tapetheta; //currentYaw = targetYaw because we are lazy
@@ -149,61 +150,145 @@ public class Hang extends GenericCommand{
                 case 6: //adios amigos
                     leftPower = 0;
                     rightPower = 0;
-                    tapeAlign = false;
+                    //tapeAlign = false;
                     commandStep = 0;
+                    startingTime = System.currentTimeMillis();
                     break;
             }
             robot.drivePercent(leftPower, rightPower);
         }
         else{////////////////////////////start the real stuff now
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             switch (commandStep){
                 case 0:///reset and enable PTO
+                    //reset encoders
                     robot.turnOnPTO();
-                    commandStep += 1;
-                    break;
-                case 1: //////raise climber arms (skip 10 steps after in case we need to scoot/scoot
-                    if (robot.armHeight() >= desiredHeight){
-                        robot.armPower(0);
+                    robot.resetEncoders();
+                    countLeft = 0;
+                    countRight = 0;
+                    if (System.currentTimeMillis() - startingTime >= 50){
                         commandStep += 1;
                     }
-                    else{
-                        robot.raiseClimberArms();
+
+                    break;
+                case 1: //////raise climber arms (skip 10 steps after in case we need to scoot/scoot
+
+                    if (!robot.getClimbSensorLeft() && countLeft == 0){
+                        countLeft = 1;
                     }
+
+                    if (robot.getClimbSensorLeft() && countLeft == 1){
+                        leftArmPower = 0;
+                        leftArrived = true;
+                    }
+                    else{
+                        leftArmPower = defaultClimbPower;
+                    }
+
+
+                    if (!robot.getClimbSensorRight() && countRight == 0){
+                        countRight = 1;
+                    }
+
+                    if (robot.getClimbSensorRight() && countRight == 1){
+                        rightArmPower = 0;
+                        rightArrived = true;
+                    }
+                    else{
+                        rightArmPower = defaultClimbPower;
+                    }
+
+                    if (leftArrived && rightArrived){
+                        leftArrived = false;
+                        rightArrived = false;
+                        countLeft = 0;
+                        countRight = 0;
+                        leftArmPower = 0;
+                        rightArmPower = 0;
+                        commandStep += 1;
+                    }
+
                     break;
                 case 2: //////disable PTO
                     robot.turnOffPTO();
                     commandStep += 1;
                     break;
-                case 3: //////scoot back a lil
-                    //go back, if in the right place, next step
-                    if (robot.inTheRightPlace()){
-                        commandStep += 1;
-                        robot.armPower(0); // because this is really the drivetrain, it will work
-                    }
-                    else{
-                        robot.lowerClimberArms(); //because this is really the drivetrain, it will work
-                    }
+                case 3: //////reset
+                    startDistance = robot.getDriveDistanceInchesLeft();
+                    commandStep += 1;
                     break;
-                case 4: //////enable PTO
+                case 4: //go back 8 in
+                    leftArmPower = -.1; //see if we should change to drive stuff
+                    rightArmPower = -.1;
+                    if (robot.getDriveDistanceInchesLeft() - startDistance <= -8){
+                        leftArmPower = 0;
+                        rightArmPower = 0;
+                        commandStep += 1;
+                    }
+                case 5: //////enable PTO
                     robot.turnOnPTO();
                     commandStep = 11;
                     break;
                 case 11: ////////lower climber arms
-                    if (robot.armInContact() && robot.armHeight() <= lowHeight){
-                        robot.armPower(0);
-                        commandStep += 1;
+
+                    if (!robot.getClimbSensorLeft() && countLeft == 0){
+                        countLeft = 1;
+                    }
+
+                    if (robot.getClimbSensorLeft() && countLeft == 1){
+                        leftArmPower = 0;
+                        leftArrived = true;
                     }
                     else{
-                        robot.lowerClimberArms();
+                        leftArmPower = -defaultClimbPower;
+                    }
+
+
+                    if (!robot.getClimbSensorRight() && countRight == 0){
+                        countRight = 1;
+                    }
+
+                    if (robot.getClimbSensorRight() && countRight == 1){
+                        rightArmPower = 0;
+                        rightArrived = true;
+                    }
+                    else{
+                        rightArmPower = -defaultClimbPower;
+                    }
+                    if (robot.armInContact() && leftArrived && rightArrived){
+                        countRight = 0;
+                        countLeft = 0;
+                        leftArmPower = 0;
+                        rightArmPower = 0;
+                        commandStep += 1;
+                        leftArrived = false;
+                        rightArrived = false;
+                        startHeightLeft = robot.armHeightLeft();
+                        startHeightRight = robot.armHeightRight();
+
                     }
                     break;
                 case 12:  /////////////raise arms slightly
-                    if (robot.armHeight() >= escapeHeight && !robot.armInContact()){
-                        robot.armPower(0);
-                        commandStep += 1;
+                    if (Math.abs(robot.armHeightLeft()-startHeightLeft) >= escapeHeight){
+                        leftArmPower = 0;
+                        leftArrived = true;
                     }
                     else{
-                        robot.raiseClimberArms();
+                        leftArmPower = .1;
+                    }
+                    if (Math.abs(robot.armHeightRight()-startHeightRight) >= escapeHeight){
+                        rightArmPower = 0;
+                        rightArrived = true;
+                    }
+                    else{
+                        rightArmPower = .1;
+                    }
+                    if (rightArrived && leftArrived){
+                        rightArmPower = 0;
+                        leftArmPower = 0;
+                        rightArrived = false;
+                        leftArrived = false;
+                        commandStep += 1;
                     }
                     break;
                 case 13:  ///////////unlock rotation piston to send arms forward
@@ -211,21 +296,53 @@ public class Hang extends GenericCommand{
                     commandStep += 1;
                     break;
                 case 14: ///////////move arms forward
-                    if (robot.armHeight() >= getToBarHeight){
-                        robot.armPower(0);
-                        commandStep += 1;
+
+                    if (!robot.getClimbSensorLeft() && countLeft == 0){
+                        countLeft = 1;
+                    }
+
+                    if (robot.getClimbSensorLeft() && countLeft == 1){
+                        leftArmPower = 0;
+                        leftArrived = true;
                     }
                     else{
-                        robot.raiseClimberArms();
+                        leftArmPower = defaultClimbPower;
+                    }
+
+
+                    if (!robot.getClimbSensorRight() && countRight == 0){
+                        countRight = 1;
+                    }
+
+                    if (robot.getClimbSensorRight() && countRight == 1){
+                        rightArmPower = 0;
+                        rightArrived = true;
+                    }
+                    else{
+                        rightArmPower = defaultClimbPower;
+                    }
+
+                    if (leftArrived && rightArrived){
+                        countLeft = 0;
+                        countRight = 0;
+                        rightArmPower = 0;
+                        leftArmPower = 0;
+                        rightArrived = false;
+                        leftArrived = false;
+                        commandStep = 16; //////////skip over step 15
                     }
                     break;
-                case 15:
-                    if (robot.armInContact()){
+                case 15:///change to check with pitch and roll
+                    // actually don't even need this step :)
+                    if (robot.getPitch() >= -10){
+                    //if (robot.armInContact()){
                         commandStep += 1;
-                        robot.armPower(0);
+                        leftArmPower = 0;
+                        rightArmPower = 0;
                     }
                     else{
-                        robot.lowerClimberArms();
+                        leftArmPower = -.1;
+                        rightArmPower = -.1;
                     }
                 case 16://///////once in contact move arms back again with the piston and swiiiiing
                     robot.setArmsBackward();
@@ -234,26 +351,60 @@ public class Hang extends GenericCommand{
                 case 17://////////go back to case 11 and repeat down to this step
                     if (firstTime){
                         commandStep = 11;
+                        countRight = 0;
+                        countLeft = 0;
                         firstTime = false;
                     }
                     else{
                         commandStep += 1;
-                        robot.armPower(0);
+                        leftArmPower = 0;
+                        rightArmPower = 0;
                     }
                     break;
-                case 19:///////lift all the way up to be extra secure
-                    if (robot.armHeight() <= lowHeight && robot.armInContact()){
-                        robot.armPower(0);
-                        commandStep += 1;
+                case 18:///////lift all the way up to be extra secure
+
+                    if (!robot.getClimbSensorLeft() && countLeft == 0){
+                        countLeft = 1;
+                    }
+
+                    if (robot.getClimbSensorLeft() && countLeft == 1){
+                        leftArmPower = 0;
+                        leftArrived = true;
                     }
                     else{
-                        robot.lowerClimberArms();
+                        leftArmPower = -defaultClimbPower;
                     }
-                case 18: ////////now we are done. If all goes well, we are on the traversal rung, if not, we no longer have a robot >;(
-                    robot.armPower(0);
+
+
+                    if (!robot.getClimbSensorRight() && countRight == 0){
+                        countRight = 1;
+                    }
+
+                    if (robot.getClimbSensorRight() && countRight == 1){
+                        rightArmPower = 0;
+                        rightArrived = true;
+                    }
+                    else{
+                        rightArmPower = -defaultClimbPower;
+                    }
+                    if (robot.armInContact() && leftArrived && rightArrived){
+                        countRight = 0;
+                        countLeft = 0;
+                        leftArmPower = 0;
+                        rightArmPower = 0;
+                        leftArrived = false;
+                        rightArrived = false;
+                        commandStep += 1;
+                    }
+
+                case 19: ////////now we are done. If all goes well, we are on the traversal rung, if not, we no longer have a robot >;(
+                    leftArmPower = 0;
+                    rightArmPower = 0;
                     break;
 
+
             }
+        robot.armPower(leftArmPower, rightArmPower);
         }
     }
 }

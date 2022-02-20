@@ -48,6 +48,10 @@ public class Robot extends TimedRobot {
   boolean hang = false;
   int count = 0;
   boolean reset = true;
+  double maxCurrentLeftA = 0;
+  double maxCurrentLeftB = 0;
+  double maxCurrentRightA = 0;
+  double maxCurrentRightB = 0;
 
 
   PIDController turretPIDController;
@@ -57,6 +61,19 @@ public class Robot extends TimedRobot {
   @Override public void robotInit() {}
 
   @Override public void robotPeriodic() {
+
+    if (robot.getLeftACurrent() > maxCurrentLeftA){
+      maxCurrentLeftA = robot.getLeftACurrent();
+    }
+    if (robot.getLeftBCurrent() > maxCurrentLeftB){
+      maxCurrentLeftB = robot.getLeftBCurrent();
+    }
+    if(robot.getRightACurrent() > maxCurrentRightA){
+      maxCurrentRightA = robot.getRightACurrent();
+    }
+    if (robot.getRightBCurrent() > maxCurrentRightB){
+      maxCurrentRightB = robot.getRightBCurrent();
+    }
 
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
     NetworkTableEntry tx = table.getEntry("tx");
@@ -69,6 +86,11 @@ public class Robot extends TimedRobot {
     turrety = ty.getDouble(0.0);
     turretarea = ta.getDouble(0.0);
     turretv = tv.getDouble(0.0);
+
+    SmartDashboard.putNumber("LeftACurrentMax", maxCurrentLeftA);
+    SmartDashboard.putNumber("LeftBCurrentMax", maxCurrentLeftB);
+    SmartDashboard.putNumber("RightACurrentMax", maxCurrentRightA);
+    SmartDashboard.putNumber("RightBCurrentMax", maxCurrentRightB);
 
     SmartDashboard.putNumber("tv", turretv);
 
@@ -146,6 +168,14 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Autonomous Step", autonomous.autonomousStep);
 
+    SmartDashboard.putNumber("leftEncoderRaw", robot.encoderTicksLeftDrive());
+    SmartDashboard.putNumber("rightEncoderRaw", robot.encoderTicksRightDrive());
+    SmartDashboard.putBoolean("leftTapeSensor", robot.getFloorSensorLeft());
+    SmartDashboard.putBoolean("rightTapeSensor", robot.getFloorSensorRight());
+    SmartDashboard.putBoolean("leftCLimberSensor", robot.getClimbSensorLeft());
+    SmartDashboard.putBoolean("rightClimberSensor", robot.getClimbSensorRight());
+
+
   }
 
   @Override public void autonomousInit() {
@@ -163,39 +193,9 @@ public class Robot extends TimedRobot {
   }
 
   @Override public void teleopPeriodic() {
-    double jx =  joystick.getX();
-    double jy = -joystick.getY();
 
-    //joystick deaden: yeet smol/weird joystick values when joystick is at rest
-    double cutoff = 0.05;
-    if(jy > -cutoff && jy < cutoff) jy = 0;
-    if(jx > -cutoff && jx < cutoff) jx = 0;
-
-    //moved this to after joystick deaden because deaden should be focused on the raw joystick values
-    double scaleFactor = 1.0;
-
-    //robot PTO not on arms, give joystick carte blanche
-    if(!robot.getPTOState()){
-      robot.drivePercent(
-              (jy+jx) * scaleFactor,
-              (jy-jx) * scaleFactor
-      );
-    }
-
-
-    SmartDashboard.putNumber("XBOX AXIS DEBUG - 0 ", xbox.getRawAxis(0));
-    SmartDashboard.putNumber("XBOX AXIS DEBUG - 1 ", xbox.getRawAxis(1));
-    SmartDashboard.putNumber("XBOX AXIS DEBUG - 2 ", xbox.getRawAxis(2));
-    SmartDashboard.putNumber("XBOX AXIS DEBUG - 3 ", xbox.getRawAxis(3));
-
-
-
-    //currently Jack has no clue what axises these are supposed to be
-    int leftAxis = 1; int rightAxis = 5;
-    double tolerance = 0.8;
-    double drivePower = 0.2;
     //note to self: buttons currently assume mirrored joystick setting
-    if (joystick.getRawButtonPressed(2)){
+    if (joystick.getRawButtonPressed(6)){
       count = (count+1)%2;
     }
     if (count == 1){
@@ -207,6 +207,39 @@ public class Robot extends TimedRobot {
 
     if (!hang) {
       reset = true;
+
+      double jx =  joystick.getX();
+      double jy = -joystick.getY();
+
+      //joystick deaden: yeet smol/weird joystick values when joystick is at rest
+      double cutoff = 0.05;
+      if(jy > -cutoff && jy < cutoff) jy = 0;
+      if(jx > -cutoff && jx < cutoff) jx = 0;
+
+      //moved this to after joystick deaden because deaden should be focused on the raw joystick values
+      double scaleFactor = 1.0;
+
+      //robot PTO not on arms, give joystick carte blanche
+      if(!robot.getPTOState()){
+        robot.drivePercent(
+                (jy+jx) * scaleFactor,
+                (jy-jx) * scaleFactor
+        );
+      }
+
+
+      SmartDashboard.putNumber("XBOX AXIS DEBUG - 0 ", xbox.getRawAxis(0));
+      SmartDashboard.putNumber("XBOX AXIS DEBUG - 1 ", xbox.getRawAxis(1));
+      SmartDashboard.putNumber("XBOX AXIS DEBUG - 2 ", xbox.getRawAxis(2));
+      SmartDashboard.putNumber("XBOX AXIS DEBUG - 3 ", xbox.getRawAxis(3));
+
+
+
+      //currently Jack has no clue what axises these are supposed to be
+      int leftAxis = 1; int rightAxis = 5;
+      double tolerance = 0.8;
+      double drivePower = 0.2;
+
       if      (joystick.getRawButton(12)) robot.setTurretPowerPct( 0.2);
       else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
       else                                robot.setTurretPowerPct( 0.0);
@@ -230,6 +263,7 @@ public class Robot extends TimedRobot {
         }
         robot.drivePercent(driveLeft, driveRight);
       }
+
     }
     else{
         if (reset){
@@ -350,10 +384,40 @@ public class Robot extends TimedRobot {
     //moved this to after joystick deaden because deaden should be focused on the raw joystick values
     double scaleFactor = 1.0;
 
-    robot.drivePercent(
-        (driveY+driveX) * scaleFactor,
-        (driveY-driveX) * scaleFactor
-    );
+    if(!robot.getPTOState()){
+      robot.drivePercent(
+              (driveY+driveX) * scaleFactor,
+              (driveY-driveX) * scaleFactor
+      );
+    }
+
+    int leftAxis = 1; int rightAxis = 5;
+    double tolerance = 0.8;
+    double drivePower = 0.2;
+
+    if      (joystick.getRawButton(12)) robot.setTurretPowerPct( 0.2);
+    else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
+    else                                robot.setTurretPowerPct( 0.0);
+
+    double driveLeft = 0;
+    double driveRight = 0;
+
+    if(robot.getPTOState()){
+      if(xbox.getRawAxis(leftAxis) > tolerance){
+        driveLeft = drivePower;
+      }
+      else if(xbox.getRawAxis(leftAxis) < -tolerance){
+        driveLeft = -drivePower;
+      }
+
+      if(xbox.getRawAxis(rightAxis) > tolerance){
+        driveRight = drivePower;
+      }
+      else if(xbox.getRawAxis(rightAxis) < -tolerance){
+        driveRight = -drivePower;
+      }
+      robot.drivePercent(driveLeft, driveRight);
+    }
 
     //note to self: buttons control mirrored joystick setting
     if(joystick.getRawButton(11)) {

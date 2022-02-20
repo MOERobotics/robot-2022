@@ -48,6 +48,19 @@ public interface GenericRobot {
 		return encoderTicksRightDrive()/encoderRightDriveTicksPerInch();
 	}
 
+	public default double getLeftACurrent(){
+		return 0.0;
+	}
+	public default double getLeftBCurrent(){
+		return 0.0;
+	}
+	public default double getRightACurrent(){
+		return 0.0;
+	}
+	public default double getRightBCurrent(){
+		return 0.0;
+	}
+
 	public default double encoderLeftDriveTicksPerInch(){
 		//System.out.println("I don't have an encoder");
 		return 1.0;
@@ -107,6 +120,7 @@ public interface GenericRobot {
 	public default void resetAttitude() {
 		System.out.println("I don't have a navx");
 	}
+
 
 	public enum TeamColor {
 		RED,
@@ -305,6 +319,10 @@ public interface GenericRobot {
 		//System.out.println("I don't have a climber");
 	}
 
+	public default void armPower(double powerOne, double powerTwo){
+
+	}
+
 	//returns true if PTO set to arms, return false if PTO set to drive
 	public default boolean getPTOState(){
 		return false;
@@ -357,10 +375,15 @@ public interface GenericRobot {
 	public default void armPower(double power){
 		//System.out.println("Elbow Grease");
 	}
-	public default double armHeight(){
+
+	public default double armHeightLeft(){
 		return 0.0;
 		//System.out.println("I don't have a climber");
 	}
+	public default double armHeightRight(){
+		return 0.0;
+	}
+
 
 	public default boolean armInContact(){
 		return false;
@@ -371,5 +394,7 @@ public interface GenericRobot {
 		return false;
 		//System.out.println("I don't have a climber");
 	}
+
+
 
 }
