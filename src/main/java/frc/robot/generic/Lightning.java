@@ -1,10 +1,7 @@
 package frc.robot.generic;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxLimitSwitch;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.*;
 import edu.wpi.first.wpilibj.*;
 
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
@@ -12,6 +9,7 @@ import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 public class Lightning implements GenericRobot {
     public static final double TICKS_PER_INCH_DRIVE = 0.96;
     public static final double TICKS_PER_DEGREE_TURRET = 116;
+    public static final double TICKS_PER_DEGREE_TURRET2 = 136.467;
     public static final double TICKS_PER_REVOLUTION_SHOOTERA = 116;
     public static final double TICKS_PER_REVOLUTION_SHOOTERB = 116;
 
@@ -219,12 +217,7 @@ public class Lightning implements GenericRobot {
     @Override
     public double getAlternateTurretAngle(){
         double raw = encoderTurretAlt.getPosition();
-        SmartDashboard.putNumber("Raw Turret", raw);
-        raw *= 136.467;
-        SmartDashboard.putNumber("Scaled Turret Value",raw);
-        raw -= 5.73;
-        SmartDashboard.putNumber("Final Turret Value", raw);
-        return raw;
+        return (raw *  136.467) - 5.73;
     }
 
     @Override
