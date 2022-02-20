@@ -131,6 +131,11 @@ public interface GenericRobot {
 		return 0;
 	};
 
+	public void setIndexerIntakePercentage(
+			double percentage
+	);
+	public double getIndexerIntakePercentage();
+
 	public default boolean hasFoundCargo(){
 		//System.out.println("robot has tunnel vision");
 		return false;
@@ -192,12 +197,21 @@ public interface GenericRobot {
 		return getTurretAngle()/encoderTurretTicksPerDegree();
 	}
 
+	public default double getAlternateTurretAngle(){
+		return 0;
+	}
+	public default double getAlternateTurretAngleDegrees(){
+		return getAlternateTurretAngle()/encoderTurretTicksPerDegree();
+	}
+
+
 	public default void setTurretAngleRelative(double angleChange){
 		//System.out.println("I don't have a turret");
 	}
 	public default void setTurretAngleAbsolute(){
 		//System.out.println("I don't have a turret");
 	}
+
 	public default void setTurretPowerPct(double powerPct){
 		//System.out.println("I don't have a turret");
 	}
@@ -211,10 +225,11 @@ public interface GenericRobot {
 	public default double getTurretPitchPowerPct(){
 		return 0;
 	}
+
 	public default void setTurretPitchAngle(){
 		//System.out.println("I don't have a turret");
 	}
-	public default void setTurretPitchPowerPct(){
+	public default void setTurretPitchPowerPct(double speed){
 		//System.out.println("I don't have a collector");
 	}
 
@@ -236,6 +251,7 @@ public interface GenericRobot {
 	public default double getShooterTargetHeight(){
 		return 0;
 	}
+	public default double getShooterTargetRPM() { return 0; }
 
 	public default void setShooterRPM(double topRPM, double bottomRPM){
 		//System.out.println("I don't have a shooter");
@@ -259,6 +275,12 @@ public interface GenericRobot {
 		//System.out.println("I don't have a shooter");
 	}
 
+	public default boolean getFloorSensorLeft(){
+		return false;
+	}
+	public default boolean getFloorSensorRight(){
+		return false;
+	}
 
 
 	public default void raiseCollector() {
@@ -281,5 +303,49 @@ public interface GenericRobot {
 	}
 	public default void setArmsBackward() {
 		//System.out.println("I don't have a climber");
+	}
+
+	//returns true if PTO set to arms, return false if PTO set to drive
+	public default boolean getPTOState(){
+		return false;
+	}
+
+	public default boolean getClimbSensorLeft(){
+		return false;
+	}
+	public default boolean getClimbSensorRight(){
+		return false;
+	}
+
+
+	public default long getShootReadyTimer(){
+		//System.out.println("Robot doesn't check if it's ready to shoot");
+		return System.currentTimeMillis();
+	}
+	public default void shooterNotReady(){
+		//System.out.println("Robot doesn't check if it's ready to shoot");
+	}
+	public default boolean isReadyToShoot(){
+		return isReadyToShoot(0.02, 100);
+	}
+	public default boolean isReadyToShoot(double tolerance, double time){
+		double shooterRPM = getShooterRPMBottom();
+		double targetRPM = getShooterTargetRPM();
+
+		//absolute percent error between actual shooter and target
+		double error = Math.abs( (shooterRPM - targetRPM) / targetRPM);
+
+		if(error > tolerance) shooterNotReady();
+
+		//we haven't called shooterNotReady() in the last "time" milliseconds
+		if(System.currentTimeMillis() - getShootReadyTimer() > time) return true;
+		return false;
+	}
+
+	public default boolean isActivelyShooting(){
+		return false;
+	}
+	public default void setActivelyShooting(boolean isShooting){
+
 	}
 }

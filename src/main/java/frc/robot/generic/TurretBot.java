@@ -220,6 +220,32 @@ public class TurretBot implements GenericRobot {
 	}
 
 	@Override
+	public void setIndexerIntakePercentage(double percentage) {
+		indexer.set(percentage);
+	}
+
+	@Override
+	public double getIndexerIntakePercentage() {
+		return indexer.get();
+	}
+
+	@Override
+	public boolean hasFoundCargo() {
+		return GenericRobot.super.hasFoundCargo();
+	}
+
+	@Override
+	public TeamColor getFoundCargoColor() {
+		return GenericRobot.super.getFoundCargoColor();
+	}
+
+	@Override
+	public boolean isTargetFound() {
+		return GenericRobot.super.isTargetFound();
+	}
+
+
+	@Override
 	public double getTurretAngle() {
 		return encoderTurret.getPosition() / TICKS_PER_DEGREE_TURRET;
 	}
@@ -292,4 +318,26 @@ public class TurretBot implements GenericRobot {
 
 	}
 
+	@Override
+	public void setShooterTargetDistance(double length, double height) {
+		//TODO
+	}
+
+	@Override
+	public void raiseCollector() { return; }
+
+	@Override
+	public void lowerCollector() { return; }
+
+	@Override
+	public void turnOnPTO() { return; }
+
+	@Override
+	public void turnOffPTO() { return; }
+
+	@Override
+	public void setArmsForward() { return; }
+
+	@Override
+	public void setArmsBackward() { return; }
 }

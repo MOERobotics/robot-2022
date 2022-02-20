@@ -94,6 +94,17 @@ public class Camoelot implements GenericRobot {
 		return 0;
 	}
 
+
+	@Override
+	public void setIndexerIntakePercentage(double percentage) {
+		System.out.println("Camelot cannot index");
+	}
+
+	@Override
+	public double getIndexerIntakePercentage() {
+		return 0;
+	}
+
 	@Override
 	public double getPIDpivotP() {
 		return 0;

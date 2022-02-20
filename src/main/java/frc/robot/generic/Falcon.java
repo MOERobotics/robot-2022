@@ -103,6 +103,16 @@ public class Falcon implements GenericRobot {
     }
 
 
+	@Override
+	public void setIndexerIntakePercentage(double percentage) {
+		indexer.set(percentage);
+	}
+
+	@Override
+	public double getIndexerIntakePercentage() {
+		return indexer.get();
+	}
+
 
     @Override
     public double getDriveLeftPercentage() {
