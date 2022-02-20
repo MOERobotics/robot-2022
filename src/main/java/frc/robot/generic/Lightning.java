@@ -38,7 +38,7 @@ public class Lightning implements GenericRobot {
     //DigitalInput ballSensor = new DigitalInput(0);
     DoubleSolenoid PTO = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 4, 5);
     DoubleSolenoid arms = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
-    Solenoid collectorPosition = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+    DoubleSolenoid collectorPosition = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6,7);
 
     SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
     SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
@@ -341,12 +341,12 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void raiseCollector(){
-        collectorPosition.set(true);
+        collectorPosition.set(DoubleSolenoid.Value.kForward);
     }
 
     @Override
     public void lowerCollector(){
-        collectorPosition.set(false);
+        collectorPosition.set(DoubleSolenoid.Value.kReverse);
     }
 
     //CONNECTS MOTORS TO CLIMB ARMS
