@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
@@ -39,7 +40,7 @@ public class Robot extends TimedRobot {
 
   PIDController turretPIDController;
 
-
+  XboxController xboxJoystick = new XboxController(1);
 
   @Override public void robotInit() {}
 
@@ -211,6 +212,11 @@ public class Robot extends TimedRobot {
     if (joystick.getRawButton(6)) autonomous = simpleBTerminal;
     if (joystick.getRawButton(7)) autonomous = simpleCTerminal;
 
+    //reset the robot
+    if (joystick.getRawButton(8)) {
+      robot.turnOffPTO();
+      robot.setArmsBackward();
+    }
   }
 
   @Override public void testInit() {}
@@ -253,6 +259,23 @@ public class Robot extends TimedRobot {
 
     if      (joystick.getRawButton( 5)) robot.setArmsForward();
     if      (joystick.getRawButton(10)) robot.setArmsBackward();
+
+    //<Xbox Controller temp>
+
+
+    if (xboxJoystick.getYButton()) {
+      robot.setCollectorIntakePercentage(.3);
+    }
+    if (xboxJoystick.getAButton()) {
+      robot.setCollectorIntakePercentage(-.3);
+    }
+    if (xboxJoystick.getBButton()) {
+      //robot.shooter
+    }
+    if(xboxJoystick.getPOV() >= 0){
+      robot.setShooterPowerPct(.5,.5);
+    }
+    //</Xbox Controller temp>
 
   }
 }
