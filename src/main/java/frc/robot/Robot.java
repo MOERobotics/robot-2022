@@ -15,6 +15,7 @@ import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
+import frc.robot.generic.TurretBot;
 
 public class Robot extends TimedRobot {
 
@@ -27,7 +28,7 @@ public class Robot extends TimedRobot {
     simpleCTerminal = new SimpleCTerminal();
 
 
-  GenericRobot robot = new Lightning();
+  GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
   GenericAutonomous autonomous = autoArc;
 
@@ -154,17 +155,17 @@ public class Robot extends TimedRobot {
 
     if (jx >0){
       R = 10*jx*(1-jx)/((Math.pow(jx, 2)+1.0e-10));
-      leftPower = -jy;
-      rightPower = -jy*(R - wheelBase/2)/(R + wheelBase/2);
+      leftPower = jy;
+      rightPower = jy*(R - wheelBase/2)/(R + wheelBase/2);
     } else{
       R = -10*jx*(1+jx)/((Math.pow(jx, 2)+1.0e-10));
-      leftPower = -jy/(R + wheelBase/2)*(R - wheelBase/2);
-      rightPower = -jy;
+      leftPower = jy/(R + wheelBase/2)*(R - wheelBase/2);
+      rightPower = jy;
     }
 
     if (Math.abs(jx)<cutoff) {
-      leftPower = -jy;
-      rightPower = -jy;
+      leftPower = jy;
+      rightPower = jy;
     }
 
     robot.drivePercent(
