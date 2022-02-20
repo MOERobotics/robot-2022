@@ -242,6 +242,27 @@ public class Robot extends TimedRobot {
 
     robot.setTurretPowerPct(currentTurretPower);
 
+    double shooterTargetRPM = 0;
+    if      (joystick.getRawButton(10)){
+      shooterTargetRPM = robot.getShooterTargetRPM();
+    }else{
+      shooterTargetRPM = 0;
+    }
+
+    robot.setShooterRPM(shooterTargetRPM, shooterTargetRPM);
+
+    if(joystick.getRawButton(16)){
+      if(robot.isReadyToShoot()){
+        robot.setActivelyShooting(true);
+      }
+      else{
+        robot.setActivelyShooting(false);
+      }
+    }
+    else{
+      robot.setActivelyShooting(false);
+    }
+
 
     //Collector indexer logic based on cargo already in sensors (from jack)
     double defCollectorPower = 1;
