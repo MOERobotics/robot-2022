@@ -54,7 +54,10 @@ public class Lightning implements GenericRobot {
     SparkMaxLimitSwitch limitSwitchLeftBForward = leftMotorB.getForwardLimitSwitch(lstype);
     SparkMaxLimitSwitch limitSwitchLeftBReverse = leftMotorB.getReverseLimitSwitch(lstype);
 
+    double defaultShooterTargetRPM = 500;
+
     boolean isPTOonArms;
+
     //True = robot is in the process of and committed to shooting a cargo at mach 12
     boolean isActivelyShooting;
 
@@ -325,7 +328,7 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double getShooterTargetRPM(){
-        return 1000;
+        return defaultShooterTargetRPM;
     }
 
     @Override

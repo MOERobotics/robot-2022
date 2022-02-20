@@ -338,8 +338,12 @@ public interface GenericRobot {
 		if(error > tolerance) shooterNotReady();
 
 		//we haven't called shooterNotReady() in the last "time" milliseconds
-		if(System.currentTimeMillis() - getShootReadyTimer() > time) return true;
-		return false;
+		if(System.currentTimeMillis() - getShootReadyTimer() > time) {
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 
 	public default boolean isActivelyShooting(){
