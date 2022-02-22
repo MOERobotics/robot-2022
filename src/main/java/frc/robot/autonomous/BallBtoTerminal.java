@@ -4,7 +4,8 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
-//Simple autonomous code for ball A, closest ball to the hangar
+//Simple autonomous code for ball B, ball between ball A and C
+//Setup: put the robot down so that the ball at the terminal and the ball B are lined up straight.
 public class BallBtoTerminal extends GenericAutonomous {
     double startingYaw;
     double startDistance;
@@ -16,7 +17,7 @@ public class BallBtoTerminal extends GenericAutonomous {
     double correction;
 
     double distanceB = 61.5;
-    double distanceTerminal = 0;
+    double distanceTerminal = 160.6;
     double rampDownDist = 10;
 
 
@@ -49,14 +50,17 @@ public class BallBtoTerminal extends GenericAutonomous {
             case 1: //shoot the ball
             case 2: //shoot the ball part 2 electric boogaloo
             case 3: //shoot the ball part 3 maybe
-            case 4: //drive to ball A
+            case 4: //drive to ball B
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB - rampDownDist){
-                    defaultPower = (distanceB-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
+                    double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist,
+                            robot.getDriveDistanceInchesLeft(), distanceB);
+                    leftpower = ramp;
+                    rightpower = ramp;
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB){
                     autonomousStep += 1;

@@ -82,7 +82,7 @@ public class BallAtoBtoTerminal extends GenericAutonomous {
             case 12: //turn to go to ball B
                 leftpower = defaultTurnPower;
                 rightpower = -defaultTurnPower;
-                //turning left
+                //turning right
 
                 if(robot.getYaw() - startingYaw > angleA) {
                     startingYaw = startingYaw + angleA;

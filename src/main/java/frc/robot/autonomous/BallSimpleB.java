@@ -1,10 +1,9 @@
 package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
-//Simple autonomous code for ball B
+//Setup: put the robot down so that the ball at the terminal and the ball B are lined up straight.
 public class BallSimpleB extends GenericAutonomous {
     double startingYaw;
 
@@ -15,7 +14,7 @@ public class BallSimpleB extends GenericAutonomous {
     double correction;
     double startTime;
 
-    double distance = 61.5; //distance to ball B from the tarmac
+    double distanceB = 61.5; //distance to ball B from the tarmac
     double rampDownDist = 10;
 
     PIDController PIDDriveStraight;
@@ -53,11 +52,11 @@ public class BallSimpleB extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distance - rampDownDist){
-                    defaultPower = (distance - robot.getDriveDistanceInchesLeft() + startDistance)
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB - rampDownDist){
+                    defaultPower = (distanceB - robot.getDriveDistanceInchesLeft() + startDistance)
                             * defaultPower / rampDownDist;
                 }
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distance){
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB){
                     autonomousStep += 1;
                     startTime = System.currentTimeMillis();
                 }

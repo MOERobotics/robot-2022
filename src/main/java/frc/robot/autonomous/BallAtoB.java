@@ -20,7 +20,7 @@ public class BallAtoB extends GenericAutonomous {
     double distanceA = 40.44;
     double distanceB = 259.26; //CHANGE
     double angleA = 87.74;
-
+    double angleB = 0; //change
     double rampDownDist = 10;
 
 

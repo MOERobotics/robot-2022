@@ -4,11 +4,10 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball C, closest ball to the hangar, and driving to the ball at terminal
-//Setup: 33.21 degrees from the white dividing line
+//Setup: Line the robot straight between ball C and the center point of the hub
 public class BallCtoTerminal extends GenericAutonomous {
     double startingYaw;
     double startDistance;
@@ -19,13 +18,16 @@ public class BallCtoTerminal extends GenericAutonomous {
     double defaultPower = .4;
     double defaultTurnPower = .4;
     double correction;
+    boolean time = false;
 
     double distanceC = 47.9;
     double distanceTerminal = 251;
-    double angleC = 82.74; //og = 84.74
+    double angleC = 82.74;
     double rampDownDist = 10;
 
     PIDController PIDDriveStraight;
+    PIDController PIDTurret;
+    PIDController PIDPivot;
 
     int averageTurretXSize = 2;
     double[] averageTurretX = new double [averageTurretXSize];
@@ -34,9 +36,7 @@ public class BallCtoTerminal extends GenericAutonomous {
     double turretarea;
     double turretv;
     int counter = 0;
-    boolean time = false;
-    PIDController turretPIDController;
-    PIDController PIDPivot;
+
     //TurretTracker tracker = new TurretTracker();
 
     @Override
@@ -47,7 +47,7 @@ public class BallCtoTerminal extends GenericAutonomous {
 
         PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
         PIDPivot = new PIDController(robot.getPIDpivotP(), robot.getPIDpivotI(), robot.getPIDpivotD());
-        turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
+        PIDTurret = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
 
         //tracker.turretInit(robot);
     }
@@ -116,12 +116,10 @@ public class BallCtoTerminal extends GenericAutonomous {
             case 11: //copium
             //will change these comments when they actually mean something
             case 12://reset
-                if (System.currentTimeMillis() - startTime >= 1000){
                     PIDDriveStraight.reset();
                     PIDDriveStraight.enableContinuousInput(-180,180);
                     startDistance = robot.getDriveDistanceInchesLeft();
                     autonomousStep +=1;
-                }
                 break;
             case 13: //turn to go to ball @ terminal
                 correction = PIDPivot.calculate(angleC + robot.getYaw() - startingYaw );
@@ -185,9 +183,9 @@ public class BallCtoTerminal extends GenericAutonomous {
         double currentTurretPower = 0;
 
         if(turretv !=0){
-            currentTurretPower = turretPIDController.calculate(average);
+            currentTurretPower = PIDTurret.calculate(average);
         }else{
-            turretPIDController.reset();
+            PIDTurret.reset();
         }
 
         robot.setTurretPowerPct(currentTurretPower);
