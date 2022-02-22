@@ -28,7 +28,7 @@ public class Robot extends TimedRobot {
       simpleBTerminal = new SimpleBTerminal(),
       simpleCTerminal = new SimpleCTerminal();
 
-  GenericRobot robot = new TurretBot();
+  GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
