@@ -1,29 +1,41 @@
 package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball C, closest ball to the hangar, and driving to the ball at terminal
+//Setup: 33.21 degrees from the white dividing line
 public class BallCtoTerminal extends GenericAutonomous {
     double startingYaw;
-
     double startDistance;
+    double startTime;
+
     double leftpower;
     double rightpower;
     double defaultPower = .4;
     double defaultTurnPower = .4;
     double correction;
-    double startTime;
 
-    double distanceC = 40.44;
+    double distanceC = 47.9;
     double distanceTerminal = 251;
-    double angleC = 84.54;
+    double angleC = 83.74; //og = 84.74
     double rampDownDist = 10;
 
     PIDController PIDDriveStraight;
 
-    TurretTracker tracker = new TurretTracker();
+    int averageTurretXSize = 2;
+    double[] averageTurretX = new double [averageTurretXSize];
+    double turretx;
+    double turrety;
+    double turretarea;
+    double turretv;
+    int counter = 0;
+    PIDController turretPIDController;
+    //TurretTracker tracker = new TurretTracker();
 
     @Override
     public void autonomousInit(GenericRobot robot) {
@@ -31,12 +43,24 @@ public class BallCtoTerminal extends GenericAutonomous {
         startingYaw = robot.getYaw();
         startTime = System.currentTimeMillis();
         PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
-        tracker.turretInit(robot);
+
+        turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
+        //tracker.turretInit(robot);
     }
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
-        tracker.turretUpdate(robot);
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+        NetworkTableEntry tx = table.getEntry("tx");
+        NetworkTableEntry ty = table.getEntry("ty");
+        NetworkTableEntry ta = table.getEntry("ta");
+        NetworkTableEntry tv = table.getEntry("tv");
+
+        turretx = tx.getDouble(0.0);
+        turrety = ty.getDouble(0.0);
+        turretarea = ta.getDouble(0.0);
+        turretv = tv.getDouble(0.0);
+        //tracker.turretUpdate(robot);
 
         switch(autonomousStep){
             case 0: //reset
@@ -61,8 +85,10 @@ public class BallCtoTerminal extends GenericAutonomous {
                 rightpower = defaultPower - correction;
 
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC - rampDownDist){
-                    defaultPower = (distanceC-robot.getDriveDistanceInchesLeft()+startDistance)
-                            *defaultPower/rampDownDist;
+                    double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist,
+                            robot.getDriveDistanceInchesLeft(), distanceC);
+                    leftpower = ramp;
+                    rightpower = ramp;
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC){
                     autonomousStep += 1;
@@ -109,8 +135,10 @@ public class BallCtoTerminal extends GenericAutonomous {
                 rightpower = defaultPower - correction;
 
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal - rampDownDist){
-                    defaultPower = (distanceTerminal-robot.getDriveDistanceInchesLeft()+startDistance)
-                            *defaultPower/rampDownDist;
+                    double ramp = rampDown(defaultPower, 0, startDistance, 10,
+                            robot.getDriveDistanceInchesLeft(), distanceTerminal);
+                    leftpower = ramp;
+                    rightpower = ramp;
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal){
                     autonomousStep += 1;
@@ -123,6 +151,27 @@ public class BallCtoTerminal extends GenericAutonomous {
                 break;
         }
         robot.drivePercent(leftpower, rightpower);
-        tracker.turretMove(robot);
+        //If turret works set value of averageTurretX[] to turretx
+        if(turretv !=0 ) {
+            averageTurretX[counter % averageTurretXSize] = turretx;
+            counter++;
+        }
+
+        double average = 0;
+        for(double i: averageTurretX){
+            average += i;
+        }
+        average /= averageTurretXSize;
+
+        double currentTurretPower = 0;
+
+        if(turretv !=0){
+            currentTurretPower = turretPIDController.calculate(average);
+        }else{
+            turretPIDController.reset();
+        }
+
+        robot.setTurretPowerPct(currentTurretPower);
+        //tracker.turretMove(robot);
     }
 }
