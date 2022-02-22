@@ -413,16 +413,27 @@ public class Lightning implements GenericRobot {
         rightMotorA.set(rightPower);
         rightMotorB.set(rightPower);
     }
+    @Override
+    public void raiseClimberArms(double rightPower, double leftPower){
+        //System.out.println("I don't have a climber");
+        armPower(leftPower, rightPower);
+    }
+    @Override
+    public void lowerClimberArms(double rightPower, double leftPower){
+        //System.out.println("I don't have a climber");
+        armPower(-leftPower, -rightPower);
+    }
 
     @Override
     public double armHeightLeft() {
-        //TODO: put in coversion
+        //TODO: put in conversion
         //Maybe use some sensor. Do NOT want to use encoders for this.
         return encoderTicksLeftDrive();
     }
 
     @Override
     public double armHeightRight(){
+        //TODO: put in conversion
         return encoderTicksRightDrive();
     }
 
@@ -458,17 +469,17 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double getPIDmaneuverP() {
-        return GenericRobot.super.getPIDmaneuverP();
+        return 1.0e-2;
     }
 
     @Override
     public double getPIDmaneuverI() {
-        return GenericRobot.super.getPIDmaneuverI();
+        return 0;
     }
 
     @Override
     public double getPIDmaneuverD() {
-        return GenericRobot.super.getPIDmaneuverD();
+        return 1.0e-4;
     }
 
     @Override

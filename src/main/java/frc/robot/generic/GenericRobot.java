@@ -366,10 +366,10 @@ public interface GenericRobot {
 	public default void setActivelyShooting(boolean isShooting){
 
 	}
-	public default void raiseClimberArms(){
+	public default void raiseClimberArms(double rightPower, double leftPower){
 		//System.out.println("I don't have a climber");
 	}
-	public default void lowerClimberArms(){
+	public default void lowerClimberArms(double rightPower, double leftPower){
 		//System.out.println("I don't have a climber");
 	}
 	public default void armPower(double power){

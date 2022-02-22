@@ -48,7 +48,8 @@ public class Hang extends GenericCommand{
     int countRight = 0;
     double leftArmPower = 0;
     double rightArmPower = 0;
-    double defaultClimbPower = .1;
+    double defaultClimbPowerUp = .5;
+    double defaultClimbPowerDown = -.2;
     boolean leftArrived = false;
     boolean rightArrived = false;
     double startHeightLeft = 0;
@@ -150,7 +151,7 @@ public class Hang extends GenericCommand{
                 case 6: //adios amigos
                     leftPower = 0;
                     rightPower = 0;
-                    //tapeAlign = false;
+                    //tapeAlign = false; TODO: make this stop being a comment
                     commandStep = 0;
                     startingTime = System.currentTimeMillis();
                     break;
@@ -182,7 +183,7 @@ public class Hang extends GenericCommand{
                         leftArrived = true;
                     }
                     else{
-                        leftArmPower = defaultClimbPower;
+                        leftArmPower = defaultClimbPowerUp;
                     }
 
 
@@ -195,7 +196,7 @@ public class Hang extends GenericCommand{
                         rightArrived = true;
                     }
                     else{
-                        rightArmPower = defaultClimbPower;
+                        rightArmPower = defaultClimbPowerUp;
                     }
 
                     if (leftArrived && rightArrived){
@@ -205,7 +206,8 @@ public class Hang extends GenericCommand{
                         countRight = 0;
                         leftArmPower = 0;
                         rightArmPower = 0;
-                        commandStep += 1;
+                        commandStep = 11;
+                        ////////////just for testing TODO: put it back to normal(+=1)
                     }
 
                     break;
@@ -240,7 +242,7 @@ public class Hang extends GenericCommand{
                         leftArrived = true;
                     }
                     else{
-                        leftArmPower = -defaultClimbPower;
+                        leftArmPower = defaultClimbPowerDown;
                     }
 
 
@@ -253,14 +255,14 @@ public class Hang extends GenericCommand{
                         rightArrived = true;
                     }
                     else{
-                        rightArmPower = -defaultClimbPower;
+                        rightArmPower = defaultClimbPowerDown;
                     }
                     if (robot.armInContact() && leftArrived && rightArrived){
                         countRight = 0;
                         countLeft = 0;
                         leftArmPower = 0;
                         rightArmPower = 0;
-                        commandStep += 1;
+                        commandStep = 19;//TODO: put it back to normal(+=1)
                         leftArrived = false;
                         rightArrived = false;
                         startHeightLeft = robot.armHeightLeft();
@@ -274,14 +276,14 @@ public class Hang extends GenericCommand{
                         leftArrived = true;
                     }
                     else{
-                        leftArmPower = .1;
+                        leftArmPower = defaultClimbPowerUp;
                     }
                     if (Math.abs(robot.armHeightRight()-startHeightRight) >= escapeHeight){
                         rightArmPower = 0;
                         rightArrived = true;
                     }
                     else{
-                        rightArmPower = .1;
+                        rightArmPower = defaultClimbPowerUp;
                     }
                     if (rightArrived && leftArrived){
                         rightArmPower = 0;
@@ -306,7 +308,7 @@ public class Hang extends GenericCommand{
                         leftArrived = true;
                     }
                     else{
-                        leftArmPower = defaultClimbPower;
+                        leftArmPower = defaultClimbPowerUp;
                     }
 
 
@@ -319,7 +321,7 @@ public class Hang extends GenericCommand{
                         rightArrived = true;
                     }
                     else{
-                        rightArmPower = defaultClimbPower;
+                        rightArmPower = defaultClimbPowerUp;
                     }
 
                     if (leftArrived && rightArrived){
@@ -372,7 +374,7 @@ public class Hang extends GenericCommand{
                         leftArrived = true;
                     }
                     else{
-                        leftArmPower = -defaultClimbPower;
+                        leftArmPower = defaultClimbPowerDown;
                     }
 
 
@@ -385,8 +387,9 @@ public class Hang extends GenericCommand{
                         rightArrived = true;
                     }
                     else{
-                        rightArmPower = -defaultClimbPower;
+                        rightArmPower = defaultClimbPowerDown;
                     }
+
                     if (robot.armInContact() && leftArrived && rightArrived){
                         countRight = 0;
                         countLeft = 0;
