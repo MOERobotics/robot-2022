@@ -303,15 +303,21 @@ public class Robot extends TimedRobot {
 
   @Override public void testPeriodic() {
 
+      double pitchChange = 0;
     if (xbox.getRawButton(1)){
-      robot.setTurretPitchPowerPct(1);
+      pitchChange = 0.02;
     }
     else if (xbox.getRawButton(2)){
-      robot.setTurretPitchPowerPct(-1);
+      pitchChange = -0.02;
     }
     else{
-      robot.setTurretPitchPowerPct(0);
+      pitchChange = 0;
     }
+      double newPos = robot.getTurretPitchPosition() + pitchChange;
+      if(newPos < 0) newPos = 0;
+      if(newPos > 1) newPos = 1;
+
+      robot.setTurretPitchPosition(newPos);
 
     double driveX =  joystick.getX();
     double driveY = -joystick.getY();
