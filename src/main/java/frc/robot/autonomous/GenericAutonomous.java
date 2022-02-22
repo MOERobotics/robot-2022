@@ -7,7 +7,7 @@ import frc.robot.generic.GenericRobot;
 
 public abstract class GenericAutonomous {
 
-    public int autonomousStep;
+    public int autonomousStep = 0;
 
     public void autonomousInit(GenericRobot robot) {
         //System.out.println("I don't have autonomousInit in my autonomous program :'(");

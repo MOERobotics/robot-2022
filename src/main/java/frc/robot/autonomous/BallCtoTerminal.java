@@ -22,7 +22,7 @@ public class BallCtoTerminal extends GenericAutonomous {
 
     double distanceC = 47.9;
     double distanceTerminal = 251;
-    double angleC = 83.74; //og = 84.74
+    double angleC = 82.74; //og = 84.74
     double rampDownDist = 10;
 
     PIDController PIDDriveStraight;
@@ -34,7 +34,9 @@ public class BallCtoTerminal extends GenericAutonomous {
     double turretarea;
     double turretv;
     int counter = 0;
+    boolean time = false;
     PIDController turretPIDController;
+    PIDController PIDPivot;
     //TurretTracker tracker = new TurretTracker();
 
     @Override
@@ -42,9 +44,11 @@ public class BallCtoTerminal extends GenericAutonomous {
         autonomousStep = 0;
         startingYaw = robot.getYaw();
         startTime = System.currentTimeMillis();
-        PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
 
+        PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
+        PIDPivot = new PIDController(robot.getPIDpivotP(), robot.getPIDpivotI(), robot.getPIDpivotD());
         turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
+
         //tracker.turretInit(robot);
     }
 
@@ -65,6 +69,8 @@ public class BallCtoTerminal extends GenericAutonomous {
         switch(autonomousStep){
             case 0: //reset
                 robot.lowerCollector();
+                PIDPivot.reset();
+                PIDPivot.enableContinuousInput(-180,180);
                 PIDDriveStraight.reset();
                 PIDDriveStraight.enableContinuousInput(-180,180);
                 robot.resetEncoders();
@@ -100,6 +106,7 @@ public class BallCtoTerminal extends GenericAutonomous {
                 rightpower = 0;
                 startDistance = robot.getDriveDistanceInchesLeft();
                 autonomousStep = 12;
+                time = false;
                 break;
             case 6: //collector to collect ball
             case 7: //collection part 2 not electric nor boogaloo
@@ -117,15 +124,27 @@ public class BallCtoTerminal extends GenericAutonomous {
                 }
                 break;
             case 13: //turn to go to ball @ terminal
-                leftpower = -defaultTurnPower;
-                rightpower = defaultTurnPower;
+                correction = PIDPivot.calculate(angleC + robot.getYaw() - startingYaw );
+                leftpower = correction;
+                rightpower = -correction;
                 //turning left
-
-                if(robot.getYaw() - startingYaw < -angleC) {
-                    startingYaw = startingYaw - angleC;
-                    startDistance = robot.getDriveDistanceInchesLeft();
-                    PIDDriveStraight.reset();
+                if (Math.abs(Math.abs(robot.getYaw() - startingYaw)-angleC) <= 1.5){
+                    if (!time){
+                        startTime = System.currentTimeMillis();
+                        time = true;
+                    }
+                }
+                else{
+                    startTime = System.currentTimeMillis();
+                    time = false;
+                }
+                if (System.currentTimeMillis() - startTime >= 50){
+                    leftpower = 0;
+                    rightpower = 0;
                     autonomousStep += 1;
+                    startingYaw = -angleC;
+                    startDistance = robot.getDriveDistanceInchesLeft();
+                    startTime = System.currentTimeMillis();
                 }
                 break;
             case 14: //drive towards the ball
