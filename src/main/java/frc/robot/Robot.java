@@ -180,6 +180,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("leftArmEncoder", robot.armHeightLeft());
 
     SmartDashboard.putBoolean("hang", hang);
+    SmartDashboard.putNumber("count", count);
 
     SmartDashboard.putNumber("CommandStep", command.commandStep);
 
@@ -203,7 +204,7 @@ public class Robot extends TimedRobot {
   @Override public void teleopPeriodic() {
 
     //note to self: buttons currently assume mirrored joystick setting
-    if (joystick.getRawButtonPressed(6)){
+    if (joystick.getRawButtonPressed(8)){
       count = (count+1)%2;
     }
     if (count == 1){
