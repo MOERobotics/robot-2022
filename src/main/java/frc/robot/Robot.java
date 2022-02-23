@@ -52,6 +52,7 @@ public class Robot extends TimedRobot {
   double maxCurrentLeftB = 0;
   double maxCurrentRightA = 0;
   double maxCurrentRightB = 0;
+  boolean ActuallyHanging = false;
 
 
   PIDController turretPIDController;
@@ -175,6 +176,13 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("leftCLimberSensor", robot.getClimbSensorLeft());
     SmartDashboard.putBoolean("rightClimberSensor", robot.getClimbSensorRight());
 
+    SmartDashboard.putNumber("rightArmEncoder", robot.armHeightRight());
+    SmartDashboard.putNumber("leftArmEncoder", robot.armHeightLeft());
+
+    SmartDashboard.putBoolean("hang", hang);
+
+    SmartDashboard.putNumber("CommandStep", command.commandStep);
+
 
   }
 
@@ -265,7 +273,9 @@ public class Robot extends TimedRobot {
       }
 
     }
-    else{
+    if(hang){
+      ActuallyHanging = true;
+      SmartDashboard.putBoolean("we really are hanging", ActuallyHanging);
         if (reset){
           command.begin(robot);
           reset = false;
@@ -347,6 +357,8 @@ public class Robot extends TimedRobot {
   @Override public void disabledInit() {}
 
   @Override public void disabledPeriodic() {
+    hang = false;
+    count = 0;
     if (joystick.getRawButton(1)){
       robot.resetAttitude();
       robot.resetEncoders();

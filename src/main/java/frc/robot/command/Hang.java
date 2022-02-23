@@ -32,7 +32,6 @@ public class Hang extends GenericCommand{
 
     double fwd = 48;
     PIDController PIDSteering;
-    int commandStep = -1;
     boolean tapeAlign;
 
     /////^^^^^^^^^^^Stuff for tapeAlign
@@ -48,8 +47,8 @@ public class Hang extends GenericCommand{
     int countRight = 0;
     double leftArmPower = 0;
     double rightArmPower = 0;
-    double defaultClimbPowerUp = .5;
-    double defaultClimbPowerDown = -.2;
+    double defaultClimbPowerUp = -.5;
+    double defaultClimbPowerDown = .2;
     boolean leftArrived = false;
     boolean rightArrived = false;
     double startHeightLeft = 0;
@@ -64,7 +63,7 @@ public class Hang extends GenericCommand{
         lTraveled = 0;
         fwd = 75.6;
         PIDSteering = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
-        tapeAlign = true;
+        tapeAlign = false;
         firstTime = true;
     }
 
@@ -161,6 +160,9 @@ public class Hang extends GenericCommand{
         else{////////////////////////////start the real stuff now
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             switch (commandStep){
+                case -1:
+                    commandStep += 1;
+                    break;
                 case 0:///reset and enable PTO
                     //reset encoders
                     robot.turnOnPTO();
@@ -168,7 +170,7 @@ public class Hang extends GenericCommand{
                     countLeft = 0;
                     countRight = 0;
                     if (System.currentTimeMillis() - startingTime >= 50){
-                        commandStep += 1;
+                        commandStep = 11;//TODO: fix
                     }
 
                     break;

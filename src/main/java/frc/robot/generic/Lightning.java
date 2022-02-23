@@ -428,13 +428,13 @@ public class Lightning implements GenericRobot {
     public double armHeightLeft() {
         //TODO: put in conversion
         //Maybe use some sensor. Do NOT want to use encoders for this.
-        return encoderTicksLeftDrive();
+        return -encoderTicksLeftDrive()*.24937;
     }
 
     @Override
     public double armHeightRight(){
         //TODO: put in conversion
-        return encoderTicksRightDrive();
+        return -encoderTicksRightDrive()*.24937;
     }
 
     @Override
