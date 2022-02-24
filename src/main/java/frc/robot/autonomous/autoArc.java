@@ -35,6 +35,8 @@ public class autoArc extends GenericAutonomous {
     double currentTurretPower = 0;
     double average;
     int averageTurretXSize = 2;
+    boolean breakRobot = false;
+    boolean startTimer = false;
 
     @Override
     public void autonomousInit(GenericRobot robot) {
@@ -125,8 +127,19 @@ public class autoArc extends GenericAutonomous {
                 currentYaw = robot.getYaw();
                 correction = PIDPivot.calculate(pivotDeg + currentYaw - startYaw);
                 leftPower = correction;
-                rightPower = -correction;
-                currentTurretPower = .05;
+                rightPower = -correction; //TODO: on lightning, change to abs encoder
+                if (!robot.isTargetFound() && !breakRobot) {
+                    if (!startTimer) {
+                        startingTime = System.currentTimeMillis();
+                        startTimer = true;
+                    }
+                    currentTurretPower = .05;
+                }
+                if (System.currentTimeMillis() - startingTime > 1000 && !breakRobot){
+                    currentTurretPower = 0;
+                    breakRobot = true;
+                }
+
                 if (Math.abs(Math.abs(currentYaw - startYaw)-pivotDeg) <= 1.5){
                     if (!time){
                         startingTime = System.currentTimeMillis();

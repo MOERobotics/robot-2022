@@ -27,10 +27,9 @@ public class Hang extends GenericCommand{
     boolean leftSensor = false;
     boolean rightSensor = false;
 
-    double outerDistArc;
     double lTraveled;
 
-    double fwd = 48;
+    double fwd = 71.6;
     PIDController PIDSteering;
     boolean tapeAlign;
 
@@ -38,10 +37,7 @@ public class Hang extends GenericCommand{
 
 
     //////////////Now the real stuff
-    double desiredHeight;
-    double lowHeight;
     double escapeHeight = 10;///TODO:what is this??
-    double getToBarHeight;
     boolean firstTime = true;
     int countLeft = 0;
     int countRight = 0;
@@ -79,6 +75,8 @@ public class Hang extends GenericCommand{
         SmartDashboard.putBoolean("rightClimberSensor", robot.getClimbSensorRight());
         SmartDashboard.putNumber("countLeft", countLeft);
         SmartDashboard.putNumber("countRight", countRight);
+        SmartDashboard.putNumber("startDistance", startDistance);
+
 
         if (tapeAlign) {
 
@@ -93,9 +91,19 @@ public class Hang extends GenericCommand{
                     break;
                 case 0:
                     startAngle = robot.getYaw();
+                    startDistance = robot.getDriveDistanceInchesLeft();
                     PIDSteering.reset();
                     PIDSteering.enableContinuousInput(-180, 180);
-                    commandStep += 1;
+                    commandStep = 12;//TODO:change back
+                    break;
+                case 12: //TODO: tester case, remove when necessary
+                    leftPower = defaultPower;
+                    rightPower = defaultPower;
+                    if (Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= 12){
+                         commandStep = 5;
+                         leftPower = 0;
+                         rightPower = 0;
+                    }
                     break;
                 case 1:
                     correction = PIDSteering.calculate(robot.getYaw() - startAngle);
@@ -120,17 +128,15 @@ public class Hang extends GenericCommand{
                     if (!rightSensor && !robot.getFloorSensorRight()) {
                         differenceDistance = Math.abs(robot.getDriveDistanceInchesLeft() - startDistance);
                         Tapetheta = Math.atan(differenceDistance / sensorDist) * 180 / Math.PI;
-                        outerDistArc = robot.getDriveDistanceInchesRight();
-                        commandStep = 4;
+                        commandStep += 1;
                     } else if (!leftSensor && !robot.getFloorSensorLeft()) {
                         differenceDistance = Math.abs(robot.getDriveDistanceInchesLeft() - startDistance);
                         Tapetheta = Math.atan(differenceDistance / sensorDist) * 180 / Math.PI;
-                        outerDistArc = robot.getDriveDistanceInchesLeft();
-                        commandStep = 4;
+                        commandStep += 1;
                     }
                     break;
 
-                case 4:
+                case 3:
                     if (leftSensor) {
                         currentYaw = startAngle - Tapetheta; //currentYaw = targetYaw because we are lazy
                     } else {
@@ -141,17 +147,17 @@ public class Hang extends GenericCommand{
                     startDistance = robot.getDriveDistanceInchesLeft();
                     commandStep += 1;
                     break;
-                case 5:
+                case 4:
                     correction = PIDSteering.calculate(robot.getYaw() - currentYaw);
                     leftPower = defaultPower + correction;
                     rightPower = defaultPower - correction;
-                    if (Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= (fwd - lTraveled)) {
+                    if (Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= (fwd)) {
                         leftPower = 0;
                         rightPower = 0;
                         commandStep += 1;
                     }
                     break;
-                case 6: //adios amigos
+                case 5: //adios amigos
                     leftPower = 0;
                     rightPower = 0;
                     //tapeAlign = false; TODO: make this stop being a comment
