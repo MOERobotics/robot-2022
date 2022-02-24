@@ -19,7 +19,7 @@ public abstract class GenericAutonomous {
 
 
     public double rampDown(double startPower, double endPower, double startDistance, double rolloutDistance, double currentDist, double endDist){
-        double power = (endDist-currentDist+startDistance)*(startPower-endPower)/rolloutDistance+endPower;
+        double power = (endDist-Math.abs(currentDist-startDistance))*(startPower-endPower)/rolloutDistance+endPower;
         return power;
     }
 }

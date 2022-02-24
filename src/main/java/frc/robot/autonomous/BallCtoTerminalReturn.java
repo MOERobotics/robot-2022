@@ -8,7 +8,7 @@ import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball C, closest ball to the hangar, and driving to the ball at terminal
 //Setup: Line the robot straight between ball C and the center point of the hub
-public class BallCtoTerminal extends GenericAutonomous {
+public class BallCtoTerminalReturn extends GenericAutonomous {
     double startingYaw;
     double startDistance;
     double startTime;
@@ -122,12 +122,12 @@ public class BallCtoTerminal extends GenericAutonomous {
             case 9: //shoot the second ball for funsies
             case 10: //miss the target and become sadge
             case 11: //copium
-            //will change these comments when they actually mean something
+                //will change these comments when they actually mean something
             case 12://reset
-                    PIDDriveStraight.reset();
-                    PIDDriveStraight.enableContinuousInput(-180,180);
-                    startDistance = robot.getDriveDistanceInchesLeft();
-                    autonomousStep +=1;
+                PIDDriveStraight.reset();
+                PIDDriveStraight.enableContinuousInput(-180,180);
+                startDistance = robot.getDriveDistanceInchesLeft();
+                autonomousStep +=1;
                 break;
             case 13: //turn to go to ball @ terminal
                 correction = PIDPivot.calculate(angleC + robot.getYaw() - startingYaw );
@@ -160,17 +160,41 @@ public class BallCtoTerminal extends GenericAutonomous {
                 rightpower = defaultPower - correction;
 
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal - rampDownDist){
-                    double ramp = rampDown(defaultPower, 0, startDistance, 10,
+                    double ramp = rampDown(defaultPower, .1, startDistance, 10,
                             robot.getDriveDistanceInchesLeft(), distanceTerminal);
                     leftpower = ramp;
                     rightpower = ramp;
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal){
                     autonomousStep += 1;
+                    startDistance = robot.getDriveDistanceInchesLeft();
                     startTime = System.currentTimeMillis();
                 }
                 break;
             case 15:
+                leftpower = 0;
+                rightpower = 0;
+                autonomousStep += 1;
+                break;
+            case 16:
+                correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
+
+                leftpower = -1*(defaultPower - correction);
+                rightpower = -1*(defaultPower + correction);
+
+                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal - rampDownDist){
+                    double ramp = rampDown(defaultPower, 0, startDistance, 10,
+                            robot.getDriveDistanceInchesLeft(), distanceTerminal);
+                    leftpower = -ramp;
+                    rightpower = -ramp;
+                }
+                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal){
+                    leftpower = 0;
+                    rightpower = 0;
+                    autonomousStep += 1;
+                }
+                break;
+            case 17:
                 leftpower = 0;
                 rightpower = 0;
                 break;

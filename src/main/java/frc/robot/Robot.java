@@ -25,7 +25,8 @@ public class Robot extends TimedRobot {
       autoArc         = new autoArc(),
       simpleATerminal = new BallAtoTerminal(),
       simpleBTerminal = new BallBtoTerminal(),
-      simpleCTerminal = new BallCtoTerminal();
+      simpleCTerminal = new BallCtoTerminal(),
+      CTerminalReturn = new BallCtoTerminalReturn();
 
   GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
@@ -140,6 +141,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Joystick raw Y", joystick.getY());
 
     SmartDashboard.putNumber("Autonomous Step", autonomous.autonomousStep);
+    SmartDashboard.putString("Autonomous Program", autonomous.getClass().getName());
 
   }
 
@@ -296,6 +298,7 @@ public class Robot extends TimedRobot {
     if (joystick.getRawButton(5)) autonomous = simpleATerminal;
     if (joystick.getRawButton(6)) autonomous = simpleBTerminal;
     if (joystick.getRawButton(7)) autonomous = simpleCTerminal;
+    if (joystick.getRawButton(9)) autonomous = CTerminalReturn;
 
   }
 
