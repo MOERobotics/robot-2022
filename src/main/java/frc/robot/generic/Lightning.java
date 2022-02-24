@@ -28,7 +28,7 @@ public class Lightning implements GenericRobot {
 
     //TODO: update servo ports
     //servo left was initially set to channel 9, don't know if that means anything
-    Servo       elevationLeft     = new Servo(0);
+    Servo       elevationLeft     = new Servo(9);
     Servo       elevationRight     = new Servo(1);
 
 
@@ -83,6 +83,8 @@ public class Lightning implements GenericRobot {
         shooterA.setInverted(true);
 
         elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+        elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+
 
         shootReadyTimer = System.currentTimeMillis();
 
@@ -269,8 +271,8 @@ public class Lightning implements GenericRobot {
         elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
 
         //TODO: figure out use setSpeed() or set()
-        elevationLeft.setSpeed(position);
-        elevationRight.setSpeed(position);
+        elevationLeft.set(position);
+        elevationRight.set(position);
     }
 
 
