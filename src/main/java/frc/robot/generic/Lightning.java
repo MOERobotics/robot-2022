@@ -10,8 +10,8 @@ public class Lightning implements GenericRobot {
     public static final double TICKS_PER_INCH_DRIVE = 0.96;
     public static final double TICKS_PER_DEGREE_TURRET = 116;
     public static final double TICKS_PER_DEGREE_TURRET2 = 136.467;
-    public static final double TICKS_PER_REVOLUTION_SHOOTERA = 116;
-    public static final double TICKS_PER_REVOLUTION_SHOOTERB = 116;
+    public static final double TICKS_PER_REVOLUTION_SHOOTERA = 1;
+    public static final double TICKS_PER_REVOLUTION_SHOOTERB = 1;
 
     AHRS navx = new AHRS(SPI.Port.kMXP, (byte) 50);
 
@@ -59,12 +59,13 @@ public class Lightning implements GenericRobot {
     SparkMaxLimitSwitch limitSwitchLeftBForward = leftMotorB.getForwardLimitSwitch(lstype);
     SparkMaxLimitSwitch limitSwitchLeftBReverse = leftMotorB.getReverseLimitSwitch(lstype);
 
-    double defaultShooterTargetRPM = 500;
+    double defaultShooterTargetRPM = 5000;
 
     boolean isPTOonArms;
 
     //True = robot is in the process of and committed to shooting a cargo at mach 12
     boolean isActivelyShooting;
+    boolean canShoot;
 
     //shootReadyTimer is used to check if shooter ready
     long shootReadyTimer;
@@ -176,6 +177,42 @@ public class Lightning implements GenericRobot {
         return limitSwitchIndexerForward.isPressed();
     }
 
+    @Override
+    public void getCargo(){
+        double collectorPct = 1;
+        double indexerPct = 1;
+        if (getUpperCargo()){
+            if (isActivelyShooting){
+                indexerPct = 1;
+            }
+            else{
+                indexerPct = 0;
+            }
+            if (getLowerCargo()){
+                collectorPct = 0;
+            }
+        }
+        setIndexerIntakePercentage(indexerPct);
+        setCollectorIntakePercentage(collectorPct);
+
+    }
+
+    @Override
+    public void shoot(){
+        double shooterRPM = defaultShooterTargetRPM;
+        if (getShooterRPMTop() >= shooterRPM && getShooterRPMBottom() >= shooterRPM){
+            canShoot = true;
+        }
+        else{
+            canShoot = false;
+        }
+    }
+
+    @Override
+    public boolean canShoot(){
+        return canShoot;
+    }
+
 
     @Override
     public void setCollectorIntakePercentage(double percentage) {
@@ -256,8 +293,6 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double getTurretPitchPosition(){
-        elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
-        elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
 
         //TODO: getSpeed()? getPosition()? getAngle()? don't know which to use
         return elevationLeft.getSpeed();
@@ -267,8 +302,6 @@ public class Lightning implements GenericRobot {
         if(position < 0) position = 0;
         if(position > 1) position = 1;
 
-        elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
-        elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
 
         //TODO: figure out use setSpeed() or set()
         elevationLeft.set(position);
@@ -352,6 +385,11 @@ public class Lightning implements GenericRobot {
     @Override
     public double getShooterTargetRPM(){
         return defaultShooterTargetRPM;
+    }
+
+    @Override
+    public void setShooterTargetRPM(double rpm){
+        defaultShooterTargetRPM = rpm;
     }
 
     @Override

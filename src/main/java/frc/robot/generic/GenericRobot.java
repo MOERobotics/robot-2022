@@ -114,6 +114,17 @@ public interface GenericRobot {
 		UNKNOWN;
 	}
 
+	public default void getCargo(){
+
+	}
+	public default void shoot(){
+
+	}
+
+	public default boolean canShoot(){
+		return false;
+	}
+
 	public default boolean getUpperCargo(){
 		//System.out.println("robot is colorblind");
 		return false;
@@ -260,6 +271,8 @@ public interface GenericRobot {
 		return 0;
 	}
 	public default double getShooterTargetRPM() { return 0; }
+
+	public default void setShooterTargetRPM(double rpm){}
 
 	public default void setShooterRPM(double topRPM, double bottomRPM){
 		//System.out.println("I don't have a shooter");

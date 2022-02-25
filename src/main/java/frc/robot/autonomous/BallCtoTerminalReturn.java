@@ -37,6 +37,12 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
     double turretv;
     int counter = 0;
 
+    double shooterTargetRPM;
+    boolean readyToShoot;
+
+    double indexerPct;
+    double collectorPct;
+
     //TurretTracker tracker = new TurretTracker();
 
 
@@ -46,7 +52,10 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
         autonomousStep = 0;
         startingYaw = robot.getYaw();
         startTime = System.currentTimeMillis();
-
+        shooterTargetRPM = 0;
+        indexerPct = 0;
+        collectorPct = 0;
+        readyToShoot = false;
         PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
         PIDPivot = new PIDController(robot.getPIDpivotP(), robot.getPIDpivotI(), robot.getPIDpivotD());
         PIDTurret = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
@@ -72,7 +81,8 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
 
 
 
-
+        robot.getCargo();
+        robot.shoot();
         switch(autonomousStep){
             case 0: //reset
                 robot.lowerCollector();
@@ -83,15 +93,26 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 robot.resetEncoders();
                 robot.resetAttitude();
                 if (System.currentTimeMillis() - startTime > 100){
-                    autonomousStep = 4;
+                    autonomousStep += 1;
                     startingYaw = robot.getYaw();
                     startDistance = robot.getDriveDistanceInchesLeft();
                 }
                 break;
-            case 1: //shoot the ball
-            case 2: //shoot the ball part 2 electric boogaloo
-            case 3: //shoot the ball part 3 maybe
-            case 4: //drive to ball A
+            case 1: //create a target shooter value and see if shooter reaches it.
+                if (robot.canShoot()){
+                    robot.setActivelyShooting(true);
+                    startTime = System.currentTimeMillis();
+                    autonomousStep += 1;
+                }
+                break;
+            case 2: //turn the shooter off
+                if (System.currentTimeMillis() - startTime >= 250){
+                    robot.setActivelyShooting(false);
+                    autonomousStep += 1;
+                }
+                break;
+            case 3: //drive to ball C
+                collectorPct = 1;
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
@@ -108,28 +129,34 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                     startTime = System.currentTimeMillis();
                 }
                 break;
-            case 5: //stop
+            case 4: //stop
                 leftpower = 0;
                 rightpower = 0;
                 startDistance = robot.getDriveDistanceInchesLeft();
                 autonomousStep = 12;
                 time = false;
                 break;
-            case 6: //turret turn
+            case 5: //collect cargo
+                if (robot.canShoot()){
+                    robot.setActivelyShooting(true);
+                    startTime = System.currentTimeMillis();
+                    autonomousStep += 1.0;
+                }
+                break;
+            case 6: //sets shooter's RPM
+                if (System.currentTimeMillis() - startTime >= 500){
+                    robot.setActivelyShooting(false);
+                    autonomousStep += 1;
+                }
+                break;
 
-            case 7: //collection part 2 not electric nor boogaloo
-            case 8: //another collection case
-            case 9: //shoot the second ball for funsies
-            case 10: //miss the target and become sadge
-            case 11: //copium
-                //will change these comments when they actually mean something
-            case 12://reset
+            case 7://reset
                 PIDDriveStraight.reset();
                 PIDDriveStraight.enableContinuousInput(-180,180);
                 startDistance = robot.getDriveDistanceInchesLeft();
                 autonomousStep +=1;
                 break;
-            case 13: //turn to go to ball @ terminal
+            case 8: //turn to go to Ball Terminal
                 correction = PIDPivot.calculate(angleC + robot.getYaw() - startingYaw );
                 leftpower = correction;
                 rightpower = -correction;
@@ -153,7 +180,8 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                     startTime = System.currentTimeMillis();
                 }
                 break;
-            case 14: //drive towards the ball
+            case 9: //drive towards Ball Terminal
+
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
@@ -171,12 +199,12 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                     startTime = System.currentTimeMillis();
                 }
                 break;
-            case 15:
+            case 10: //collect Ball Terminal
                 leftpower = 0;
                 rightpower = 0;
                 autonomousStep += 1;
                 break;
-            case 16:
+            case 11: //Drive forward a better shooting position
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = -1*(defaultPower - correction);
@@ -194,15 +222,27 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                     autonomousStep += 1;
                 }
                 break;
-            case 17:
+            case 12: //shoot it :)
+                if (robot.canShoot()){
+                    robot.setActivelyShooting(true);
+                    startTime = System.currentTimeMillis();
+                    autonomousStep += 1.00;
+                }
+                break;
+            case 13: //shoot part 2
+                if (System.currentTimeMillis() - startTime >= 250){
+                    robot.setActivelyShooting(false);
+                    autonomousStep += 1.0;
+                }
+                break;
+            case 14: //End of autonomous, wait for Teleop
                 leftpower = 0;
                 rightpower = 0;
                 break;
         }
         robot.drivePercent(leftpower, rightpower);
+
         //If turret works set value of averageTurretX[] to turretx
-
-
         if(turretv !=0 ) {
             averageTurretX[counter % averageTurretXSize] = turretx;
             counter++;
