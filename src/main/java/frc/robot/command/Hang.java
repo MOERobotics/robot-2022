@@ -33,7 +33,7 @@ public class Hang extends GenericCommand{
     PIDController PIDSteering;
     boolean tapeAlign;
 
-    /////^^^^^^^^^^^Stuff for tapeAlign
+    /////^^^^^^^^^^^Stuff for tapeAlign/
 
 
     //////////////Now the real stuff
