@@ -45,6 +45,8 @@ public class Robot extends TimedRobot {
   double currentTurretPower;
 
 
+
+
   PIDController turretPIDController;
 
 
@@ -153,7 +155,6 @@ public class Robot extends TimedRobot {
 
   @Override public void teleopInit() {
       turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
-
   }
 
   @Override public void teleopPeriodic() {
@@ -169,12 +170,13 @@ public class Robot extends TimedRobot {
     double scaleFactor = 1.0;
 
     //robot PTO not on arms, give joystick carte blanche
+    /**
     if(!robot.getPTOState()){
       robot.drivePercent(
               (jy+jx) * scaleFactor,
               (jy-jx) * scaleFactor
       );
-    }
+    }**/
 
 
 
@@ -259,19 +261,18 @@ public class Robot extends TimedRobot {
       robot.setActivelyShooting(true);
     }
 
+
     double pitchChange = 0;
-    if (joystick.getRawButton(13)){
+    if (joystick.getRawButtonPressed(13)){
       pitchChange = 0.02;
     }
-    else if (joystick.getRawButton(14)){
+    else if (joystick.getRawButtonPressed(14)){
       pitchChange = -0.02;
     }
     else{
       pitchChange = 0;
     }
     double newPos = robot.getTurretPitchPosition() + pitchChange;
-    if(newPos < 0) newPos = 0;
-    if(newPos > 1) newPos = 1;
 
     robot.setTurretPitchPosition(newPos);
 
@@ -297,6 +298,9 @@ public class Robot extends TimedRobot {
           curCollector = 0;
         }
       }
+      if(robot.isActivelyShooting()){
+        curIndexer = defIndexerPower;
+      }
     }
     else if (joystick.getRawButton(5)){
       curCollector = -defCollectorPower;
@@ -314,6 +318,8 @@ public class Robot extends TimedRobot {
 
     robot.setCollectorIntakePercentage(curCollector);
     robot.setIndexerIntakePercentage(curIndexer);
+
+    //robot.drivePercent(0, 0);
 
   }
 
@@ -409,6 +415,10 @@ public class Robot extends TimedRobot {
 
     if      (joystick.getRawButton( 5)) robot.setArmsForward();
     if      (joystick.getRawButton(10)) robot.setArmsBackward();
+
+
+    //robot.drivePercent(0, 0);
+
 
   }
 }
