@@ -236,10 +236,9 @@ public class Lightning implements GenericRobot {
     }
 
 
-
     @Override
     public void setTurretPowerPct(double powerPct) {
-        turretRotator.set(powerPct);
+        turretRotator.set(-powerPct);
     }
 
     @Override
@@ -434,17 +433,17 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double turretPIDgetP() {
-        return GenericRobot.super.turretPIDgetP();
+        return 3.0e-2;
     }
 
     @Override
     public double turretPIDgetI() {
-        return GenericRobot.super.turretPIDgetI();
+        return 0;
     }
 
     @Override
     public double turretPIDgetD() {
-        return GenericRobot.super.turretPIDgetD();
+        return 3.0e-4;
     }
 
 

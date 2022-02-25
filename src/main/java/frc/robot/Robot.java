@@ -28,7 +28,7 @@ public class Robot extends TimedRobot {
       simpleBTerminal = new SimpleBTerminal(),
       simpleCTerminal = new SimpleCTerminal();
 
-  GenericRobot robot = new TurretBot();
+  GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
   Joystick xbox = new Joystick(1);
   GenericAutonomous autonomous = autoArc;
@@ -141,6 +141,16 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Joystick raw Y", joystick.getY());
 
     SmartDashboard.putNumber("Autonomous Step", autonomous.autonomousStep);
+
+    //<Saiarun Turret Limiter>
+    double turretAbsoluteAngle = robot.getAlternateTurretAngle();
+    double currentTurretPower = robot.getTurretPowerPct();
+    if(turretAbsoluteAngle <=5 && currentTurretPower<0){
+      robot.setTurretPowerPct(0);
+    }else if(turretAbsoluteAngle >= 355 && currentTurretPower>0){
+      robot.setTurretPowerPct(0);
+    }
+    //</Saiarun Turret Limiter>
 
   }
 
