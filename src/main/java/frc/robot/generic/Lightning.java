@@ -10,8 +10,8 @@ public class Lightning implements GenericRobot {
     public static final double TICKS_PER_INCH_DRIVE = 0.96;
     public static final double TICKS_PER_DEGREE_TURRET = 116;
     public static final double TICKS_PER_DEGREE_TURRET2 = 136.467;
-    public static final double TICKS_PER_REVOLUTION_SHOOTERA = 116;
-    public static final double TICKS_PER_REVOLUTION_SHOOTERB = 116;
+    public static final double TICKS_PER_REVOLUTION_SHOOTERA = 1;
+    public static final double TICKS_PER_REVOLUTION_SHOOTERB = 1;
 
     AHRS navx = new AHRS(SPI.Port.kMXP, (byte) 50);
 
@@ -60,6 +60,7 @@ public class Lightning implements GenericRobot {
 
     //shootReadyTimer is used to check if shooter ready
     long shootReadyTimer;
+    double targetRPM;
 
     public Lightning(){
         boolean invertLeft = false;
@@ -82,6 +83,18 @@ public class Lightning implements GenericRobot {
         isActivelyShooting = false;
 
         indexer.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+        shooterAPIDController.setP(0.00025);
+        shooterAPIDController.setI(0.0000001);
+        shooterAPIDController.setD(0.02500);
+        shooterAPIDController.setFF(0.000167);
+        shooterAPIDController.setOutputRange(0,1);
+        shooterBPIDController.setP(0.00025);
+        shooterBPIDController.setI(0.0000001);
+        shooterBPIDController.setD(0.02500);
+        shooterBPIDController.setFF(0.000167);
+        shooterBPIDController.setOutputRange(0,1);
+
 
         limitSwitchIndexerForward.enableLimitSwitch(false);
         limitSwitchIndexerReverse.enableLimitSwitch(false);
@@ -292,6 +305,7 @@ public class Lightning implements GenericRobot {
     @Override
     public void setShooterRPMTop(double rpm) {
         shooterAPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
+        targetRPM = rpm;
     }
 
     @Override
@@ -325,7 +339,7 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double getShooterTargetRPM(){
-        return 1000;
+        return targetRPM;
     }
 
     @Override
@@ -370,11 +384,11 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void setArmsForward(){
-        arms.set(DoubleSolenoid.Value.kReverse);
+        arms.set(DoubleSolenoid.Value.kForward);
     }
     @Override
     public void setArmsBackward(){
-        arms.set(DoubleSolenoid.Value.kForward);
+        arms.set(DoubleSolenoid.Value.kReverse);
     }
 
     @Override

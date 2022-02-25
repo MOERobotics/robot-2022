@@ -3,6 +3,7 @@ package frc.robot.generic;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public interface GenericRobot {
 
@@ -326,7 +327,7 @@ public interface GenericRobot {
 		//System.out.println("Robot doesn't check if it's ready to shoot");
 	}
 	public default boolean isReadyToShoot(){
-		return isReadyToShoot(0.02, 100);
+		return isReadyToShoot(0.2, 100);
 	}
 	public default boolean isReadyToShoot(double tolerance, double time){
 		double shooterRPM = getShooterRPMBottom();
@@ -334,7 +335,7 @@ public interface GenericRobot {
 
 		//absolute percent error between actual shooter and target
 		double error = Math.abs( (shooterRPM - targetRPM) / targetRPM);
-
+		SmartDashboard.putNumber("rpm error", error);
 		if(error > tolerance) shooterNotReady();
 
 		//we haven't called shooterNotReady() in the last "time" milliseconds

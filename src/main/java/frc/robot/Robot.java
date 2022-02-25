@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
       simpleBTerminal = new SimpleBTerminal(),
       simpleCTerminal = new SimpleCTerminal();
 
-  GenericRobot robot = new TurretBot();
+  GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
   Joystick xbox = new Joystick(1);
   GenericAutonomous autonomous = autoArc;
@@ -54,11 +54,11 @@ public class Robot extends TimedRobot {
   double currentTurretPower;
 
   double turretPitch = 0;
-  int targetRPM = 500;
+  int targetRPM = 4000;
 
   PIDController turretPIDController;
 
-  TurretState        turretState = TURRET_INACTIVE;
+  TurretState        turretState = TURRET_MANUAL;
   ClimberState      climberState = CLIMBER_INACTIVE;
   ShooterState      shooterState = SHOOTER_INACTIVE;
   CollectorState  collectorState = COLLECTOR_INACTIVE;
@@ -193,7 +193,7 @@ public class Robot extends TimedRobot {
 
 
 
-  public static final double deadzone = 0.05;
+  public static final double deadzone = 0.15;
   @Override public void teleopPeriodic() {
     double
         driveLPower = 0,
@@ -207,10 +207,10 @@ public class Robot extends TimedRobot {
      */
 
     switch (POVDirection.getDirection(xbox.getPOV())) {
-      case NORTH: targetRPM =  250; turretPitch = 0.00; break;
-      case EAST : targetRPM =  500; turretPitch = 0.00; break;
-      case SOUTH: targetRPM = 1000; turretPitch = 0.00; break;
-      case WEST : targetRPM = 1500; turretPitch = 0.00; break;
+      case NORTH: targetRPM = 3250; turretPitch = 0.00; break;
+      case EAST : targetRPM = 4000; turretPitch = 0.00; break;
+      case SOUTH: targetRPM = 5000; turretPitch = 0.00; break;
+      case WEST : targetRPM = 5500; turretPitch = 0.00; break;
     }
 
     //Fine Tune turret hood position
@@ -226,7 +226,7 @@ public class Robot extends TimedRobot {
     if (rJoyLY > -deadzone && rJoyLY < deadzone) rJoyLY = 0;
     targetRPM += rJoyLY * 0.5;
     if (targetRPM <  250) targetRPM =  250;
-    if (targetRPM > 4000) targetRPM = 4000;
+    if (targetRPM > 6000) targetRPM = 6000;
 
 
     if (joystick.getRawButton( 2)) robot.raiseCollector();
@@ -279,11 +279,13 @@ public class Robot extends TimedRobot {
         lJoyY *= scaleFactor;
         lJoyX *= scaleFactor;
 
-        driveLPower = lJoyY - lJoyX;
-        driveRPower = lJoyY + lJoyX;
+        driveLPower = lJoyY + lJoyX;
+        driveRPower = lJoyY - lJoyX;
 
-        if (joystick.getRawButton(11)) driveLPower = driveRPower =  0.30;
-        if (joystick.getRawButton(16)) driveLPower = driveRPower = -0.30;
+        if (joystick.getRawButton(11)) {driveLPower =  0.30; driveRPower =  0.30;}
+        if (joystick.getRawButton(16)) {driveLPower = -0.30; driveRPower = -0.30;}
+        if (joystick.getRawButton( 4)) {driveLPower =  0.30; driveRPower = -0.30;}
+        if (joystick.getRawButton( 3)) {driveLPower = -0.30; driveRPower =  0.30;}
         break;
 
     } //switch (climberState)
@@ -291,13 +293,14 @@ public class Robot extends TimedRobot {
     /**
      * Turret
      */
-    if (xbox.getRawAxis(3) > 0.80) turretState = TURRET_ACTIVE;
+    if (xbox.getRawAxis(4) > 0.80) turretState = TURRET_ACTIVE;
     else                           turretState = TURRET_MANUAL;
 
     switch (turretState) {
+      default:
       case TURRET_MANUAL:
-        if (xbox.getRawButton( 6)) turretPower = -0.5;
-        if (xbox.getRawButton( 5)) turretPower =  0.5;
+        if (xbox.getRawButton( 5)) turretPower = -0.45;
+        if (xbox.getRawButton( 6)) turretPower =  0.45;
         //Leave the tracking array empty for the next autotrack
         turretPIDController.reset();
         for (int i = 0; i < averageTurretXSize; i++)
@@ -318,11 +321,6 @@ public class Robot extends TimedRobot {
         average /= averageTurretXSize;
         turretPower = turretPIDController.calculate(average);
         break;
-
-      default:
-      case TURRET_INACTIVE:
-        //IDK?
-        break;
     } //switch (turretState)
 
     /**
@@ -331,7 +329,7 @@ public class Robot extends TimedRobot {
 
     collectorState = COLLECTOR_INACTIVE;
     if (joystick.getRawButton( 1)) collectorState = COLLECTOR_COLLECTING;
-    if (    xbox.getRawButton( 3)) collectorState = COLLECTOR_EJECTING;
+    if (    xbox.getRawButton( 2)) collectorState = COLLECTOR_EJECTING;
     if (    xbox.getRawButton( 4)) collectorState = COLLECTOR_COLLECTING;
 
     switch (collectorState) {
@@ -363,7 +361,7 @@ public class Robot extends TimedRobot {
      * Shooter
      */
 
-    if (    xbox.getRawButton( 1)) shooterState = SHOOTER_ACTIVE;
+    if (    xbox.getRawButton( 3)) shooterState = SHOOTER_ACTIVE;
     else                           shooterState = SHOOTER_INACTIVE;
 
     switch (shooterState) {
@@ -372,7 +370,7 @@ public class Robot extends TimedRobot {
         robot.setShooterRPM(targetRPM,targetRPM);
         if (
             robot.isReadyToShoot() &&
-            xbox.getRawButton( 2)
+            xbox.getRawButton( 1)
         ) {
           indexerPower = 1.00;
         }
@@ -407,12 +405,12 @@ public class Robot extends TimedRobot {
 
     if (
         turretPower < 0 && //todo: degrees
-        robot.getAlternateTurretAngle() < 120
+        robot.getAlternateTurretAngle() < 30
     ) turretPower = 0;
 
     if (
         turretPower > 0 &&
-        robot.getAlternateTurretAngle() > 240
+        robot.getAlternateTurretAngle() > 340
     ) turretPower = 0;
 
 
@@ -563,7 +561,6 @@ public class Robot extends TimedRobot {
 
   public static enum TurretState {
     TURRET_ACTIVE,
-    TURRET_INACTIVE,
     TURRET_MANUAL
   }
 
@@ -572,6 +569,7 @@ public class Robot extends TimedRobot {
     ARMS_BACK,
     ARMS_UNKNOWN
   }
+
   public enum POVDirection {
     NORTH     (   0),
     NORTHEAST (  45),
