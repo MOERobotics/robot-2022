@@ -26,7 +26,11 @@ public class Lightning implements GenericRobot {
     CANSparkMax rightMotorA       = new CANSparkMax(18, kBrushless);
     CANSparkMax rightMotorB       = new CANSparkMax(19, kBrushless);
 
+    //TODO: update servo ports
+    //servo left was initially set to channel 9, don't know if that means anything
     Servo       elevationLeft     = new Servo(9);
+    Servo       elevationRight     = new Servo(1);
+
 
     RelativeEncoder encoderRight  = rightMotorA.getEncoder();
     RelativeEncoder encoderLeft   = leftMotorA.getEncoder();
@@ -34,6 +38,7 @@ public class Lightning implements GenericRobot {
     SparkMaxAnalogSensor encoderTurretAlt = turretRotator.getAnalog(SparkMaxAnalogSensor.Mode.kAbsolute);
     RelativeEncoder encoderShootA = shooterA.getEncoder();
     RelativeEncoder encoderShootB = shooterB.getEncoder();
+
 
     //DigitalInput ballSensor = new DigitalInput(0);
     DoubleSolenoid PTO = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 4, 5);
@@ -54,7 +59,10 @@ public class Lightning implements GenericRobot {
     SparkMaxLimitSwitch limitSwitchLeftBForward = leftMotorB.getForwardLimitSwitch(lstype);
     SparkMaxLimitSwitch limitSwitchLeftBReverse = leftMotorB.getReverseLimitSwitch(lstype);
 
+    double defaultShooterTargetRPM = 500;
+
     boolean isPTOonArms;
+
     //True = robot is in the process of and committed to shooting a cargo at mach 12
     boolean isActivelyShooting;
 
@@ -75,6 +83,8 @@ public class Lightning implements GenericRobot {
         shooterA.setInverted(true);
 
         elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+        elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+
 
         shootReadyTimer = System.currentTimeMillis();
 
@@ -245,8 +255,24 @@ public class Lightning implements GenericRobot {
     }
 
     @Override
-    public void setTurretPitchPowerPct(double speed){
-        elevationLeft.setSpeed(speed);
+    public double getTurretPitchPosition(){
+        elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+        elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+
+        //TODO: getSpeed()? getPosition()? getAngle()? don't know which to use
+        return elevationLeft.getSpeed();
+    }
+    @Override
+    public void setTurretPitchPosition(double position){
+        if(position < 0) position = 0;
+        if(position > 1) position = 1;
+
+        elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+        elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+
+        //TODO: figure out use setSpeed() or set()
+        elevationLeft.set(position);
+        elevationRight.set(position);
     }
 
 
@@ -325,7 +351,7 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double getShooterTargetRPM(){
-        return 1000;
+        return defaultShooterTargetRPM;
     }
 
     @Override
