@@ -224,7 +224,7 @@ public class Robot extends TimedRobot {
     double turretPitch=0;
 
     switch (POVDirection.getDirection(xbox.getPOV())) {
-      case NORTH: targetRPM = 3250; turretPitch = 0.00; break;
+      case NORTH: targetRPM = 5500; turretPitch = 0.38; break;
       case EAST : targetRPM = 4000; turretPitch = 0.00; break;
       case SOUTH: targetRPM = 5000; turretPitch = 0.00; break;
       case WEST : targetRPM = 5500; turretPitch = 0.00; break;
@@ -400,7 +400,7 @@ public class Robot extends TimedRobot {
 
       robot.drivePercent(driveLeft, driveRight);
       robot.setShooterRPM(shooterTargetRPM, shooterTargetRPM);
-      robot.setTurretPitchPosition(newPos);
+      robot.setTurretPitchPosition(turretPitch);
       robot.setTurretPowerPct(turretPower);
       robot.setCollectorIntakePercentage(curCollector);
       robot.setIndexerIntakePercentage(curIndexer);
