@@ -96,6 +96,19 @@ public class Lightning implements GenericRobot {
         elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
         elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
 
+        shooterAPIDController.setP(2.5e-4);
+        shooterAPIDController.setI(0);
+        shooterAPIDController.setD(2.5e-1);
+        shooterAPIDController.setFF(1.67e-4);
+        shooterAPIDController.getIZone(500);
+        shooterAPIDController.getDFilter(0);
+
+        shooterBPIDController.setP(2.5e-4);
+        shooterBPIDController.setI(0);
+        shooterBPIDController.setD(2.5e-1);
+        shooterBPIDController.setFF(1.67e-4);
+        shooterBPIDController.getIZone(500);
+        shooterBPIDController.getDFilter(0);
 
         shootReadyTimer = System.currentTimeMillis();
 
@@ -104,6 +117,9 @@ public class Lightning implements GenericRobot {
 
         indexer.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
+        shooterA.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        shooterB.setIdleMode(CANSparkMax.IdleMode.kCoast);
+
         limitSwitchIndexerForward.enableLimitSwitch(false);
         limitSwitchIndexerReverse.enableLimitSwitch(false);
         limitSwitchRightAForward.enableLimitSwitch(false);
@@ -111,6 +127,10 @@ public class Lightning implements GenericRobot {
 
         limitSwitchLeftBForward.enableLimitSwitch(false);
         limitSwitchLeftBReverse.enableLimitSwitch(false);
+
+        elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+        elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+
 
     }
 
@@ -324,7 +344,7 @@ public class Lightning implements GenericRobot {
     public double getTurretPitchPosition(){
 
         //TODO: getSpeed()? getPosition()? getAngle()? don't know which to use
-        return elevationLeft.getSpeed();
+        return elevationLeft.get();
     }
     @Override
     public void setTurretPitchPosition(double position){
@@ -384,7 +404,7 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void setShooterRPMBottom(double rpm) {
-        shooterBPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
+        shooterBPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);//
     }
 
 

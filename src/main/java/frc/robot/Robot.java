@@ -56,6 +56,8 @@ public class Robot extends TimedRobot {
   boolean ActuallyHanging = false;
 
 
+
+
   PIDController turretPIDController;
 
 
@@ -341,17 +343,18 @@ public class Robot extends TimedRobot {
         robot.setActivelyShooting(true);
       }
 
-      double pitchChange = 0;
-      if (joystick.getRawButton(13)) {
-        pitchChange = 0.02;
-      } else if (joystick.getRawButton(14)) {
-        pitchChange = -0.02;
-      } else {
-        pitchChange = 0;
-      }
-      double newPos = robot.getTurretPitchPosition() + pitchChange;
-      if (newPos < 0) newPos = 0;
-      if (newPos > 1) newPos = 1;
+
+    double pitchChange = 0;
+    if (joystick.getRawButtonPressed(13)){
+      pitchChange = 0.02;
+    }
+    else if (joystick.getRawButtonPressed(14)){
+      pitchChange = -0.02;
+    }
+    else{
+      pitchChange = 0;
+    }
+    double newPos = robot.getTurretPitchPosition() + pitchChange;
 
       robot.setTurretPitchPosition(newPos);
 
@@ -362,26 +365,33 @@ public class Robot extends TimedRobot {
       double curCollector;
       double curIndexer;
 
-      //button 2 = bottom center button
-      if (joystick.getRawButton(2)) {
-        if (!robot.getUpperCargo()) {
-          curCollector = defCollectorPower;
-          curIndexer = defIndexerPower;
-        } else {
-          curIndexer = 0;
-          if (!robot.getLowerCargo()) {
-            curCollector = defCollectorPower;
-          } else {
-            curCollector = 0;
-          }
-        }
-      } else if (joystick.getRawButton(5)) {
-        curCollector = -defCollectorPower;
-        curIndexer = -defIndexerPower;
-      } else {
-        curCollector = 0;
-        curIndexer = 0;
+    //button 2 = bottom center button
+    if(joystick.getRawButton(2)){
+      if(!robot.getUpperCargo()){
+        curCollector = defCollectorPower;
+        curIndexer = defIndexerPower;
       }
+      else{
+        curIndexer = 0;
+        if(!robot.getLowerCargo()){
+          curCollector = defCollectorPower;
+        }
+        else{
+          curCollector = 0;
+        }
+      }
+      if(robot.isActivelyShooting()){
+        curIndexer = defIndexerPower;
+      }
+    }
+    else if (joystick.getRawButton(5)){
+      curCollector = -defCollectorPower;
+      curIndexer = -defIndexerPower;
+    }
+    else{
+      curCollector = 0;
+      curIndexer = 0;
+    }
 
       //Cargo is on upper sensor and we want to yeet it: indexer needs to push it past sensor
       if (robot.isActivelyShooting() && robot.getUpperCargo()) {
@@ -390,6 +400,8 @@ public class Robot extends TimedRobot {
 
       robot.setCollectorIntakePercentage(curCollector);
       robot.setIndexerIntakePercentage(curIndexer);
+
+    //robot.drivePercent(0, 0);
 
     }
   }
