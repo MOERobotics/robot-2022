@@ -77,9 +77,11 @@ public class BallCtoTerminal extends GenericAutonomous {
 
 
 
-        robot.getCargo();
-        robot.shoot();
-        robot.setTurretPitchPosition(.38);
+        if (autonomousStep >= 1){
+            robot.getCargo();
+            robot.shoot();
+            robot.setTurretPitchPosition(.38);
+        }
         switch(autonomousStep){
             case 0: //reset
                 robot.lowerCollector();
@@ -129,7 +131,7 @@ public class BallCtoTerminal extends GenericAutonomous {
                 leftpower = 0;
                 rightpower = 0;
                 startDistance = robot.getDriveDistanceInchesLeft();
-                autonomousStep = 12;
+                autonomousStep += 1;
                 time = false;
                 break;
             case 6: //turret turn

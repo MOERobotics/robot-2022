@@ -65,9 +65,11 @@ public class autoArc extends GenericAutonomous {
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
 
-        robot.getCargo();
-        robot.shoot();
-        robot.setTurretPitchPosition(.38);
+        if (autonomousStep >= 1){
+            robot.getCargo();
+            robot.shoot();
+            robot.setTurretPitchPosition(.38);
+        }
         switch (autonomousStep){
             case 0: //reset
                 robot.lowerCollector();
@@ -83,20 +85,7 @@ public class autoArc extends GenericAutonomous {
                     autonomousStep += 1;
                 }
                 break;
-            case 1:
-                if (robot.canShoot()){
-                    startingTime = System.currentTimeMillis();
-                    robot.setActivelyShooting(true);
-                    autonomousStep += 1;
-                }
-                break;
-            case 2:
-                if (System.currentTimeMillis() - startingTime >= 250){
-                    robot.setActivelyShooting(false);
-                    autonomousStep += 1;
-                }
-                break;
-            case 3: //straightaway
+            case 1: //straightaway
                 currentYaw = robot.getYaw();
                 currentDistInches = robot.getDriveDistanceInchesLeft();
                 correction = PIDSteering.calculate(currentYaw - startYaw);
@@ -108,40 +97,32 @@ public class autoArc extends GenericAutonomous {
                     rightPower = a;
                 }
                 if (currentDistInches - startInches >= rollout){
-                    defaultPower = .4;
                     leftPower = 0;
                     rightPower = 0;
                     autonomousStep += 1;
                 }
                 break;
-            case 4:
+            case 2:
                 if (robot.canShoot()){
                     startingTime = System.currentTimeMillis();
                     robot.setActivelyShooting(true);
                     autonomousStep += 1.0;
                 }
                 break;
-            case 5:
-                if (System.currentTimeMillis() - startingTime >= 500){
+            case 3:
+                if (System.currentTimeMillis() - startingTime >= 1000){
                     robot.setActivelyShooting(true);
                     robot.setShooterTargetRPM(500); //super low power to yeet out undesirable cargo
                     autonomousStep += 1;
                 }
                 break;
-            case 6: // Pid pivot 90 degrees ccw
+            case 4: // Pid pivot 90 degrees ccw
                 currentYaw = robot.getYaw();
                 correction = PIDPivot.calculate(pivotDeg + currentYaw - startYaw);
                 leftPower = correction;
                 rightPower = -correction; //TODO: on lightning, change to abs encoder
                 if (!robot.isTargetFound() && !breakRobot) {
-                    if (!startTimer) {
-                        startingTime = System.currentTimeMillis();
-                        startTimer = true;
-                    }
-                    currentTurretPower = .05;
-                }
-                if (System.currentTimeMillis() - startingTime > 1000 && !breakRobot){
-                    currentTurretPower = 0;
+                    startingTime = System.currentTimeMillis();
                     breakRobot = true;
                 }
 
@@ -163,7 +144,7 @@ public class autoArc extends GenericAutonomous {
                 }
                 break;
 
-            case 7: //Pid reset
+            case 5: //Pid reset
                 PIDSteering.reset();
                 PIDPivot.reset();
                 PIDSteering.disableContinuousInput();
@@ -173,7 +154,7 @@ public class autoArc extends GenericAutonomous {
                 autonomousStep += 1;
                 break;
 
-            case 8: //Pid Arc 10 ft Left
+            case 6: //Pid Arc 10 ft Left
                 currentYaw = robot.getYaw();
                 currentDistInches = robot.getDriveDistanceInchesRight();
                 correction = PIDSteering.calculate(Math.toDegrees((currentDistInches-startInches)/outerRadius) + (currentYaw-startYaw));
@@ -186,17 +167,17 @@ public class autoArc extends GenericAutonomous {
                     autonomousStep += 1;
                 }
                 if (currentDistInches - startInches >= outerArcDist - 24){
-                    robot.setShooterTargetRPM(5000);
+                    robot.setShooterTargetRPM(5000); //set it back to where we want
                     robot.setActivelyShooting(false);
                 }
                 break;
 
-            case 9: //stop
+            case 7: //stop
                 leftPower = 0;
                 rightPower = 0;
                 autonomousStep += 1;
                 break;
-            case 10:   //shoot last cargo
+            case 8:   //shoot last cargo
                 if (robot.canShoot()){
                     robot.setActivelyShooting(true);
                 }
@@ -211,14 +192,13 @@ public class autoArc extends GenericAutonomous {
             counter++;
         }
 
-        double average = 0;
+        average = 0;
         for(double i: averageX){
             average += i;
         }
         average /= averageTurretXSize;
 
-        double currentTurretPower = 0;
-
+        currentTurretPower = 0;
         if(robot.isTargetFound()){
             currentTurretPower = turretPIDController.calculate(average);
         }else{

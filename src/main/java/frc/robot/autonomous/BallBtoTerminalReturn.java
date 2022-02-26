@@ -41,9 +41,11 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
 
-        robot.getCargo();
-        robot.shoot();
-        robot.setTurretPitchPosition(.38);
+        if (autonomousStep >= 1){
+            robot.getCargo();
+            robot.shoot();
+            robot.setTurretPitchPosition(.38);
+        }
         switch(autonomousStep){
             case 0: //reset
                 robot.lowerCollector();
@@ -54,23 +56,11 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 if (System.currentTimeMillis() - startTime > 100){
                     startDistance = robot.getDriveDistanceInchesLeft();
                     startingYaw = robot.getYaw();
-                    autonomousStep = 4;
-                }
-                break;
-            case 1: //shoot the ball
-                if (robot.canShoot()){
-                    robot.setActivelyShooting(true);
-                    startTime = System.currentTimeMillis();
                     autonomousStep += 1;
                 }
                 break;
-            case 2: //shoot the ball part 2 electric boogaloo
-                if (System.currentTimeMillis() - startTime >= 250){
-                    robot.setActivelyShooting(false);
-                    autonomousStep += 1;
-                }
-                break;
-            case 3: //drive to ball B
+
+            case 1: //drive to ball B
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
@@ -87,26 +77,26 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                     startTime = System.currentTimeMillis();
                 }
                 break;
-            case 4: //stop
+            case 2: //stop
                 leftpower = 0;
                 rightpower = 0;
                 autonomousStep += 1;
                 break;
-            case 5:
+            case 3:
                 if (robot.canShoot()){
                     robot.setActivelyShooting(true);
                     startTime = System.currentTimeMillis();
                     autonomousStep += 1.0;
                 }
                 break;
-            case 6: // part 2 not electric nor boogaloo
-                if (System.currentTimeMillis() - startTime >= 500){
+            case 4: // part 2 not electric nor boogaloo
+                if (System.currentTimeMillis() - startTime >= 1000){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1;
                 }
                 break;
 
-            case 7://reset
+            case 5://reset
                 if (System.currentTimeMillis() - startTime >= 1000){
                     PIDDriveStraight.reset();
                     PIDDriveStraight.enableContinuousInput(-180,180);
@@ -114,7 +104,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                     autonomousStep +=1;
                 }
                 break;
-            case 8://drive to ball at terminal
+            case 6://drive to ball at terminal
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
@@ -131,13 +121,13 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                     rightpower = 0;
                 }
                 break;
-            case 9:
+            case 7:
                 leftpower = 0;
                 rightpower = 0;
                 autonomousStep += 1.0;
                 break;
 
-            case 10:
+            case 8:
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = -defaultPower + correction;
@@ -154,19 +144,19 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                     rightpower = 0;
                 }
                 break;
-            case 11:
+            case 9:
                 if (robot.canShoot()){
                     robot.setActivelyShooting(true);
                     startTime = System.currentTimeMillis();
                     autonomousStep += 1.00;
                 }
                 break;
-            case 12:
+            case 10:
                 if (System.currentTimeMillis() - startTime >= 251){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1;
                 }
-            case 13:
+            case 11:
                 leftpower = 0;
                 rightpower = 0;
                 break;
