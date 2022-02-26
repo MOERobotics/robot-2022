@@ -210,6 +210,7 @@ public class Robot extends TimedRobot {
     if (joystick.getRawButtonPressed(8)) {
       count = (count + 1) % 2;
     }
+
     if (count == 1) {
       hang = true;
     } else {
@@ -219,26 +220,24 @@ public class Robot extends TimedRobot {
     if (!hang) {
       reset = true;
 
+      //////////////////////////////////////////////////DRIVETRAIN CONTROL
       double jx = joystick.getX();
       double jy = -joystick.getY();
-
       //joystick deaden: yeet smol/weird joystick values when joystick is at rest
       double cutoff = 0.05;
       if (jy > -cutoff && jy < cutoff) jy = 0;
       if (jx > -cutoff && jx < cutoff) jx = 0;
-
       //moved this to after joystick deaden because deaden should be focused on the raw joystick values
       double scaleFactor = 1.0;
-
-      //robot PTO not on arms, give joystick carte blanche
       if (!robot.getPTOState()) {
         robot.drivePercent(
                 (jy + jx) * scaleFactor,
                 (jy - jx) * scaleFactor
         );
       }
+      //////////////////////////////////////////////DRIVETRAIN CONTROL ENDS
 
-
+      ///////////////////////////////////////////////////////////////////////SET UP XBOX
       SmartDashboard.putNumber("XBOX AXIS DEBUG - 0 ", xbox.getRawAxis(0));
       SmartDashboard.putNumber("XBOX AXIS DEBUG - 1 ", xbox.getRawAxis(1));
       SmartDashboard.putNumber("XBOX AXIS DEBUG - 2 ", xbox.getRawAxis(2));
@@ -249,76 +248,44 @@ public class Robot extends TimedRobot {
       int rightAxis = 5;
       double tolerance = 0.8;
       double drivePower = 0.2;
+      ///////////////////////////////////////////////////////////////////SET UP OVER
 
-      if (joystick.getRawButton(12)) robot.setTurretPowerPct(0.2);
-      else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
-      else robot.setTurretPowerPct(0.0);
+      //////////////////////////////////////////////////////////TURRET CONTROL
+      if (joystick.getRawButton(12)) {
+        currentTurretPower = .2;
+      }
+      else if (joystick.getRawButton(15)) {
+        currentTurretPower = -.2;
+      }
+      else {
+        currentTurretPower = 0.0;
+      }
+      robot.setTurretPowerPct(currentTurretPower);
+      /////////////////////////////////////////////////////TURRET CONTROL ENDS
 
+
+      /////////////////////////////////////////////////////CLIMBER WHEN PTO
       double driveLeft = 0;
       double driveRight = 0;
-
       if (robot.getPTOState()) {
         if (xbox.getRawAxis(leftAxis) > tolerance) {
           driveLeft = drivePower;
         } else if (xbox.getRawAxis(leftAxis) < -tolerance) {
           driveLeft = -drivePower;
         }
-        if (robot.getPTOState()) {
-          if (xbox.getRawAxis(leftAxis) > tolerance) {
-            driveLeft = drivePower;
-          } else if (xbox.getRawAxis(leftAxis) < -tolerance) {
-            driveLeft = -drivePower;
-          }
 
-          if (xbox.getRawAxis(rightAxis) > tolerance) {
-            driveRight = drivePower;
-          } else if (xbox.getRawAxis(rightAxis) < -tolerance) {
-            driveRight = -drivePower;
-          }
-          robot.drivePercent(driveLeft, driveRight);
+        if (xbox.getRawAxis(rightAxis) > tolerance) {
+          driveRight = drivePower;
+        } else if (xbox.getRawAxis(rightAxis) < -tolerance) {
+          driveRight = -drivePower;
         }
-
+        robot.drivePercent(driveLeft, driveRight);
       }
-      if (hang) {
-        ActuallyHanging = true;
-        SmartDashboard.putBoolean("we really are hanging", ActuallyHanging);
-        if (reset) {
-          command.begin(robot);
-          reset = false;
-        }
-        command.step(robot);
-      }
+    /////////////////////////////////////////////////////CLIMBER CODE ENDS
 
 
-      //Start of Daniel+Saiarun Turret test
-      average = 0;
 
-      if (robot.isTargetFound()) {
-        counter = counter % averageTurretXSize;
-        averageX[counter] = robot.getTargetX();
-        counter++;
-      }
-      average = 0;
-      for (double i : averageX) {
-        average += i;
-      }
-      average /= averageTurretXSize;
-      SmartDashboard.putNumber("Average", average);
-
-      if (joystick.getRawButtonPressed(1)) turretPIDController.reset();
-      if (joystick.getRawButton(1) && robot.isTargetFound()) {
-        currentTurretPower = turretPIDController.calculate(average);
-      } else {
-        if (joystick.getRawButton(3)) currentTurretPower = -0.1;
-        else if (joystick.getRawButton(4)) currentTurretPower = 0.1;
-        else currentTurretPower = 0.0;
-      }
-
-      if (joystick.getRawButton(12)) currentTurretPower = 0.2;
-      else if (joystick.getRawButton(15)) currentTurretPower = -0.2;
-
-      robot.setTurretPowerPct(currentTurretPower);
-
+    //////////////////////////////////////////////////////////SHOOTER CODE BEGINS
       double shooterTargetRPM = 0;
       if (joystick.getRawButton(11)) {
         shooterTargetRPM = robot.getShooterTargetRPM();
@@ -342,56 +309,59 @@ public class Robot extends TimedRobot {
       if (joystick.getRawButton(7)) {
         robot.setActivelyShooting(true);
       }
+    ////////////////////////////////////////////////////////////SHOOTER CODE ENDS
 
 
-    double pitchChange = 0;
-    if (joystick.getRawButtonPressed(13)){
-      pitchChange = 0.02;
-    }
-    else if (joystick.getRawButtonPressed(14)){
-      pitchChange = -0.02;
-    }
-    else{
-      pitchChange = 0;
-    }
-    double newPos = robot.getTurretPitchPosition() + pitchChange;
+    ///////////////////////////////////////////////////////////ACTUATOR STUFF
+      double pitchChange = 0;
+      if (joystick.getRawButtonPressed(13)){
+        pitchChange = 0.02;
+      }
+      else if (joystick.getRawButtonPressed(14)){
+        pitchChange = -0.02;
+      }
+      else{
+        pitchChange = 0;
+      }
+      double newPos = robot.getTurretPitchPosition() + pitchChange;
 
       robot.setTurretPitchPosition(newPos);
+    /////////////////////////////////////////////////////////////////ACTUATOR STUFF ENDS
 
 
-      //Collector indexer logic based on cargo already in sensors (from jack)
+    /////////////////////////////////////////////////////////COLLECTOR CONTROLS
       double defCollectorPower = 1;
       double defIndexerPower = 1;
       double curCollector;
       double curIndexer;
 
-    //button 2 = bottom center button
-    if(joystick.getRawButton(2)){
-      if(!robot.getUpperCargo()){
-        curCollector = defCollectorPower;
-        curIndexer = defIndexerPower;
-      }
-      else{
-        curIndexer = 0;
-        if(!robot.getLowerCargo()){
+      //button 2 = bottom center button
+      if(joystick.getRawButton(2)){
+        if(!robot.getUpperCargo()){
           curCollector = defCollectorPower;
+          curIndexer = defIndexerPower;
         }
         else{
-          curCollector = 0;
+          curIndexer = 0;
+          if(!robot.getLowerCargo()){
+            curCollector = defCollectorPower;
+          }
+          else{
+            curCollector = 0;
+          }
+        }
+        if(robot.isActivelyShooting()){
+          curIndexer = defIndexerPower;
         }
       }
-      if(robot.isActivelyShooting()){
-        curIndexer = defIndexerPower;
+      else if (joystick.getRawButton(5)){
+        curCollector = -defCollectorPower;
+        curIndexer = -defIndexerPower;
       }
-    }
-    else if (joystick.getRawButton(5)){
-      curCollector = -defCollectorPower;
-      curIndexer = -defIndexerPower;
-    }
-    else{
-      curCollector = 0;
-      curIndexer = 0;
-    }
+      else{
+        curCollector = 0;
+        curIndexer = 0;
+      }
 
       //Cargo is on upper sensor and we want to yeet it: indexer needs to push it past sensor
       if (robot.isActivelyShooting() && robot.getUpperCargo()) {
@@ -400,11 +370,26 @@ public class Robot extends TimedRobot {
 
       robot.setCollectorIntakePercentage(curCollector);
       robot.setIndexerIntakePercentage(curIndexer);
+    //////////////////////////////////////////////////COLLECTOR LOGIC ENDS
 
-    //robot.drivePercent(0, 0);
 
     }
+    if (hang) {
+      ///////////////////////////////////////////RUN AUTO-CLIMB
+      ActuallyHanging = true;
+      SmartDashboard.putBoolean("we really are hanging", ActuallyHanging);
+      if (reset) {
+        command.begin(robot);
+        reset = false;
+      }
+      command.step(robot);
+    }
+
+
+
+
   }
+
 
   @Override public void disabledInit() {}
 
