@@ -78,9 +78,6 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
         turretv = tv.getDouble(0.0);
         //tracker.turretUpdate(robot);
 
-
-
-
         robot.getCargo();
         robot.shoot();
         switch(autonomousStep){

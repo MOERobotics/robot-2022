@@ -74,9 +74,6 @@ public class BallCtoTerminal extends GenericAutonomous {
         turretv = tv.getDouble(0.0);
         //tracker.turretUpdate(robot);
 
-
-
-
         robot.getCargo();
         robot.shoot();
         robot.setTurretPitchPosition(.38);
@@ -108,7 +105,7 @@ public class BallCtoTerminal extends GenericAutonomous {
                     autonomousStep += 1;
                 }
                 break;
-            case 3: //drive to ball A
+            case 3: //drive to ball C
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;

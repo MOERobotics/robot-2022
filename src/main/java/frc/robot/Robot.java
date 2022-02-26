@@ -28,10 +28,10 @@ public class Robot extends TimedRobot {
       simpleCTerminal = new BallCtoTerminal(),
       CTerminalReturn = new BallCtoTerminalReturn();
 
-  GenericRobot robot = new Lightning();
+  GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = autoArc;
+  GenericAutonomous autonomous = simpleATerminal;
 
 
   int averageTurretXSize = 2;
