@@ -14,6 +14,11 @@ import frc.robot.command.*;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 public class Robot extends TimedRobot {
 
   //Instantiate autonomous once, don't create unnecessary duplicates
@@ -215,6 +220,15 @@ public class Robot extends TimedRobot {
   @Override public void teleopPeriodic() {
 
     double turretPower = 0;
+    double targetRPM=0;
+    double turretPitch=0;
+
+    switch (POVDirection.getDirection(xbox.getPOV())) {
+      case NORTH: targetRPM = 3250; turretPitch = 0.00; break;
+      case EAST : targetRPM = 4000; turretPitch = 0.00; break;
+      case SOUTH: targetRPM = 5000; turretPitch = 0.00; break;
+      case WEST : targetRPM = 5500; turretPitch = 0.00; break;
+    }
 
     //note to self: buttons currently assume mirrored joystick setting
     if (joystick.getRawButtonPressed(8)) {
@@ -534,5 +548,40 @@ public class Robot extends TimedRobot {
     if      (joystick.getRawButton( 5)) robot.setArmsForward();
     if      (joystick.getRawButton(10)) robot.setArmsBackward();
 
+
+
   }
+
+  public enum POVDirection {
+    NORTH     (   0),
+    NORTHEAST (  45),
+    EAST      (  90),
+    SOUTHEAST ( 135),
+    SOUTH     ( 180),
+    SOUTHWEST ( 225),
+    WEST      ( 270), //best
+    NORTHWEST ( 315),
+    NULL      (  -1);
+
+    private final int angle;
+
+    POVDirection(int angle) {
+      this.angle = angle;
+    }
+    public int getAngle() {
+      return angle;
+    }
+
+    //Kevin voodoo to turn ints into directions
+    public static final Map<Integer, POVDirection> directionMap =
+            Arrays.stream(POVDirection.values()).collect(
+                    Collectors.toMap(
+                            POVDirection::getAngle,
+                            Function.identity()
+                    )
+            );
+
+    public static POVDirection getDirection(int angle) {
+      return directionMap.getOrDefault(angle, POVDirection.NULL);
+    }
 }
