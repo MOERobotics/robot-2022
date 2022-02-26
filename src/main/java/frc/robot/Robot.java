@@ -315,7 +315,7 @@ public class Robot extends TimedRobot {
     //////////////////////////////////////////////////////////SHOOTER CODE BEGINS
 
       if (xbox.getRawButton(3)) {
-        shooterTargetRPM = robot.getShooterTargetRPM();
+        shooterTargetRPM = targetRPM;
       } else {
         shooterTargetRPM = 0;
       }
@@ -342,15 +342,12 @@ public class Robot extends TimedRobot {
     ///////////////////////////////////////////////////////////ACTUATOR STUFF
 
       if (joystick.getRawButtonPressed(13)){
-        pitchChange = 0.02;
+        turretPitch = robot.getTurretPitchPosition() + .02;
       }
       else if (joystick.getRawButtonPressed(14)){
         pitchChange = -0.02;
+        turretPitch = robot.getTurretPitchPosition() + .02;
       }
-      else{
-        pitchChange = 0;
-      }
-      newPos = robot.getTurretPitchPosition() + pitchChange;
 
 
     /////////////////////////////////////////////////////////////////ACTUATOR STUFF ENDS
