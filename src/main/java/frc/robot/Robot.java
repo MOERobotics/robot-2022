@@ -224,10 +224,22 @@ public class Robot extends TimedRobot {
     double turretPitch=0;
 
     switch (POVDirection.getDirection(xbox.getPOV())) {
-      case NORTH: targetRPM = 5500; turretPitch = 0.38; break;
-      case EAST : targetRPM = 4000; turretPitch = 0.00; break;
-      case SOUTH: targetRPM = 5000; turretPitch = 0.00; break;
-      case WEST : targetRPM = 5500; turretPitch = 0.00; break;
+      case NORTH:
+        targetRPM = 5500;
+        turretPitch = 0.38;
+        break;
+      case EAST:
+        targetRPM = 4000;
+        turretPitch = 0.00;
+        break;
+      case SOUTH:
+        targetRPM = 5000;
+        turretPitch = 0.00;
+        break;
+      case WEST:
+        targetRPM = 5500;
+        turretPitch = 0.00;
+        break;
     }
 
     //note to self: buttons currently assume mirrored joystick setting
@@ -315,7 +327,7 @@ public class Robot extends TimedRobot {
     //////////////////////////////////////////////////////////SHOOTER CODE BEGINS
 
       if (xbox.getRawButton(3)) {
-        shooterTargetRPM = robot.getShooterTargetRPM();
+        shooterTargetRPM = targetRPM;
       } else {
         shooterTargetRPM = 0;
       }
@@ -347,9 +359,12 @@ public class Robot extends TimedRobot {
       turretPitch += rJoyRY * 0.05;
       if (joystick.getRawButtonPressed(13)){
         pitchChange = 0.02;
+      if (joystick.getRawButtonPressed(13)) {
+        turretPitch = robot.getTurretPitchPosition() + .02;
       }
-      else if (joystick.getRawButtonPressed(14)){
+      else if (joystick.getRawButtonPressed(14)) {
         pitchChange = -0.02;
+        turretPitch = robot.getTurretPitchPosition() + .02;
       }
       else{
         pitchChange = 0;
@@ -357,10 +372,10 @@ public class Robot extends TimedRobot {
       newPos = robot.getTurretPitchPosition() + pitchChange;
 
 
-    /////////////////////////////////////////////////////////////////ACTUATOR STUFF ENDS
+      /////////////////////////////////////////////////////////////////ACTUATOR STUFF ENDS
 
 
-    /////////////////////////////////////////////////////////COLLECTOR CONTROLS
+      /////////////////////////////////////////////////////////COLLECTOR CONTROLS
 
 
       //button 2 = bottom center button
