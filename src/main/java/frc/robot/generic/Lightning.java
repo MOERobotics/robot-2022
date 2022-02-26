@@ -83,6 +83,8 @@ public class Lightning implements GenericRobot {
         rightMotorA.setInverted(invertRight);
         rightMotorB.setInverted(invertRight);
 
+        turretRotator.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
         leftMotorA.setIdleMode(CANSparkMax.IdleMode.kBrake);
         leftMotorB.setIdleMode(CANSparkMax.IdleMode.kBrake);
         rightMotorA.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -249,7 +251,8 @@ public class Lightning implements GenericRobot {
     @Override
     public void shoot(){
         double shooterRPM = defaultShooterTargetRPM;
-        if (getShooterRPMTop() >= shooterRPM && getShooterRPMBottom() >= shooterRPM){
+        setShooterRPM(shooterRPM, shooterRPM);
+        if (getShooterRPMTop() >= (shooterRPM-300) && getShooterRPMBottom() >= (shooterRPM-300)){
             canShoot = true;
         }
         else{
@@ -332,11 +335,11 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void setTurretPowerPct(double powerPct) {
-        if ( (getAlternateTurretAngleDegrees()>355) & (powerPct>0))
+        if ( (getAlternateTurretAngle()>350) & (powerPct<0))
         {
             powerPct = 0;
         }
-        if ( (getAlternateTurretAngleDegrees()>5) & (powerPct<0))
+        if ( (getAlternateTurretAngle()<10) & (powerPct>0))
         {
             powerPct = 0;
         }
@@ -576,17 +579,17 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double getPIDpivotP() {
-        return GenericRobot.super.getPIDpivotP();
+        return 1.5e-2;
     }
 
     @Override
     public double getPIDpivotI() {
-        return GenericRobot.super.getPIDpivotI();
+        return 0;
     }
 
     @Override
     public double getPIDpivotD() {
-        return GenericRobot.super.getPIDpivotD();
+        return 0;
     }
 
     @Override
@@ -605,17 +608,17 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double turretPIDgetP() {
-        return GenericRobot.super.turretPIDgetP();
+        return 3.0e-2;
     }
 
     @Override
     public double turretPIDgetI() {
-        return GenericRobot.super.turretPIDgetI();
+        return 0;
     }
 
     @Override
     public double turretPIDgetD() {
-        return GenericRobot.super.turretPIDgetD();
+        return 3.0e-4;
     }
 
 
@@ -634,6 +637,11 @@ public class Lightning implements GenericRobot {
     }
 
     //TODO: Add check using isReadyToShoot() function?
+    @Override
+    public boolean isReadyToShoot(){
+        return true;
+    }
+
     @Override
     public void setActivelyShooting(boolean isShooting){
         isActivelyShooting = isShooting;

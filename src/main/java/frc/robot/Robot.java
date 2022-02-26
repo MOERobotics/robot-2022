@@ -28,7 +28,8 @@ public class Robot extends TimedRobot {
           simpleATerminal = new BallAtoTerminal(),
           simpleBTerminal = new BallBtoTerminal(),
           simpleCTerminal = new BallCtoTerminal(),
-          CTerminalReturn = new BallCtoTerminalReturn();
+          CTerminalReturn = new BallCtoTerminalReturn(),
+          simpleB         = new BallSimpleB();
 
   GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
@@ -73,7 +74,8 @@ public class Robot extends TimedRobot {
   double curCollector;
   double curIndexer;
 
-  double newPos;
+  double targetRPM = 0;
+  double turretPitch = 0;
 
 
   PIDController turretPIDController;
@@ -149,13 +151,14 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putBoolean("Vision target found", robot.isTargetFound());
     SmartDashboard.putNumber("Vision target x", robot.getTargetX());
+    SmartDashboard.putNumber("Vision target Average", average);
     SmartDashboard.putNumber("Vision target y", robot.getTargetY());
     SmartDashboard.putNumber("Vision target angle", robot.getTargetAngle());
     SmartDashboard.putNumber("Vision target dist", robot.getTargetDistance());
 
     SmartDashboard.putNumber("Turret direction angle ticks", robot.getTurretAngle());
     SmartDashboard.putNumber("Turret direction angle degrees", robot.getTurretAngleDegrees());
-    SmartDashboard.putNumber("Alternate turret angle ticks", robot.getAlternateTurretAngle());
+    SmartDashboard.putNumber("Alternate turret angle degrees", robot.getAlternateTurretAngle());
 
     SmartDashboard.putNumber("Turret direction motor pct", robot.getTurretPowerPct());
 
@@ -224,10 +227,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    turretPower = 0;
 
-    double turretPower = 0;
-    double targetRPM = 0;
-    double turretPitch = 0;
 
     switch (POVDirection.getDirection(xbox.getPOV())) {
       case NORTH:
@@ -286,20 +287,19 @@ public class Robot extends TimedRobot {
 
       counter = (counter + 1) % averageTurretXSize;
       averageX[counter] = robot.getTargetX();
-      turretPIDController.calculate(average);
 
-      double average = 0;
+      average = 0;
       for (int i = 0; i < averageTurretXSize; i++)
         average += averageX[i];
       average /= averageTurretXSize;
 
-      if ((xbox.getRawAxis(4) > 0.80) & robot.isTargetFound()) {
+      if ((xbox.getRawAxis(2) > 0.10) & robot.isTargetFound()) {
         turretPower = turretPIDController.calculate(average);
       } else {
         turretPIDController.reset();
-        if (xbox.getRawButton(5)) {
+        if (xbox.getRawButton(6)) {
           turretPower = -0.45;
-        } else if (xbox.getRawButton(6)) {
+        } else if (xbox.getRawButton(5)) {
           turretPower = 0.45;
         } else {
           turretPower = 0.0;
@@ -374,7 +374,7 @@ public class Robot extends TimedRobot {
 
 
       //button 2 = bottom center button
-      if (xbox.getRawButton(4)) {
+      if (xbox.getRawButton(2)) {
         if (!robot.getUpperCargo()) {
           curCollector = defCollectorPower;
           curIndexer = defIndexerPower;
@@ -389,7 +389,7 @@ public class Robot extends TimedRobot {
         if (robot.isActivelyShooting()) {
           curIndexer = defIndexerPower;
         }
-      } else if (xbox.getRawButton(2)) {
+      } else if (xbox.getRawButton(4)) {
         curCollector = -defCollectorPower;
         curIndexer = -defIndexerPower;
       } else {
@@ -437,6 +437,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    joystick.getRawButtonPressed(8);
     hang = false;
     count = 0;
     if (joystick.getRawButton(1)) {
@@ -449,6 +450,7 @@ public class Robot extends TimedRobot {
     if (joystick.getRawButton(6)) autonomous = simpleBTerminal;
     if (joystick.getRawButton(7)) autonomous = simpleCTerminal;
     if (joystick.getRawButton(9)) autonomous = CTerminalReturn;
+    if (joystick.getRawButton(11)) autonomous = simpleB;
 
   }
 
