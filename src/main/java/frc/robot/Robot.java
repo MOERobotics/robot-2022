@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
 
   int counter = 0;
   double average;
-  double currentTurretPower;
+  double turretPower;
   boolean hang = false;
   int count = 0;
   boolean reset = true;
@@ -214,6 +214,8 @@ public class Robot extends TimedRobot {
 
   @Override public void teleopPeriodic() {
 
+    double turretPower = 0;
+
     //note to self: buttons currently assume mirrored joystick setting
     if (joystick.getRawButtonPressed(8)) {
       count = (count + 1) % 2;
@@ -249,16 +251,31 @@ public class Robot extends TimedRobot {
 
 
       //////////////////////////////////////////////////////////TURRET CONTROL
-      if (joystick.getRawButton(12)) {
-        currentTurretPower = .2;
+
+      counter = (counter + 1) % averageTurretXSize;
+      averageX[counter] = robot.getTargetX();
+      turretPIDController.calculate(average);
+
+      double average = 0;
+      for (int i = 0; i < averageTurretXSize; i++)
+          average += averageX[i];
+      average /= averageTurretXSize;
+
+      if ((xbox.getRawAxis(4) > 0.80) & robot.isTargetFound())
+      {
+        turretPower = turretPIDController.calculate(average);
       }
-      else if (joystick.getRawButton(15)) {
-        currentTurretPower = -.2;
+      else
+      {
+        turretPIDController.reset();
+        if (xbox.getRawButton(5)) {
+          turretPower = -0.45;
+        } else if (xbox.getRawButton(6)) {
+          turretPower = 0.45;
+        } else {
+          turretPower = 0.0;
+        }
       }
-      else {
-        currentTurretPower = 0.0;
-      }
-      robot.setTurretPowerPct(currentTurretPower);
       /////////////////////////////////////////////////////TURRET CONTROL ENDS
 
 
@@ -370,6 +387,7 @@ public class Robot extends TimedRobot {
       robot.drivePercent(driveLeft, driveRight);
       robot.setShooterRPM(shooterTargetRPM, shooterTargetRPM);
       robot.setTurretPitchPosition(newPos);
+      robot.setTurretPowerPct(turretPower);
       robot.setCollectorIntakePercentage(curCollector);
       robot.setIndexerIntakePercentage(curIndexer);
 
@@ -386,9 +404,6 @@ public class Robot extends TimedRobot {
       }
       command.step(robot);
     }
-
-
-
 
   }
 
