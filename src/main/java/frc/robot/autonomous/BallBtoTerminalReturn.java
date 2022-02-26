@@ -6,7 +6,7 @@ import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball B, ball between ball A and C
 //Setup: put the robot down so that the ball at the terminal and the ball B are lined up straight.
-public class BallBtoTerminal extends GenericAutonomous {
+public class BallBtoTerminalReturn extends GenericAutonomous {
     double startingYaw;
     double startDistance;
     double startTime;
@@ -132,6 +132,41 @@ public class BallBtoTerminal extends GenericAutonomous {
                 }
                 break;
             case 9:
+                leftpower = 0;
+                rightpower = 0;
+                autonomousStep += 1.0;
+                break;
+
+            case 10:
+                correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
+
+                leftpower = -defaultPower + correction;
+                rightpower = -defaultPower - correction;
+
+                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal - rampDownDist){
+                    double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist, robot.getDriveDistanceInchesLeft(), distanceTerminal);
+                    leftpower = -ramp;
+                    rightpower = -ramp;
+                }
+                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal) {
+                    autonomousStep += 1;
+                    leftpower = 0;
+                    rightpower = 0;
+                }
+                break;
+            case 11:
+                if (robot.canShoot()){
+                    robot.setActivelyShooting(true);
+                    startTime = System.currentTimeMillis();
+                    autonomousStep += 1.00;
+                }
+                break;
+            case 12:
+                if (System.currentTimeMillis() - startTime >= 251){
+                    robot.setActivelyShooting(false);
+                    autonomousStep += 1;
+                }
+            case 13:
                 leftpower = 0;
                 rightpower = 0;
                 break;
