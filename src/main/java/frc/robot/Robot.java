@@ -341,6 +341,10 @@ public class Robot extends TimedRobot {
 
     ///////////////////////////////////////////////////////////ACTUATOR STUFF
 
+      double deadzone = 0.1;
+      double rJoyRY = xbox.getRawAxis( 5);
+      if (rJoyRY > -deadzone && rJoyRY < deadzone) rJoyRY = 0;
+      turretPitch += rJoyRY * 0.05;
       if (joystick.getRawButtonPressed(13)){
         pitchChange = 0.02;
       }
