@@ -5,9 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,7 +13,6 @@ import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.command.*;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
-import frc.robot.generic.TurretBot;
 
 public class Robot extends TimedRobot {
 
@@ -45,7 +41,7 @@ public class Robot extends TimedRobot {
   double turretv;*/
   int counter = 0;
   double average;
-  double currentTurretPower;
+  double turretPower;
   boolean hang = false;
   int count = 0;
   boolean reset = true;
@@ -206,6 +202,8 @@ public class Robot extends TimedRobot {
 
   @Override public void teleopPeriodic() {
 
+    double turretPower = 0;
+
     //note to self: buttons currently assume mirrored joystick setting
     if (joystick.getRawButtonPressed(8)) {
       count = (count + 1) % 2;
@@ -251,16 +249,31 @@ public class Robot extends TimedRobot {
       ///////////////////////////////////////////////////////////////////SET UP OVER
 
       //////////////////////////////////////////////////////////TURRET CONTROL
-      if (joystick.getRawButton(12)) {
-        currentTurretPower = .2;
+
+      counter = (counter + 1) % averageTurretXSize;
+      averageX[counter] = robot.getTargetX();
+      turretPIDController.calculate(average);
+
+      double average = 0;
+      for (int i = 0; i < averageTurretXSize; i++)
+          average += averageX[i];
+      average /= averageTurretXSize;
+
+      if ((xbox.getRawAxis(4) > 0.80) & robot.isTargetFound())
+      {
+        turretPower = turretPIDController.calculate(average);
       }
-      else if (joystick.getRawButton(15)) {
-        currentTurretPower = -.2;
+      else
+      {
+        turretPIDController.reset();
+        if (xbox.getRawButton(5)) {
+          turretPower = -0.45;
+        } else if (xbox.getRawButton(6)) {
+          turretPower = 0.45;
+        } else {
+          turretPower = 0.0;
+        }
       }
-      else {
-        currentTurretPower = 0.0;
-      }
-      robot.setTurretPowerPct(currentTurretPower);
       /////////////////////////////////////////////////////TURRET CONTROL ENDS
 
 
@@ -368,10 +381,12 @@ public class Robot extends TimedRobot {
         curIndexer = defIndexerPower;
       }
 
-      robot.setCollectorIntakePercentage(curCollector);
-      robot.setIndexerIntakePercentage(curIndexer);
+
     //////////////////////////////////////////////////COLLECTOR LOGIC ENDS
 
+      robot.setTurretPowerPct(turretPower);
+      robot.setCollectorIntakePercentage(curCollector);
+      robot.setIndexerIntakePercentage(curIndexer);
 
     }
     if (hang) {
@@ -384,9 +399,6 @@ public class Robot extends TimedRobot {
       }
       command.step(robot);
     }
-
-
-
 
   }
 
