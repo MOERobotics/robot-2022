@@ -332,7 +332,15 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void setTurretPowerPct(double powerPct) {
-        turretRotator.set(powerPct);
+        if ( (getAlternateTurretAngleDegrees()>355) & (powerPct>0))
+        {
+            powerPct = 0;
+        }
+        if ( (getAlternateTurretAngleDegrees()>5) & (powerPct<0))
+        {
+            powerPct = 0;
+        }
+        turretRotator.set(-powerPct);
     }
 
     @Override
