@@ -110,7 +110,7 @@ public class BallCtoTerminal extends GenericAutonomous {
                     autonomousStep += 1;
                 }
                 break;
-            case 3: //drive to ball A
+            case 3: //drive to ball C
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
@@ -134,25 +134,25 @@ public class BallCtoTerminal extends GenericAutonomous {
                 autonomousStep += 1;
                 time = false;
                 break;
-            case 6: //turret turn
+            case 5: //turret turn
                 if (robot.canShoot()){
                     robot.setActivelyShooting(true);
                     startTime = System.currentTimeMillis();
                     autonomousStep += 1.0;
                 }
                 break;
-            case 7:
+            case 6:
                 if (System.currentTimeMillis() - startTime >= 500){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1;
                 }
-            case 8://reset
+            case 7://reset
                     PIDDriveStraight.reset();
                     PIDDriveStraight.enableContinuousInput(-180,180);
                     startDistance = robot.getDriveDistanceInchesLeft();
                     autonomousStep +=1;
                 break;
-            case 9: //turn to go to ball @ terminal
+            case 8: //turn to go to ball @ terminal
                 correction = PIDPivot.calculate(angleC + robot.getYaw() - startingYaw );
                 leftpower = correction;
                 rightpower = -correction;
@@ -176,7 +176,7 @@ public class BallCtoTerminal extends GenericAutonomous {
                     startTime = System.currentTimeMillis();
                 }
                 break;
-            case 10: //drive towards the ball
+            case 9: //drive towards the ball
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
@@ -193,7 +193,7 @@ public class BallCtoTerminal extends GenericAutonomous {
                     startTime = System.currentTimeMillis();
                 }
                 break;
-            case 11:
+            case 10:
                 leftpower = 0;
                 rightpower = 0;
                 break;
