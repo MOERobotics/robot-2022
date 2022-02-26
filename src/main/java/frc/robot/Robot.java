@@ -300,7 +300,7 @@ public class Robot extends TimedRobot {
 
     //////////////////////////////////////////////////////////SHOOTER CODE BEGINS
 
-      if (joystick.getRawButton(11)) {
+      if (xbox.getRawButton(3)) {
         shooterTargetRPM = robot.getShooterTargetRPM();
       } else {
         shooterTargetRPM = 0;
@@ -308,7 +308,7 @@ public class Robot extends TimedRobot {
 
 
 
-      if (joystick.getRawButton(16)) {
+      if (xbox.getRawButton(1)) {
         if (robot.isReadyToShoot()) {
           robot.setActivelyShooting(true);
         } else {
