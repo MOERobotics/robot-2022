@@ -346,7 +346,7 @@ public class Robot extends TimedRobot {
 
 
       //button 2 = bottom center button
-      if(joystick.getRawButton(2)){
+      if(xbox.getRawButton(4)){
         if(!robot.getUpperCargo()){
           curCollector = defCollectorPower;
           curIndexer = defIndexerPower;
@@ -364,7 +364,7 @@ public class Robot extends TimedRobot {
           curIndexer = defIndexerPower;
         }
       }
-      else if (joystick.getRawButton(5)){
+      else if (xbox.getRawButton(2)){
         curCollector = -defCollectorPower;
         curIndexer = -defIndexerPower;
       }
