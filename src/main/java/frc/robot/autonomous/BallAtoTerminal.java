@@ -1,69 +1,42 @@
 package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball A, closest ball to the scoring table, and driving to the ball at terminal
-public class SimpleATerminal extends GenericAutonomous {
+public class BallAtoTerminal extends GenericAutonomous {
     double startingYaw;
-
-    double leftpower;
-    double rightpower;
-    double defaultPower = .25;
-    double defaultTurnPower = .25;
-
-    double correction;
     double startTime;
     double startDistance;
 
-    double distanceA = 37;
-    double distanceB = 259.26;
+    double leftpower;
+    double rightpower;
+    double defaultPower = .4;
+    double defaultTurnPower = .4;
+    double correction;
+
+    double distanceA = 40.44;
+    double distanceTerminal = 259.26;
     double angleA = 87.74;
-
     double rampDownDist = 10;
-
 
     PIDController PIDDriveStraight;
 
-    //<Turret>
-    int averageTurretXSize = 2;
-    double[] averageTurretX = new double [averageTurretXSize];
-    double turretx;
-    double turrety;
-    double turretarea;
-    double turretv;
-    int counter = 0;
-    PIDController turretPIDController;
-    //</Turret>
+    TurretTracker tracker = new TurretTracker();
 
     @Override
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
-        startingYaw = robot.getYaw(); //might need to change to set degrees
+        startingYaw = robot.getYaw();
         startTime = System.currentTimeMillis();
         PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDpivotD());
-
-        turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
+        tracker.turretInit(robot);
     }
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
-        //<Turret>
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-        NetworkTableEntry tx = table.getEntry("tx");
-        NetworkTableEntry ty = table.getEntry("ty");
-        NetworkTableEntry ta = table.getEntry("ta");
-        NetworkTableEntry tv = table.getEntry("tv");
-
-        turretx = tx.getDouble(0.0);
-        turrety = ty.getDouble(0.0);
-        turretarea = ta.getDouble(0.0);
-        turretv = tv.getDouble(0.0);
-        //</Turret>
+        tracker.turretUpdate(robot);
 
         switch(autonomousStep){
             case 0: //reset
@@ -88,14 +61,12 @@ public class SimpleATerminal extends GenericAutonomous {
                 rightpower = defaultPower - correction;
 
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceA - rampDownDist){
-                    double a = rampDown(defaultPower, 0, startDistance, rampDownDist, robot.getDriveDistanceInchesLeft(), distanceA);
-                    leftpower = a;
-                    rightpower = a;
+                    defaultPower = (distanceA-robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceA){
                     autonomousStep += 1;
                     startTime = System.currentTimeMillis();
-                } //has 3 inches of momentum with .25 power
+                }
                 break;
             case 5: //stop
                 leftpower = 0;
@@ -103,7 +74,6 @@ public class SimpleATerminal extends GenericAutonomous {
                 if (System.currentTimeMillis() - startTime > 1000){
                     autonomousStep = 12;
                 }
-                //autonomousStep = 8;
                 break;
             case 6: //collector to collect ball
             case 7: //collection part 2 not electric nor boogaloo
@@ -130,16 +100,14 @@ public class SimpleATerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB - rampDownDist){
-                    double a = rampDown(defaultPower, 0, startDistance, rampDownDist, robot.getDriveDistanceInchesLeft(), distanceB);
-                    leftpower = a;
-                    rightpower = a;
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal - rampDownDist){
+                    defaultPower = (distanceTerminal -robot.getDriveDistanceInchesLeft()+startDistance)*defaultPower/rampDownDist;
                 }
-                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB) {
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal) {
                     autonomousStep += 1;
                     leftpower = 0;
                     rightpower = 0;
-                } //might need to tune for momentum
+                }
                 break;
             case 14:
                 leftpower = 0;
@@ -147,28 +115,7 @@ public class SimpleATerminal extends GenericAutonomous {
                 break;
         }
         robot.drivePercent(leftpower, rightpower);
-
-        //If turret works set value of averageTurretX[] to turretx
-        if(turretv !=0 ) {
-            averageTurretX[counter % averageTurretXSize] = turretx;
-            counter++;
-        }
-
-        double average = 0;
-        for(double i: averageTurretX){
-            average += i;
-        }
-        average /= averageTurretXSize;
-
-        double currentTurretPower = 0;
-
-        if(turretv !=0){
-            currentTurretPower = turretPIDController.calculate(average);
-        }else{
-            turretPIDController.reset();
-        }
-
-        robot.setTurretPowerPct(currentTurretPower);
+        tracker.turretMove(robot);
 
     }
 }

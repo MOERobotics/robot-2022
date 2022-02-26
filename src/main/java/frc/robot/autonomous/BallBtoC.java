@@ -1,14 +1,11 @@
 package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball A, closest ball to the hangar
-public class SimpleBTerminal extends GenericAutonomous {
+public class BallBtoC extends GenericAutonomous {
     double startingYaw;
     double leftpower;
     double rightpower;
@@ -20,48 +17,16 @@ public class SimpleBTerminal extends GenericAutonomous {
 
     PIDController PIDDriveStraight;
 
-    //<Turret>
-    int averageTurretXSize = 2;
-    double[] averageTurretX = new double [averageTurretXSize];
-    double turretx;
-    double turrety;
-    double turretarea;
-    double turretv;
-    int counter = 0;
-    PIDController turretPIDController;
-    //</Turret>
-
     @Override
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
         startingYaw = robot.getYaw(); //might need to change to set degrees
         PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
         startTime = System.currentTimeMillis();
-
-        turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     }
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
-        //<Turret>
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-        NetworkTableEntry tx = table.getEntry("tx");
-        NetworkTableEntry ty = table.getEntry("ty");
-        NetworkTableEntry ta = table.getEntry("ta");
-        NetworkTableEntry tv = table.getEntry("tv");
-
-        turretx = tx.getDouble(0.0);
-        turrety = ty.getDouble(0.0);
-        turretarea = ta.getDouble(0.0);
-        turretv = tv.getDouble(0.0);
-        //</Turret>
-
-
-        SmartDashboard.putNumber("Autonomous Step", autonomousStep);
-        SmartDashboard.putNumber("Position", robot.getDriveDistanceInchesLeft());
-        SmartDashboard.putNumber("Starting Yaw", startingYaw);
-        SmartDashboard.putNumber("Current Yaw", robot.getYaw());
-        SmartDashboard.putNumber("startDistance", startDistance);
 
         switch(autonomousStep){
             case 0: //reset
@@ -85,13 +50,7 @@ public class SimpleBTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if (robot.getDriveDistanceInchesLeft()- startDistance >= 51.5){
-                    double a = rampDown(defaultPower, 0, startDistance,10, robot.getDriveDistanceInchesLeft(), 61.5);
-                    leftpower = a;
-                    rightpower = a;
-                }
-
-                if(robot.getDriveDistanceInchesLeft()- startDistance >= 61.5){
+                if(robot.getDriveDistanceInchesLeft() >= 61.5){
                     autonomousStep += 1;
                     startTime = System.currentTimeMillis();
                 } //has 3 inches of momentum with .25 power
@@ -122,12 +81,6 @@ public class SimpleBTerminal extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if (robot.getDriveDistanceInchesLeft() - startDistance >= 143.5){
-                    double a = rampDown(defaultPower,0,startDistance,10, robot.getDriveDistanceInchesLeft(), 153.5);
-                    leftpower = a;
-                    rightpower = a;
-                }
-
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= 153.5){
                     autonomousStep += 1;
                 }
@@ -142,28 +95,6 @@ public class SimpleBTerminal extends GenericAutonomous {
             case 18: //shoot the second ball for funsies
         }
         robot.drivePercent(leftpower, rightpower);
-
-        //If turret works set value of averageTurretX[] to turretx
-        if(turretv !=0 ) {
-            averageTurretX[counter % averageTurretXSize] = turretx;
-            counter++;
-        }
-
-        double average = 0;
-        for(double i: averageTurretX){
-            average += i;
-        }
-        average /= averageTurretXSize;
-
-        double currentTurretPower = 0;
-
-        if(turretv !=0){
-            currentTurretPower = turretPIDController.calculate(average);
-        }else{
-            turretPIDController.reset();
-        }
-
-        robot.setTurretPowerPct(currentTurretPower);
 
     }
 }

@@ -128,6 +128,17 @@ public interface GenericRobot {
 		UNKNOWN;
 	}
 
+	public default void getCargo(){
+
+	}
+	public default void shoot(){
+
+	}
+
+	public default boolean canShoot(){
+		return false;
+	}
+
 	public default boolean getUpperCargo(){
 		//System.out.println("robot is colorblind");
 		return false;
@@ -233,12 +244,20 @@ public interface GenericRobot {
 		return 0;
 	}
 
+    public default double getTurretPitchPosition(){
+        return 0;
+    }
+
 	public default double getTurretPitchAngle(){
 		return 0;
 	}
 	public default double getTurretPitchPowerPct(){
 		return 0;
 	}
+
+    public default void setTurretPitchPosition(double position){
+        //System.out.println("I don't have a turret");
+    }
 
 	public default void setTurretPitchAngle(){
 		//System.out.println("I don't have a turret");
@@ -266,6 +285,8 @@ public interface GenericRobot {
 		return 0;
 	}
 	public default double getShooterTargetRPM() { return 0; }
+
+	public default void setShooterTargetRPM(double rpm){}
 
 	public default void setShooterRPM(double topRPM, double bottomRPM){
 		//System.out.println("I don't have a shooter");
@@ -356,8 +377,12 @@ public interface GenericRobot {
 		if(error > tolerance) shooterNotReady();
 
 		//we haven't called shooterNotReady() in the last "time" milliseconds
-		if(System.currentTimeMillis() - getShootReadyTimer() > time) return true;
-		return false;
+		if(System.currentTimeMillis() - getShootReadyTimer() > time) {
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 
 	public default boolean isActivelyShooting(){
