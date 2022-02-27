@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball A, closest ball to the scoring table, and driving to the ball at terminal
-public class BallAtoTerminal extends GenericAutonomous {
+public class BallAtoTerminalReturn extends GenericAutonomous {
     double startingYaw;
     double startTime;
     double startDistance;
@@ -127,7 +127,6 @@ public class BallAtoTerminal extends GenericAutonomous {
                     startTime = System.currentTimeMillis();
                 }
                 break;
-
             case 7: //drive towards the ball
                 //SKIPPED RIGHT NOW
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
@@ -148,6 +147,42 @@ public class BallAtoTerminal extends GenericAutonomous {
                 }
                 break;
             case 8:
+                leftpower = 0;
+                rightpower = 0;
+                startDistance = robot.getDriveDistanceInchesLeft();
+                autonomousStep += 1;
+            case 9: // drive back
+                correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
+
+                leftpower = -defaultPower + correction;
+                rightpower = -defaultPower - correction;
+
+                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal - rampDownDist){
+                    double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist,
+                            robot.getDriveDistanceInchesLeft(), distanceTerminal);
+                    leftpower = -ramp;
+                    rightpower = -ramp;
+                }
+                if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal) {
+                    autonomousStep += 1;
+                    leftpower = 0;
+                    rightpower = 0;
+                }
+                break;
+            case 10: //shoot the ball if target is found
+                if (robot.canShoot()){
+                    robot.setActivelyShooting(true);
+                    startTime = System.currentTimeMillis();
+                    autonomousStep += 1.0;
+                }
+                break;
+            case 11: //turn shooter off
+                if (System.currentTimeMillis()-startTime >= 250){
+                    robot.setActivelyShooting(false);
+                    autonomousStep += 1;
+                }
+                break;
+            case 12:
                 leftpower = 0;
                 rightpower = 0;
                 break;
