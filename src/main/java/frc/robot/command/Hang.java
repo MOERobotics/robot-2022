@@ -16,7 +16,7 @@ public class Hang extends GenericCommand{
     double startDistance;
     double differenceDistance;
 
-    double sensorDist = 12.0;
+    double sensorDist = 21.0;
     double Tapetheta = 0;
 
     double correction;
@@ -29,7 +29,7 @@ public class Hang extends GenericCommand{
 
     double lTraveled;
 
-    double fwd = 71.6;
+    double fwd = 49.5;
     PIDController PIDSteering;
     boolean tapeAlign;
 
@@ -43,8 +43,8 @@ public class Hang extends GenericCommand{
     int countRight = 0;
     double leftArmPower = 0;
     double rightArmPower = 0;
-    double defaultClimbPowerUp = -.5;
-    double defaultClimbPowerDown = .5;
+    double defaultClimbPowerUp = .5;
+    double defaultClimbPowerDown = -.5;
     boolean leftArrived = false;
     boolean rightArrived = false;
     double startHeightLeft = 0;
@@ -57,7 +57,7 @@ public class Hang extends GenericCommand{
         leftSensor = false;
         rightSensor = false;
         lTraveled = 0;
-        fwd = 71.6;
+        fwd = 49.5;
         PIDSteering = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
         tapeAlign = true;
         firstTime = true;
@@ -67,8 +67,8 @@ public class Hang extends GenericCommand{
         SmartDashboard.putNumber("tapetheta", Tapetheta);
         SmartDashboard.putNumber("ltraveled", lTraveled);
         SmartDashboard.putNumber("fwd", fwd);
-        SmartDashboard.putNumber("leftEncoderRaw", robot.encoderTicksLeftDrive());
-        SmartDashboard.putNumber("rightEncoderRaw", robot.encoderTicksRightDrive());
+        SmartDashboard.putNumber("leftEncoderRaw", robot.encoderTicksLeftDriveA());
+        SmartDashboard.putNumber("rightEncoderRaw", robot.encoderTicksRightDriveA());
         SmartDashboard.putBoolean("leftTapeSensor", robot.getFloorSensorLeft());
         SmartDashboard.putBoolean("rightTapeSensor", robot.getFloorSensorRight());
         SmartDashboard.putBoolean("leftCLimberSensor", robot.getClimbSensorLeft());
@@ -94,7 +94,7 @@ public class Hang extends GenericCommand{
                     startDistance = robot.getDriveDistanceInchesLeft();
                     PIDSteering.reset();
                     PIDSteering.enableContinuousInput(-180, 180);
-                    commandStep = 12;//TODO:change back
+                    commandStep += 1;//TODO:change back
                     break;
                 case 12: //TODO: tester case, remove when necessary
                     leftPower = defaultPower;
@@ -110,7 +110,11 @@ public class Hang extends GenericCommand{
                     leftPower = defaultPower + correction; //didn't we stop doing this?
                     rightPower = defaultPower - correction;
 
-                    if (!robot.getFloorSensorLeft()) {
+                    if (!robot.getFloorSensorLeft() && !robot.getFloorSensorRight()){
+                        Tapetheta = 0;
+                        commandStep = 3;
+                    }
+                    else if (!robot.getFloorSensorLeft()) {
                         startDistance = robot.getDriveDistanceInchesLeft();
                         leftSensor = true;
                         commandStep += 1;
@@ -127,16 +131,17 @@ public class Hang extends GenericCommand{
 
                     if (!rightSensor && !robot.getFloorSensorRight()) {
                         differenceDistance = Math.abs(robot.getDriveDistanceInchesLeft() - startDistance);
-                        Tapetheta = Math.atan(differenceDistance / sensorDist) * 180 / Math.PI;
+                        Tapetheta = (Math.atan(differenceDistance / sensorDist) * 180 / Math.PI);
                         commandStep += 1;
                     } else if (!leftSensor && !robot.getFloorSensorLeft()) {
                         differenceDistance = Math.abs(robot.getDriveDistanceInchesLeft() - startDistance);
-                        Tapetheta = Math.atan(differenceDistance / sensorDist) * 180 / Math.PI;
+                        Tapetheta = (Math.atan(differenceDistance / sensorDist) * 180 / Math.PI);
                         commandStep += 1;
                     }
                     break;
 
                 case 3:
+                    robot.setArmsForward();
                     if (leftSensor) {
                         currentYaw = startAngle - Tapetheta; //currentYaw = targetYaw because we are lazy
                     } else {
@@ -151,6 +156,11 @@ public class Hang extends GenericCommand{
                     correction = PIDSteering.calculate(robot.getYaw() - currentYaw);
                     leftPower = defaultPower + correction;
                     rightPower = defaultPower - correction;
+                    if (Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= (fwd-10)){
+                        double ramp = rampDown(defaultPower, .1, startDistance, 10, robot.getDriveDistanceInchesLeft(), fwd);
+                        leftPower = ramp;
+                        rightPower = ramp;
+                    }
                     if (Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= (fwd)) {
                         leftPower = 0;
                         rightPower = 0;
@@ -160,10 +170,11 @@ public class Hang extends GenericCommand{
                 case 5: //adios amigos
                     leftPower = 0;
                     rightPower = 0;
-                    //tapeAlign = false; TODO: make this stop being a comment
-                    //commandStep = -1;
+                    tapeAlign = false;
+                    commandStep = -1;
                     startingTime = System.currentTimeMillis();
                     break;
+                    /////////TODO:Put arms forward
             }
             robot.drivePercent(leftPower, rightPower);
         }
@@ -180,12 +191,12 @@ public class Hang extends GenericCommand{
                     countLeft = 0;
                     countRight = 0;
                     if (System.currentTimeMillis() - startingTime >= 50){
-                        commandStep += 1;
+                        commandStep = 2; ///TODO: fix numbering
                     }
 
                     break;
                 case 1:  ///////////unlock rotation piston to send arms forward
-                    robot.setArmsForward();
+                    robot.setArmsForward(); //TODO: skip step
                     commandStep += 1;
                     break;
                 case 2: //////raise climber arms (skip 10 steps after in case we need to scoot/scoot
@@ -222,14 +233,17 @@ public class Hang extends GenericCommand{
                         countRight = 0;
                         leftArmPower = 0;
                         rightArmPower = 0;
+                        startingTime = System.currentTimeMillis();
                         commandStep += 1;
 
                     }
 
                     break;
-                case 3:  ///////////unlock rotation piston to send arms forward
+                case 3:  ///////////unlock rotation piston to send arms back
                     robot.setArmsBackward();
-                    commandStep = 11;
+                    if (System.currentTimeMillis() - startingTime >= 500) {
+                        commandStep = 11;
+                    }
                     break;
                 /*case 2: //////disable PTO
                     robot.turnOffPTO();
@@ -362,6 +376,7 @@ public class Hang extends GenericCommand{
                         rightArmPower = 0;
                         leftArmPower = 0;
                         commandStep = 16; //////////skip over step 15
+                        startingTime = System.currentTimeMillis();
                     }
                     break;
                 case 15:///change to check with pitch and roll
@@ -380,7 +395,9 @@ public class Hang extends GenericCommand{
                     }
                 case 16://///////once in contact move arms back again with the piston and swiiiiing
                     robot.setArmsBackward();
-                    commandStep += 1;//TODO:change back
+                    if (System.currentTimeMillis() - startingTime >= 500) {
+                        commandStep += 1;//TODO:change back
+                    }
                     break;
                 case 17://////////go back to case 11 and repeat down to this step
                     if (firstTime){

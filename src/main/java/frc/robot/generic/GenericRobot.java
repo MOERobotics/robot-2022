@@ -41,11 +41,11 @@ public interface GenericRobot {
 	};
 
 	public default double getDriveDistanceInchesLeft(){
-		return encoderTicksLeftDrive()/encoderLeftDriveTicksPerInch();
+		return encoderTicksLeftDriveA()/encoderLeftDriveTicksPerInch();
 	}
 
 	public default double getDriveDistanceInchesRight(){
-		return encoderTicksRightDrive()/encoderRightDriveTicksPerInch();
+		return encoderTicksRightDriveB()/encoderRightDriveTicksPerInch();
 	}
 
 	public default double getLeftACurrent(){
@@ -71,13 +71,21 @@ public interface GenericRobot {
 		return 1.0;
 	}
 
-	public default double encoderTicksLeftDrive(){
+	public default double encoderTicksLeftDriveA(){
 		//System.out.println("I don't have an encoder");
 		return 0;
 	}
 
-	public default double encoderTicksRightDrive(){
+	public default double encoderTicksRightDriveA(){
 		//System.out.println("I don't have an encoder");
+		return 0;
+	}
+
+	public default double encoderTicksLeftDriveB(){
+		return 0;
+	}
+
+	public default double encoderTicksRightDriveB(){
 		return 0;
 	}
 
@@ -154,7 +162,7 @@ public interface GenericRobot {
 	}
 	public default double getCollectorIntakePercentage() {
 		return 0;
-	};
+	}
 
 	public void setIndexerIntakePercentage(
 			double percentage

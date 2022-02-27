@@ -155,12 +155,12 @@ public class Camoelot implements GenericRobot {
 	}
 
 	@Override
-	public double encoderTicksLeftDrive(){
+	public double encoderTicksLeftDriveA(){
 		return leftEncoder.get();
 	}
 
 	@Override
-	public double encoderTicksRightDrive(){
+	public double encoderTicksRightDriveA(){
 		return rightEncoder.get();
 	}
 

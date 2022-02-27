@@ -29,13 +29,14 @@ public class Robot extends TimedRobot {
           simpleBTerminal = new BallBtoTerminal(),
           simpleCTerminal = new BallCtoTerminal(),
           CTerminalReturn = new BallCtoTerminalReturn(),
-          simpleB         = new BallSimpleB();
+          simpleB         = new BallSimpleB(),
+          calibration = new Calibration();
 
   GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = simpleATerminal;
+  GenericAutonomous autonomous = calibration;
 
 
   int averageTurretXSize = 2;
@@ -83,6 +84,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    robot.setTurretPitchPosition(0);
   }
 
   @Override
@@ -122,8 +124,11 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Drive left rpm", robot.getDriveLeftRPM());
     SmartDashboard.putNumber("Drive right rpm", robot.getDriveRightRPM());
 
-    SmartDashboard.putNumber("Left encoder Ticks", robot.encoderTicksLeftDrive());
-    SmartDashboard.putNumber("Right encoder Ticks", robot.encoderTicksRightDrive());
+    SmartDashboard.putNumber("Left encoder Ticks A", robot.encoderTicksLeftDriveA());
+    SmartDashboard.putNumber("Right encoder Ticks A", robot.encoderTicksRightDriveA());
+
+    SmartDashboard.putNumber("Left encoder Ticks B", robot.encoderTicksLeftDriveB());
+    SmartDashboard.putNumber("Right encoder Ticks B", robot.encoderTicksRightDriveB());
 
     SmartDashboard.putNumber("Left encoder Inches", robot.getDriveDistanceInchesLeft());
     SmartDashboard.putNumber("Right encoder Inches", robot.getDriveDistanceInchesRight());
@@ -190,8 +195,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Autonomous Step", autonomous.autonomousStep);
     SmartDashboard.putString("Autonomous Program", autonomous.getClass().getName());
 
-    SmartDashboard.putNumber("leftEncoderRaw", robot.encoderTicksLeftDrive());
-    SmartDashboard.putNumber("rightEncoderRaw", robot.encoderTicksRightDrive());
+    SmartDashboard.putNumber("leftEncoderRaw", robot.encoderTicksLeftDriveA());
+    SmartDashboard.putNumber("rightEncoderRaw", robot.encoderTicksRightDriveA());
     SmartDashboard.putBoolean("leftTapeSensor", robot.getFloorSensorLeft());
     SmartDashboard.putBoolean("rightTapeSensor", robot.getFloorSensorRight());
     SmartDashboard.putBoolean("leftCLimberSensor", robot.getClimbSensorLeft());
@@ -220,6 +225,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    robot.setTurretPitchPosition(0);
     turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     hang = false;
     count = 0;
@@ -231,17 +237,17 @@ public class Robot extends TimedRobot {
 
 
     switch (POVDirection.getDirection(xbox.getPOV())) {
-      case NORTH:
-        targetRPM = 5500;
+      case NORTH: //MEDIUM SHOT RANGE
+        targetRPM = 4000;
         turretPitch = 0.38;
         break;
       case EAST:
         targetRPM = 4000;
         turretPitch = 0.00;
         break;
-      case SOUTH:
-        targetRPM = 5000;
-        turretPitch = 0.00;
+      case SOUTH: ////CLOSE SHOT
+        targetRPM = 3500;
+        turretPitch = 0.12;
         break;
       case WEST:
         targetRPM = 5500;
@@ -359,11 +365,11 @@ public class Robot extends TimedRobot {
       if (rJoyRY > -deadzone && rJoyRY < deadzone) rJoyRY = 0;
 
       if (rJoyRY > deadzone) {
-        turretPitch = robot.getTurretPitchPosition() + .02;
+        turretPitch = robot.getTurretPitchPosition() + .002;
       }
 
       if (rJoyRY < -deadzone) {
-        turretPitch = robot.getTurretPitchPosition() - .02;
+        turretPitch = robot.getTurretPitchPosition() - .002;
       }
 
 
@@ -451,6 +457,7 @@ public class Robot extends TimedRobot {
     if (joystick.getRawButton(7)) autonomous = simpleCTerminal;
     if (joystick.getRawButton(9)) autonomous = CTerminalReturn;
     if (joystick.getRawButton(11)) autonomous = simpleB;
+    if (joystick.getRawButton(12)) autonomous = calibration;
 
   }
 

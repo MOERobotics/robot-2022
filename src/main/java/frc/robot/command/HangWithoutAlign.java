@@ -67,8 +67,8 @@ public class HangWithoutAlign extends GenericCommand{
         SmartDashboard.putNumber("tapetheta", Tapetheta);
         SmartDashboard.putNumber("ltraveled", lTraveled);
         SmartDashboard.putNumber("fwd", fwd);
-        SmartDashboard.putNumber("leftEncoderRaw", robot.encoderTicksLeftDrive());
-        SmartDashboard.putNumber("rightEncoderRaw", robot.encoderTicksRightDrive());
+        SmartDashboard.putNumber("leftEncoderRaw", robot.encoderTicksLeftDriveA());
+        SmartDashboard.putNumber("rightEncoderRaw", robot.encoderTicksRightDriveA());
         SmartDashboard.putBoolean("leftTapeSensor", robot.getFloorSensorLeft());
         SmartDashboard.putBoolean("rightTapeSensor", robot.getFloorSensorRight());
         SmartDashboard.putBoolean("leftCLimberSensor", robot.getClimbSensorLeft());

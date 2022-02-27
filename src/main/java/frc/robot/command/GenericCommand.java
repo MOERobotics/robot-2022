@@ -18,5 +18,10 @@ public abstract class GenericCommand {
 
     public boolean enable;
 
+    public double rampDown(double startPower, double endPower, double startDistance, double rolloutDistance, double currentDist, double endDist){
+        double power = (endDist-Math.abs(currentDist-startDistance))*(startPower-endPower)/rolloutDistance+endPower;
+        return power;
+    }
+
 
 }

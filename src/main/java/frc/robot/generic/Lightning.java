@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.*;
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
 public class Lightning implements GenericRobot {
-    public static final double TICKS_PER_INCH_DRIVE = 0.96;
+    public static final double TICKS_PER_INCH_DRIVE = 0.875;
     public static final double TICKS_PER_DEGREE_TURRET = 116;
     public static final double TICKS_PER_DEGREE_TURRET2 = 136.467;
     public static final double TICKS_PER_REVOLUTION_SHOOTERA = 1;
@@ -37,8 +37,10 @@ public class Lightning implements GenericRobot {
     Servo       elevationRight     = new Servo(1);
 
 
-    RelativeEncoder encoderRight  = rightMotorA.getEncoder();
-    RelativeEncoder encoderLeft   = leftMotorA.getEncoder();
+    RelativeEncoder encoderRightA  = rightMotorA.getEncoder();
+    RelativeEncoder encoderLeftA   = leftMotorA.getEncoder();
+    RelativeEncoder encoderRightB = rightMotorB.getEncoder();
+    RelativeEncoder encoderLeftB = leftMotorB.getEncoder();
     RelativeEncoder encoderTurret = turretRotator.getEncoder();
     SparkMaxAnalogSensor encoderTurretAlt = turretRotator.getAnalog(SparkMaxAnalogSensor.Mode.kAbsolute);
     RelativeEncoder encoderShootA = shooterA.getEncoder();
@@ -156,12 +158,12 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double getDriveLeftRPM() {
-        return encoderLeft.getVelocity()/encoderLeftDriveTicksPerInch();
+        return encoderLeftA.getVelocity()/encoderLeftDriveTicksPerInch();
     }
 
     @Override
     public double getDriveRightRPM() {
-        return encoderRight.getVelocity()/encoderRightDriveTicksPerInch();
+        return encoderRightA.getVelocity()/encoderRightDriveTicksPerInch();
     }
 
     @Override
@@ -195,13 +197,23 @@ public class Lightning implements GenericRobot {
     }
 
     @Override
-    public double encoderTicksLeftDrive() {
-        return encoderLeft.getPosition();
+    public double encoderTicksLeftDriveA() {
+        return encoderLeftA.getPosition();
     }
 
     @Override
-    public double encoderTicksRightDrive() {
-        return encoderRight.getPosition();
+    public double encoderTicksRightDriveA() {
+        return encoderRightA.getPosition();
+    }
+
+    @Override
+    public double encoderTicksLeftDriveB(){
+        return encoderLeftB.getPosition();
+    }
+
+    @Override
+    public double encoderTicksRightDriveB(){
+        return encoderRightB.getPosition();
     }
 
     @Override
@@ -523,13 +535,13 @@ public class Lightning implements GenericRobot {
     public double armHeightLeft() {
         //TODO: put in conversion
         //Maybe use some sensor. Do NOT want to use encoders for this.
-        return -encoderTicksLeftDrive()*.24937;
+        return -encoderTicksLeftDriveA()*.24937;
     }
 
     @Override
     public double armHeightRight(){
         //TODO: put in conversion
-        return -encoderTicksRightDrive()*.24937;
+        return -encoderTicksRightDriveA()*.24937;
     }
 
     @Override
