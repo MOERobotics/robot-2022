@@ -66,7 +66,7 @@ public class Lightning implements GenericRobot {
     SparkMaxLimitSwitch limitSwitchLeftBForward = leftMotorB.getForwardLimitSwitch(lstype);
     SparkMaxLimitSwitch limitSwitchLeftBReverse = leftMotorB.getReverseLimitSwitch(lstype);
 
-    double defaultShooterTargetRPM = 5000;
+    double defaultShooterTargetRPM = 4000;
 
     boolean isPTOonArms;
 
@@ -100,14 +100,14 @@ public class Lightning implements GenericRobot {
         elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
         elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
 
-        shooterAPIDController.setP(2.5e-4);
+        shooterAPIDController.setP(9.0e-4);
         shooterAPIDController.setI(0);
         shooterAPIDController.setD(2.5e-1);
         shooterAPIDController.setFF(1.67e-4);
         shooterAPIDController.getIZone(500);
         shooterAPIDController.getDFilter(0);
 
-        shooterBPIDController.setP(2.5e-4);
+        shooterBPIDController.setP(9.0e-4);
         shooterBPIDController.setI(0);
         shooterBPIDController.setD(2.5e-1);
         shooterBPIDController.setFF(1.67e-4);

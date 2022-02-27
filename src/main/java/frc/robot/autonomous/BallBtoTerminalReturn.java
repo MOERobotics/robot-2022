@@ -83,26 +83,26 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 autonomousStep += 1;
                 break;
             case 3:
-                if (robot.canShoot()){
+                if (robot.isTargetFound() && robot.canShoot()){
                     robot.setActivelyShooting(true);
                     startTime = System.currentTimeMillis();
                     autonomousStep += 1.0;
                 }
                 break;
             case 4: // part 2 not electric nor boogaloo
-                if (System.currentTimeMillis() - startTime >= 1000){
+                if (System.currentTimeMillis() - startTime >= 1500){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1;
                 }
                 break;
 
             case 5://reset
-                if (System.currentTimeMillis() - startTime >= 1000){
-                    PIDDriveStraight.reset();
-                    PIDDriveStraight.enableContinuousInput(-180,180);
-                    startDistance = robot.getDriveDistanceInchesLeft();
-                    autonomousStep +=1;
-                }
+
+                PIDDriveStraight.reset();
+                PIDDriveStraight.enableContinuousInput(-180,180);
+                startDistance = robot.getDriveDistanceInchesLeft();
+                autonomousStep +=1;
+
                 break;
             case 6://drive to ball at terminal
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
@@ -124,9 +124,9 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
             case 7:
                 leftpower = 0;
                 rightpower = 0;
+                startDistance = robot.getDriveDistanceInchesLeft();
                 autonomousStep += 1.0;
                 break;
-
             case 8:
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
@@ -145,7 +145,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 }
                 break;
             case 9:
-                if (robot.canShoot()){
+                if (robot.isTargetFound() && robot.canShoot()){
                     robot.setActivelyShooting(true);
                     startTime = System.currentTimeMillis();
                     autonomousStep += 1.00;
@@ -182,7 +182,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
             PIDTurret.reset();
         }
         if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 2000)) {
-            currentTurretPower = .2;
+            currentTurretPower = .4;
         }
         robot.setTurretPowerPct(currentTurretPower);
 

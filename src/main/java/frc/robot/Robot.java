@@ -29,6 +29,7 @@ public class Robot extends TimedRobot {
           simpleBTerminal = new BallBtoTerminal(),
           simpleCTerminal = new BallCtoTerminal(),
           CTerminalReturn = new BallCtoTerminalReturn(),
+          BTerminalReturn = new BallBtoTerminalReturn(),
           simpleB         = new BallSimpleB(),
           calibration = new Calibration();
 
@@ -36,7 +37,7 @@ public class Robot extends TimedRobot {
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = calibration;
+  GenericAutonomous autonomous = BTerminalReturn;
 
 
   int averageTurretXSize = 2;
@@ -457,7 +458,6 @@ public class Robot extends TimedRobot {
     if (joystick.getRawButton(7)) autonomous = simpleCTerminal;
     if (joystick.getRawButton(9)) autonomous = CTerminalReturn;
     if (joystick.getRawButton(11)) autonomous = simpleB;
-    if (joystick.getRawButton(12)) autonomous = calibration;
 
   }
 
