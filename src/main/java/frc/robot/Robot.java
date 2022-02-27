@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
           CTerminalReturn = new BallCtoTerminalReturn(),
           simpleB         = new BallSimpleB();
 
-  GenericRobot robot = new TurretBot();
+  GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
@@ -293,7 +293,7 @@ public class Robot extends TimedRobot {
         average += averageX[i];
       average /= averageTurretXSize;
 
-      if ((xbox.getRawAxis(2) > 0.10) & robot.isTargetFound()) {
+      if ((xbox.getRawAxis(2) > 0.10) & robot.isTargetFound()) { ////////////AUTO-AIM
         turretPower = turretPIDController.calculate(average);
       } else {
         turretPIDController.reset();
