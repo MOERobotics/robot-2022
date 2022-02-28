@@ -409,6 +409,29 @@ public class Robot extends TimedRobot {
         curIndexer = defIndexerPower;
       }
 
+      /* Some code for setting up the collector after flight check. */
+      if (joystick.getRawButton(10)) {
+        if (robot.getAlternateTurretAngle()>320)
+        {
+          turretPower = 0.4;
+        }
+        else if (robot.getAlternateTurretAngle()<310)
+        {
+          turretPower = -0.4;
+        }
+        else
+        {
+          turretPower = 0.0;
+        }
+      }
+
+      if (joystick.getRawButton(11) & joystick.getRawButton(12) &
+              (Math.abs(robot.getAlternateTurretAngleDegrees()-315)<5) )
+      {
+        robot.raiseCollector();
+      }
+
+
       //////////////////////////////////////////////////COLLECTOR LOGIC ENDS
 
 
