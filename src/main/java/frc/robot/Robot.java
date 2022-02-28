@@ -410,12 +410,15 @@ public class Robot extends TimedRobot {
       }
 
       /* Some code for setting up the collector after flight check. */
+      double flightCheckTol = 5.0;
+      double storagePosition = 315;
+      
       if (joystick.getRawButton(10)) {
-        if (robot.getAlternateTurretAngle()>320)
+        if (robot.getAlternateTurretAngle()>storagePosition+flightCheckTol)
         {
           turretPower = 0.4;
         }
-        else if (robot.getAlternateTurretAngle()<310)
+        else if (robot.getAlternateTurretAngle()<storagePosition-flightCheckTol)
         {
           turretPower = -0.4;
         }
@@ -426,7 +429,7 @@ public class Robot extends TimedRobot {
       }
 
       if (joystick.getRawButton(11) & joystick.getRawButton(12) &
-              (Math.abs(robot.getAlternateTurretAngleDegrees()-315)<5) )
+              (Math.abs(robot.getAlternateTurretAngleDegrees()-storagePosition)<flightCheckTol) )
       {
         robot.raiseCollector();
       }
