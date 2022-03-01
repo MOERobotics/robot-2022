@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
           simpleB         = new BallSimpleB(),
           calibration = new Calibration();
 
-  GenericRobot robot = new TurretBot();
+  GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
@@ -228,7 +228,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    robot.setTurretPitchPosition(0);
+    turretPitch = 0;
     turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     hang = false;
     countHang = 0;
@@ -335,6 +335,12 @@ public class Robot extends TimedRobot {
           turretPower = 0.0;
         }
       }
+      if (joystick.getRawButtonPressed(5)){
+          turretPIDController.reset();
+      }
+      if (joystick.getRawButton(5)){
+          turretPower = -turretPIDController.calculate(robot.getAlternateTurretAngle()-45);
+      }
       /////////////////////////////////////////////////////TURRET CONTROL ENDS
 
 
@@ -384,7 +390,7 @@ public class Robot extends TimedRobot {
 
       ///////////////////////////////////////////////////////////ACTUATOR STUFF
 
-      double deadzone = 0.1;
+      double deadzone = 0.5;
       double rJoyRY = xbox.getRawAxis(5);
       if (rJoyRY > -deadzone && rJoyRY < deadzone) rJoyRY = 0;
 
