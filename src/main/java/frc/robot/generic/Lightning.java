@@ -100,17 +100,17 @@ public class Lightning implements GenericRobot {
         elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
         elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
 
-        shooterAPIDController.setP(9.0e-4);
-        shooterAPIDController.setI(0);
-        shooterAPIDController.setD(2.5e-1);
-        shooterAPIDController.setFF(1.67e-4);
+        shooterAPIDController.setP(5.0e-4);
+        shooterAPIDController.setI(5.0e-7);
+        shooterAPIDController.setD(5.0e-1);
+        shooterAPIDController.setFF(1.7e-4);
         shooterAPIDController.getIZone(500);
         shooterAPIDController.getDFilter(0);
 
-        shooterBPIDController.setP(9.0e-4);
-        shooterBPIDController.setI(0);
-        shooterBPIDController.setD(2.5e-1);
-        shooterBPIDController.setFF(1.67e-4);
+        shooterBPIDController.setP(5.0e-4);
+        shooterBPIDController.setI(5.0e-7);
+        shooterBPIDController.setD(5.0e-1);
+        shooterBPIDController.setFF(1.7e-4);
         shooterBPIDController.getIZone(500);
         shooterBPIDController.getDFilter(0);
 

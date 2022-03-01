@@ -11,8 +11,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.command.*;
+import frc.robot.generic.Falcon;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
+import frc.robot.generic.TurretBot;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -33,7 +35,7 @@ public class Robot extends TimedRobot {
           simpleB         = new BallSimpleB(),
           calibration = new Calibration();
 
-  GenericRobot robot = new Lightning();
+  GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
@@ -48,7 +50,7 @@ public class Robot extends TimedRobot {
   double average;
   double turretPower;
   boolean hang = false;
-  int count = 0;
+  int countHang = 0;
   boolean reset = true;
   double maxCurrentLeftA = 0;
   double maxCurrentLeftB = 0;
@@ -207,7 +209,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("leftArmEncoder", robot.armHeightLeft());
 
     SmartDashboard.putBoolean("hang", hang);
-    SmartDashboard.putNumber("count", count);
+    SmartDashboard.putNumber("count", countHang);
 
     SmartDashboard.putNumber("CommandStep", command.commandStep);
 
@@ -229,7 +231,7 @@ public class Robot extends TimedRobot {
     robot.setTurretPitchPosition(0);
     turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     hang = false;
-    count = 0;
+    countHang = 0;
   }
 
   @Override
@@ -256,12 +258,11 @@ public class Robot extends TimedRobot {
         break;
     }
 
-    //note to self: buttons currently assume mirrored joystick setting
     if (joystick.getRawButtonPressed(8)) {
-      count = (count + 1) % 2;
+      countHang = (countHang + 1) % 2;
     }
 
-    if (count == 1) {
+    if (countHang == 1) {
       hang = true;
     } else {
       hang = false;
@@ -272,19 +273,41 @@ public class Robot extends TimedRobot {
 
       //////////////////////////////////////////////////DRIVETRAIN CONTROL
 
-      joystickX = joystick.getX();
-      joystickY = -joystick.getY();
-
-      if (joystickY > -cutoff && joystickY < cutoff) {
-        joystickY = 0;
-      }
-      if (joystickX > -cutoff && joystickX < cutoff) {
-        joystickX = 0;
-      }
-
       if (!robot.getPTOState()) {
-        driveLeft = (joystickY + joystickX) * scaleFactor;
-        driveRight = (joystickY - joystickX) * scaleFactor;
+
+        if(joystick.getRawButton(1)){
+          driveLeft = 1;
+          driveRight = 1;
+        }
+        else if(joystick.getRawButton(2)){
+          driveLeft = -1;
+          driveRight = -1;
+        }
+        else if(joystick.getRawButton(3)){
+          //pivot left
+          driveLeft = -1;
+          driveRight = 1;
+        }
+        else if(joystick.getRawButton(4)){
+          //pivot right
+          driveLeft = 1;
+          driveRight = -1;
+        }
+        else{
+          joystickX = joystick.getX();
+          joystickY = -joystick.getY();
+
+          if (joystickY > -cutoff && joystickY < cutoff) {
+            joystickY = 0;
+          }
+          if (joystickX > -cutoff && joystickX < cutoff) {
+            joystickX = 0;
+          }
+
+          driveLeft = (joystickY + joystickX) * scaleFactor;
+          driveRight = (joystickY - joystickX) * scaleFactor;
+        }
+
       }
 
       //////////////////////////////////////////////DRIVETRAIN CONTROL ENDS
@@ -411,9 +434,9 @@ public class Robot extends TimedRobot {
 
       /* Some code for setting up the collector after flight check. */
       double flightCheckTol = 5.0;
-      double storagePosition = 315;
+      double storagePosition = 312;
       
-      if (joystick.getRawButton(10)) {
+      if (joystick.getRawButton(13)) {
         if (robot.getAlternateTurretAngle()>storagePosition+flightCheckTol)
         {
           turretPower = 0.4;
@@ -428,10 +451,14 @@ public class Robot extends TimedRobot {
         }
       }
 
-      if (joystick.getRawButton(11) & joystick.getRawButton(12) &
-              (Math.abs(robot.getAlternateTurretAngleDegrees()-storagePosition)<flightCheckTol) )
+      if (joystick.getRawButton(11) && joystick.getRawButton(12) &&
+              (Math.abs(robot.getAlternateTurretAngle()-storagePosition)<flightCheckTol) )
       {
         robot.raiseCollector();
+      }
+
+      if (joystick.getRawButton(16)){
+        robot.lowerCollector();
       }
 
 
@@ -472,7 +499,7 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
     joystick.getRawButtonPressed(8);
     hang = false;
-    count = 0;
+    countHang = 0;
     if (joystick.getRawButton(1)) {
       robot.resetAttitude();
       robot.resetEncoders();

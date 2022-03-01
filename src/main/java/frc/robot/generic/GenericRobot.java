@@ -233,9 +233,7 @@ public interface GenericRobot {
 	public default double getAlternateTurretAngle(){
 		return 0;
 	}
-	public default double getAlternateTurretAngleDegrees(){
-		return getAlternateTurretAngle()/encoderTurretTicksPerDegree();
-	}
+
 
 
 	public default void setTurretAngleRelative(double angleChange){
