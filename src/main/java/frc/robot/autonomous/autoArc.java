@@ -103,7 +103,7 @@ public class autoArc extends GenericAutonomous {
                 }
                 break;
             case 2:
-                if (robot.canShoot()){
+                if (robot.canShoot() && robot.isTargetFound() &&(-5<average) && (average < 5)){
                     startingTime = System.currentTimeMillis();
                     robot.setActivelyShooting(true);
                     autonomousStep += 1.0;
