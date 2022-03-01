@@ -15,8 +15,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
 
     double leftpower;
     double rightpower;
-    double defaultPower = .4;
-    double defaultTurnPower = .4;
+    double defaultPower = .5;
     double correction;
     boolean time = false;
 
@@ -31,10 +30,6 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
 
     int averageTurretXSize = 2;
     double[] averageTurretX = new double [averageTurretXSize];
-    double turretx;
-    double turrety;
-    double turretarea;
-    double turretv;
     int counter = 0;
 
     double shooterTargetRPM;
@@ -43,7 +38,6 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
     double indexerPct;
     double collectorPct;
 
-    //TurretTracker tracker = new TurretTracker();
 
 
     boolean initialTurretSpin = true;
@@ -60,23 +54,36 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
         PIDPivot = new PIDController(robot.getPIDpivotP(), robot.getPIDpivotI(), robot.getPIDpivotD());
         PIDTurret = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
 
-        //tracker.turretInit(robot);
 
     }
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-        NetworkTableEntry tx = table.getEntry("tx");
-        NetworkTableEntry ty = table.getEntry("ty");
-        NetworkTableEntry ta = table.getEntry("ta");
-        NetworkTableEntry tv = table.getEntry("tv");
 
-        turretx = tx.getDouble(0.0);
-        turrety = ty.getDouble(0.0);
-        turretarea = ta.getDouble(0.0);
-        turretv = tv.getDouble(0.0);
-        //tracker.turretUpdate(robot);
+        if(robot.isTargetFound()) {
+            averageTurretX[counter % averageTurretXSize] = robot.getTargetX();
+            counter++;
+        }
+
+        double average = 0;
+        for(double i: averageTurretX){
+            average += i;
+        }
+        average /= averageTurretXSize;
+
+        double currentTurretPower = 0;
+
+        if(robot.isTargetFound()){
+            currentTurretPower = PIDTurret.calculate(average);
+        }else{
+            PIDTurret.reset();
+        }
+        if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 2000)) {
+            currentTurretPower = .2;
+        }
+        robot.setTurretPowerPct(currentTurretPower);
+
+
 
 
 
@@ -84,7 +91,13 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
         if (autonomousStep >= 1){
             robot.getCargo();
             robot.shoot();
+        }
+        if (autonomousStep >= 1 && autonomousStep <=10){
             robot.setTurretPitchPosition(.38);
+        }
+        else{
+            robot.setCollectorIntakePercentage(0);
+            robot.setTurretPowerPct(0);
         }
         switch(autonomousStep){
             case 0: //reset
@@ -128,14 +141,14 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 time = false;
                 break;
             case 3: //create a target shooter value and see if shooter reaches it.
-                if (robot.canShoot()){
+                if (robot.isTargetFound() && robot.canShoot() && (-5 < average) && (average< 5)){
                     robot.setActivelyShooting(true);
                     startTime = System.currentTimeMillis();
                     autonomousStep += 1;
                 }
                 break;
             case 4: //turn the shooter off
-                if (System.currentTimeMillis() - startTime >= 1000){
+                if (System.currentTimeMillis() - startTime >= 2000){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1;
                 }
@@ -221,7 +234,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 }
                 break;
             case 11: //shoot part 2
-                if (System.currentTimeMillis() - startTime >= 250){
+                if (System.currentTimeMillis() - startTime >= 1000){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1.0;
                 }
@@ -233,30 +246,6 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
         }
         robot.drivePercent(leftpower, rightpower);
 
-        //If turret works set value of averageTurretX[] to turretx
-        if(turretv !=0 ) {
-            averageTurretX[counter % averageTurretXSize] = turretx;
-            counter++;
-        }
 
-        double average = 0;
-        for(double i: averageTurretX){
-            average += i;
-        }
-        average /= averageTurretXSize;
-
-        double currentTurretPower = 0;
-
-        if(turretv !=0){
-            currentTurretPower = PIDTurret.calculate(average);
-        }else{
-            PIDTurret.reset();
-        }
-        if((turretv == 0) && (System.currentTimeMillis() - startTime < 2000)) {
-            currentTurretPower = .2;
-        }
-        robot.setTurretPowerPct(currentTurretPower);
-
-        //tracker.turretMove(robot);
     }
 }

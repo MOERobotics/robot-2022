@@ -66,8 +66,10 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
         //////////AUTO TRACK STUFF
 
 
-        robot.getCargo();
-        robot.shoot();
+        if (autonomousStep >= 1){
+            robot.getCargo();
+            robot.shoot();
+        }
         if (autonomousStep >= 1 && autonomousStep <=10){
             robot.setTurretPitchPosition(.38);
         }
@@ -181,7 +183,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 }
                 break;
             case 10:
-                if (System.currentTimeMillis() - startTime >= 251){
+                if (System.currentTimeMillis() - startTime >= 500){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1;
                 }

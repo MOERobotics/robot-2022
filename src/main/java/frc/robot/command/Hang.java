@@ -256,7 +256,7 @@ public class Hang extends GenericCommand{
                     break;
                 case 3:  ///////////unlock rotation piston to send arms back
                     robot.setArmsBackward();
-                    if (System.currentTimeMillis() - startingTime >= 500) {
+                    if (System.currentTimeMillis() - startingTime >= 1000) {
                         commandStep = 11;
                     }
                     break;
@@ -405,7 +405,7 @@ public class Hang extends GenericCommand{
                     }
                 case 16://///////once in contact move arms back again with the piston and swiiiiing
                     robot.setArmsBackward();
-                    if (System.currentTimeMillis() - startingTime >= 500) {
+                    if (System.currentTimeMillis() - startingTime >= 1000) {
                         commandStep += 1;//TODO:change back
                     }
                     break;
