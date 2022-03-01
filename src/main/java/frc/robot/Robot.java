@@ -164,8 +164,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Vision target angle", robot.getTargetAngle());
     SmartDashboard.putNumber("Vision target dist", robot.getTargetDistance());
 
-    SmartDashboard.putNumber("Turret direction angle ticks", robot.getTurretAngle());
-    SmartDashboard.putNumber("Turret direction angle degrees", robot.getTurretAngleDegrees());
+    //SmartDashboard.putNumber("Turret direction angle ticks", robot.getTurretAngle());
+    //SmartDashboard.putNumber("Turret direction angle degrees", robot.getTurretAngleDegrees());
     SmartDashboard.putNumber("Alternate turret angle degrees", robot.getAlternateTurretAngle());
 
     SmartDashboard.putNumber("Turret direction motor pct", robot.getTurretPowerPct());
