@@ -49,6 +49,8 @@ public class Hang extends GenericCommand{
     boolean rightArrived = false;
     double startHeightLeft = 0;
     double startHeightRight = 0;
+    double turretPower = 0;
+    PIDController turretPIDController;
 
 
     public void begin(GenericRobot robot){
@@ -59,6 +61,7 @@ public class Hang extends GenericCommand{
         lTraveled = 0;
         fwd = 49.5;
         PIDSteering = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
+        turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
         tapeAlign = true;
         firstTime = true;
     }
@@ -79,11 +82,23 @@ public class Hang extends GenericCommand{
 
 
         if (tapeAlign) {
+            /*if (commandStep > -1) {
 
+                if ((robot.getAlternateTurretAngle() <48) && (robot.getAlternateTurretAngle() > 42)){
+                    turretPower = 0;
+                    robot.raiseCollector();
+                }
+                else{
+                    turretPower = -turretPIDController.calculate(robot.getAlternateTurretAngle() - 45);
+                }
+            }
+            robot.setTurretPowerPct(turretPower);*/
+            robot.raiseCollector();
             switch (commandStep) { /////////////tapeAlign Code
                 case -1:
                     robot.resetEncoders();
                     robot.resetAttitude();
+                    turretPIDController.disableContinuousInput();
 
                     if (System.currentTimeMillis() >= startingTime + 100) {
                         commandStep += 1;
@@ -190,7 +205,7 @@ public class Hang extends GenericCommand{
                     robot.resetEncoders();
                     countLeft = 0;
                     countRight = 0;
-                    if (System.currentTimeMillis() - startingTime >= 50){
+                    if (System.currentTimeMillis() - startingTime >= 5000){
                         commandStep = 2; ///TODO: fix numbering
                     }
 
@@ -241,7 +256,7 @@ public class Hang extends GenericCommand{
                     break;
                 case 3:  ///////////unlock rotation piston to send arms back
                     robot.setArmsBackward();
-                    if (System.currentTimeMillis() - startingTime >= 500) {
+                    if (System.currentTimeMillis() - startingTime >= 1000) {
                         commandStep = 11;
                     }
                     break;
@@ -297,12 +312,7 @@ public class Hang extends GenericCommand{
                         leftArmPower = 0;
                         rightArmPower = 0;
                         //TODO: change
-                        if (!firstTime){
-                            commandStep = 19;
-                        }
-                        else {
-                            commandStep = 30;
-                        }
+                        commandStep = 30;
                         leftArrived = false;
                         rightArrived = false;
                         startHeightLeft = robot.armHeightLeft();
@@ -395,7 +405,7 @@ public class Hang extends GenericCommand{
                     }
                 case 16://///////once in contact move arms back again with the piston and swiiiiing
                     robot.setArmsBackward();
-                    if (System.currentTimeMillis() - startingTime >= 500) {
+                    if (System.currentTimeMillis() - startingTime >= 1000) {
                         commandStep += 1;//TODO:change back
                     }
                     break;
@@ -452,7 +462,7 @@ public class Hang extends GenericCommand{
                         rightArrived = false;
                         commandStep += 1;
                     }
-
+                    break;
                 case 19: ////////now we are done. If all goes well, we are on the traversal rung, if not, we no longer have a robot >;(
                     leftArmPower = 0;
                     rightArmPower = 0;
