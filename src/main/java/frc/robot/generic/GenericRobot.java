@@ -12,6 +12,10 @@ public interface GenericRobot {
 	NetworkTableEntry ta = table.getEntry("ta");
 	NetworkTableEntry tv = table.getEntry("tv");
 
+	public default void setPipeline(int id)
+	{
+		table.getEntry("pipeline").setNumber(id);
+	}
 
 	public void drivePercent(
 		double leftPercent,
