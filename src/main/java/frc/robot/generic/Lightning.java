@@ -102,15 +102,15 @@ public class Lightning implements GenericRobot {
         shooterAPIDController.setI(0);
         shooterAPIDController.setD(2.5e-1);
         shooterAPIDController.setFF(1.67e-4);
-        shooterAPIDController.getIZone(500);
-        shooterAPIDController.getDFilter(0);
+        shooterAPIDController.setIZone(500);
+        shooterAPIDController.setDFilter(0);
 
         shooterBPIDController.setP(2.5e-4);
         shooterBPIDController.setI(0);
         shooterBPIDController.setD(2.5e-1);
         shooterBPIDController.setFF(1.67e-4);
-        shooterBPIDController.getIZone(500);
-        shooterBPIDController.getDFilter(0);
+        shooterBPIDController.setIZone(500);
+        shooterBPIDController.setDFilter(0);
 
         shootReadyTimer = System.currentTimeMillis();
 
