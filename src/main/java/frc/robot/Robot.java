@@ -269,22 +269,22 @@ public class Robot extends TimedRobot {
       if (!robot.getPTOState()) {
 
         if(joystick.getRawButton(1)){
-          driveLeft = 1;
-          driveRight = 1;
+          driveLeft = 0.5;
+          driveRight = 0.5;
         }
         else if(joystick.getRawButton(2)){
-          driveLeft = -1;
-          driveRight = -1;
+          driveLeft = -0.5;
+          driveRight = -0.5;
         }
         else if(joystick.getRawButton(3)){
           //pivot left
-          driveLeft = -1;
-          driveRight = 1;
+          driveLeft = -0.25;
+          driveRight = 0.25;
         }
         else if(joystick.getRawButton(4)){
           //pivot right
-          driveLeft = 1;
-          driveRight = -1;
+          driveLeft = 0.25;
+          driveRight = -0.25;
         }
         else{
           joystickX = joystick.getX();
