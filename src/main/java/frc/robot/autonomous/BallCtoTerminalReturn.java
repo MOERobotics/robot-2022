@@ -20,7 +20,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
     boolean time = false;
 
     double distanceC = 47.9;
-    double distanceTerminal = 251;
+    double distanceTerminal = 225;
     double angleC = 82.74;
     double rampDownDist = 10;
 
@@ -40,7 +40,6 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
 
 
 
-    boolean initialTurretSpin = true;
     @Override
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
@@ -78,8 +77,11 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
         }else{
             PIDTurret.reset();
         }
-        if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 2000)) {
-            currentTurretPower = .2;
+
+        if (autonomousStep < 4){
+            if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 2000)) {
+                currentTurretPower = .2;
+            }
         }
         robot.setTurretPowerPct(currentTurretPower);
 
@@ -108,7 +110,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 PIDDriveStraight.enableContinuousInput(-180,180);
                 robot.resetEncoders();
                 robot.resetAttitude();
-                if (System.currentTimeMillis() - startTime > 100){
+                if (System.currentTimeMillis() - startTime > 1000){
                     autonomousStep += 1;
                     startingYaw = robot.getYaw();
                     startDistance = robot.getDriveDistanceInchesLeft();

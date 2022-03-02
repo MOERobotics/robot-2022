@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = BTerminalReturn;
+  GenericAutonomous autonomous = CTerminalReturn;
 
 
   int averageTurretXSize = 2;
@@ -440,7 +440,7 @@ public class Robot extends TimedRobot {
 
       /* Some code for setting up the collector after flight check. */
       double flightCheckTol = 5.0;
-      double storagePosition = 312;
+      double storagePosition = 317;
       
       if (joystick.getRawButton(13)) {
         if (robot.getAlternateTurretAngle()>storagePosition+flightCheckTol)
