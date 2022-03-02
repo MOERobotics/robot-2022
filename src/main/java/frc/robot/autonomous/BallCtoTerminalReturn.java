@@ -114,7 +114,6 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                     startDistance = robot.getDriveDistanceInchesLeft();
                 }
                 break;
-
             case 1: //drive to ball C
                 collectorPct = 1;
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
