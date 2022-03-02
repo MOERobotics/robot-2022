@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball A, closest ball to the scoring table, and driving to the ball at terminal
+//Setup: Line the robot straight on the tape facing ball A
 public class BallAtoTerminalReturn extends GenericAutonomous {
     double startingYaw;
     double startTime;
@@ -17,6 +18,13 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
     boolean time = false;
     boolean readyToShoot = false;
     double shooterTargetRPM;
+
+    int averageTurretXSize = 2;
+    double[] averageTurretX = new double [averageTurretXSize];
+    int counter = 0;
+
+    double indexerPct;
+    double collectorPct;
 
     double distanceA = 44.2;
     double distanceTerminal = 259.26;
@@ -37,17 +45,48 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
         PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDpivotD());
         PIDPivot = new PIDController(robot.getPIDpivotP(), robot.getPIDpivotI(), robot.getPIDpivotD());
         tracker.turretInit(robot);
+        robot.setPipeline(0);
     }
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
-        tracker.turretUpdate(robot);
+        double currentTurretPower = 0;
+        double average = 0;
+
+        if(robot.isTargetFound()) {
+            averageTurretX[counter % averageTurretXSize] = robot.getTargetX();
+            counter++;
+        }
+        for(double i: averageTurretX){
+            average += i;
+        }
+        average /= averageTurretXSize;
+
+        if (autonomousStep < 4){
+            if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
+                currentTurretPower = .3;
+            }
+        }
+        if ((autonomousStep>=4) && (autonomousStep < 8)){
+            if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
+                currentTurretPower = -.2;
+            }
+        }
+        robot.setTurretPowerPct(currentTurretPower);
 
         if (autonomousStep >= 1){
             robot.getCargo();
             robot.shoot();
-            robot.setTurretPitchPosition(.38);
         }
+        if (autonomousStep >= 1 && autonomousStep <=10){
+            robot.setTurretPitchPosition(.38);
+        } else{
+            robot.setCollectorIntakePercentage(0);
+            robot.setTurretPowerPct(0);
+        }
+
+        tracker.turretUpdate(robot);
+
         switch(autonomousStep){
             case 0: //reset
                 robot.lowerCollector();
@@ -57,13 +96,14 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
                 PIDPivot.enableContinuousInput(-180,180);
                 robot.resetEncoders();
                 robot.resetAttitude();
-                if (System.currentTimeMillis() - startTime > 100){
+                if (System.currentTimeMillis() - startTime > 500){
                     autonomousStep += 1;
                     startingYaw = robot.getYaw();
                     startDistance = robot.getDriveDistanceInchesLeft();
                 }
                 break;
             case 1: //drive to ball A
+                collectorPct = 1;
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
@@ -83,30 +123,34 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
             case 2: //stop
                 leftpower = 0;
                 rightpower = 0;
-                if (System.currentTimeMillis() - startTime > 1000){
-                    autonomousStep += 1;
-                }
+                startDistance = robot.getDriveDistanceInchesLeft();
+                autonomousStep += 1;
+                time = false;
                 break;
             case 3: //shoot the ball if target is found
-                if (robot.canShoot()){
+                if (robot.isTargetFound() && robot.canShoot() && (-5 < average) && (average< 5)){
                     robot.setActivelyShooting(true);
                     startTime = System.currentTimeMillis();
                     autonomousStep += 1;
                 }
                 break;
             case 4: //turn shooter off
-                if (System.currentTimeMillis()-startTime >= 1000){
+                if (System.currentTimeMillis()-startTime >= 2000){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1;
                 }
                 break;
             case 5: //reset
-                autonomousStep += 1;
+                PIDDriveStraight.reset();
+                PIDDriveStraight.enableContinuousInput(-180,180);
+                startDistance = robot.getDriveDistanceInchesLeft();
+                autonomousStep +=1;
                 break;
             case 6: //turn to go to ball @ terminal
                 correction = PIDPivot.calculate(-angleA + robot.getYaw() - startingYaw);
                 leftpower = correction;
                 rightpower = -correction;
+                robot.setPipeline(1);
                 //turning right
                 if (Math.abs(Math.abs(robot.getYaw() - startingYaw)-angleA) <= 1.5){
                     if (!time){
@@ -127,8 +171,7 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
                     startTime = System.currentTimeMillis();
                 }
                 break;
-            case 7: //drive towards the ball
-                //SKIPPED RIGHT NOW
+            case 7: //drive towards Ball Terminal
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
@@ -142,20 +185,20 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal) {
                     autonomousStep += 1;
-                    leftpower = 0;
-                    rightpower = 0;
+                    startDistance = robot.getDriveDistanceInchesLeft();
+                    startTime = System.currentTimeMillis();
                 }
                 break;
-            case 8:
+            case 8: //collect ball at Terminal
                 leftpower = 0;
                 rightpower = 0;
-                startDistance = robot.getDriveDistanceInchesLeft();
                 autonomousStep += 1;
+                robot.setPipeline(0);
             case 9: // drive back
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
-                leftpower = -defaultPower + correction;
-                rightpower = -defaultPower - correction;
+                leftpower = -1*(defaultPower + correction);
+                rightpower = -1*(defaultPower - correction);
 
                 if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal - rampDownDist){
                     double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist,
@@ -177,7 +220,7 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
                 }
                 break;
             case 11: //turn shooter off
-                if (System.currentTimeMillis()-startTime >= 250){
+                if (System.currentTimeMillis()-startTime >= 1000){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1;
                 }
@@ -189,6 +232,5 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
         }
         robot.drivePercent(leftpower, rightpower);
         tracker.turretMove(robot);
-
     }
 }

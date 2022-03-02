@@ -210,7 +210,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 autonomousStep += 1;
                 robot.setPipeline(0);
                 break;
-            case 9: //Drive forward a better shooting position
+            case 9: //Drive back to Ball C
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = -1*(defaultPower - correction);
@@ -247,7 +247,5 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 break;
         }
         robot.drivePercent(leftpower, rightpower);
-
-
     }
 }
