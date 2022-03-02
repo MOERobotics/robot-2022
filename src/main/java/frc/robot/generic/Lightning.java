@@ -325,6 +325,14 @@ public class Lightning implements GenericRobot {
     }
 
     //Measured range 0.042 - 2.68
+
+    /*
+    Offset is to set the turret encoder origin.  It is the difference between a desired turret angle and the actual one.
+    Sample calculation:
+      Point the turret straight forward which is supposed to be 045.
+      Read the Alternate Turret Angle Degrees on the smart dashboard.  Suppose it reads "52.5"
+      Offset = 52.5-45 = 12.5
+     */
     @Override
     public double getAlternateTurretAngle(){
         double raw = encoderTurretAlt.getPosition();
