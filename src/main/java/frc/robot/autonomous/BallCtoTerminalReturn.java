@@ -15,7 +15,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
 
     double leftpower;
     double rightpower;
-    double defaultPower = .5;
+    double defaultPower = .6;
     double correction;
     boolean time = false;
 
@@ -79,7 +79,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
 
         if (autonomousStep < 4){
             if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
-                currentTurretPower = .2;
+                currentTurretPower = .3;
             }
         }
         if ((autonomousStep>=4) && (autonomousStep < 8)){
@@ -109,7 +109,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 PIDDriveStraight.enableContinuousInput(-180,180);
                 robot.resetEncoders();
                 robot.resetAttitude();
-                if (System.currentTimeMillis() - startTime > 1000){
+                if (System.currentTimeMillis() - startTime > 500){
                     autonomousStep += 1;
                     startingYaw = robot.getYaw();
                     startDistance = robot.getDriveDistanceInchesLeft();
