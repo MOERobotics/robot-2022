@@ -412,6 +412,7 @@ public class Robot extends TimedRobot {
       //button 2 = bottom center button
       if (xbox.getRawButton(2)) {
         if (!robot.getUpperCargo()) {
+          //consumes ball
           curCollector = defCollectorPower;
           curIndexer = defIndexerPower;
         } else {
@@ -426,6 +427,7 @@ public class Robot extends TimedRobot {
           curIndexer = defIndexerPower;
         }
       } else if (xbox.getRawButton(4)) {
+        //barfs out ball
         curCollector = -defCollectorPower;
         curIndexer = -defIndexerPower;
       } else {
