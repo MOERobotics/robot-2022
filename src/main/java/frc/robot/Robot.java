@@ -51,6 +51,8 @@ public class Robot extends TimedRobot {
   double turretPower;
   boolean hang = false;
   int countHang = 0;
+  int countShoot = 0;
+  boolean shoot = false;
   boolean reset = true;
   double maxCurrentLeftA = 0;
   double maxCurrentLeftB = 0;
@@ -71,7 +73,6 @@ public class Robot extends TimedRobot {
   double defaultClimbPower = 0.2;
 
   double shooterTargetRPM = 0;
-  double pitchChange = 0;
 
   double defCollectorPower = 1;
   double defIndexerPower = 1;
@@ -228,10 +229,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    shoot = false;
+    countShoot = 0;
     turretPitch = 0;
     turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     hang = false;
     countHang = 0;
+    xbox.getRawButtonPressed(3);
   }
 
   @Override
@@ -245,16 +249,16 @@ public class Robot extends TimedRobot {
         turretPitch = 0.38;
         break;
       case EAST:
-        targetRPM = 4000;
-        turretPitch = 0.00;
+        targetRPM = 2000;
+        turretPitch = 0.8;
         break;
       case SOUTH: ////CLOSE SHOT
-        targetRPM = 3500;
-        turretPitch = 0.12;
+        targetRPM = 3400;
+        turretPitch = 0.00;
         break;
       case WEST:
-        targetRPM = 5500;
-        turretPitch = 0.00;
+        targetRPM = 3700;
+        turretPitch = 0.1;
         break;
     }
 
@@ -270,6 +274,7 @@ public class Robot extends TimedRobot {
 
     if (!hang) {
       reset = true;
+      robot.turnOffPTO();
 
       //////////////////////////////////////////////////DRIVETRAIN CONTROL
 
@@ -364,7 +369,16 @@ public class Robot extends TimedRobot {
 
       //////////////////////////////////////////////////////////SHOOTER CODE BEGINS
 
-      if (xbox.getRawButton(3)) {
+      if (xbox.getRawButtonPressed(3)) {
+        countShoot = (countShoot + 1) % 2;
+      }
+      if (countShoot == 0){
+        shoot = false;
+      }
+      else{
+        shoot = true;
+      }
+      if (shoot){
         shooterTargetRPM = targetRPM;
       } else {
         shooterTargetRPM = 0;
@@ -505,6 +519,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    xbox.getRawButtonPressed(3);
     joystick.getRawButtonPressed(8);
     hang = false;
     countHang = 0;

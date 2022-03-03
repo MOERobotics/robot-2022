@@ -34,7 +34,7 @@ public class Lightning implements GenericRobot {
     //TODO: update servo ports
     //servo left was initially set to channel 9, don't know if that means anything
     Servo       elevationLeft     = new Servo(9);
-    Servo       elevationRight     = new Servo(1);
+    Servo       elevationRight     = new Servo(8);
 
 
     RelativeEncoder encoderRightA  = rightMotorA.getEncoder();
@@ -94,8 +94,10 @@ public class Lightning implements GenericRobot {
 
         indexer.setInverted(true);
         collector.setInverted(false);
-        shooterB.setInverted(false);
+        //shooterB.setInverted(false);
         shooterA.setInverted(true);
+
+        shooterB.follow(shooterA, true);
 
         elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
         elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
@@ -107,12 +109,12 @@ public class Lightning implements GenericRobot {
         shooterAPIDController.getIZone(500);
         shooterAPIDController.getDFilter(0);
 
-        shooterBPIDController.setP(5.0e-4);
+        /*shooterBPIDController.setP(5.0e-4);
         shooterBPIDController.setI(5.0e-7);
         shooterBPIDController.setD(5.0e-1);
         shooterBPIDController.setFF(1.7e-4);
         shooterBPIDController.getIZone(500);
-        shooterBPIDController.getDFilter(0);
+        shooterBPIDController.getDFilter(0);*/
 
         shootReadyTimer = System.currentTimeMillis();
 
@@ -223,12 +225,12 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double getPitch() {
-        return navx.getPitch();
+        return navx.getRoll();
     }
 
     @Override
     public double getRoll() {
-        return navx.getRoll();
+        return -navx.getPitch();
     }
 
     @Override
@@ -337,7 +339,7 @@ public class Lightning implements GenericRobot {
     public double getAlternateTurretAngle(){
         double raw = encoderTurretAlt.getPosition();
         double out;
-        double offset = 185-45;
+        double offset = 185-45+30;
         out = (raw *  136.467) - 5.73 - offset;
         if (out>360)
         {
@@ -436,12 +438,17 @@ public class Lightning implements GenericRobot {
     @Override
     public void setShooterRPM(double topRPM, double bottomRPM) {
         setShooterRPMTop(topRPM);
-        setShooterRPMBottom(bottomRPM);
+        //setShooterRPMBottom(bottomRPM);
     }
 
     @Override
     public void setShooterRPMTop(double rpm) {
+        if (rpm < 10){
+            shooterA.set(0);
+        }
+        else{
         shooterAPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
+        }
     }
 
     @Override

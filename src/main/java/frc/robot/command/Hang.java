@@ -50,6 +50,9 @@ public class Hang extends GenericCommand{
     double startHeightLeft = 0;
     double startHeightRight = 0;
     double turretPower = 0;
+    double level = 7;
+    double leveltol = 2;
+
     PIDController turretPIDController;
 
 
@@ -82,7 +85,7 @@ public class Hang extends GenericCommand{
 
 
         if (tapeAlign) {
-            /*if (commandStep > -1) {
+            if (commandStep > -1) {
 
                 if ((robot.getAlternateTurretAngle() <48) && (robot.getAlternateTurretAngle() > 42)){
                     turretPower = 0;
@@ -92,7 +95,7 @@ public class Hang extends GenericCommand{
                     turretPower = -turretPIDController.calculate(robot.getAlternateTurretAngle() - 45);
                 }
             }
-            robot.setTurretPowerPct(turretPower);*/
+            robot.setTurretPowerPct(turretPower);
             robot.raiseCollector();
             switch (commandStep) { /////////////tapeAlign Code
                 case -1:
@@ -256,7 +259,7 @@ public class Hang extends GenericCommand{
                     break;
                 case 3:  ///////////unlock rotation piston to send arms back
                     robot.setArmsBackward();
-                    if (System.currentTimeMillis() - startingTime >= 1000) {
+                    if (System.currentTimeMillis() - startingTime >= 3000) {
                         commandStep = 11;
                     }
                     break;
@@ -405,7 +408,7 @@ public class Hang extends GenericCommand{
                     }
                 case 16://///////once in contact move arms back again with the piston and swiiiiing
                     robot.setArmsBackward();
-                    if (System.currentTimeMillis() - startingTime >= 1000) {
+                    if (System.currentTimeMillis() - startingTime >= 3000) {
                         commandStep += 1;//TODO:change back
                     }
                     break;
@@ -470,6 +473,12 @@ public class Hang extends GenericCommand{
 
 
             }
+        if (robot.getRoll() - level > leveltol){
+            rightArmPower *= .8;
+        }
+        if (robot.getRoll() - level < - leveltol){
+            leftArmPower *= .8;
+        }
         robot.armPower(leftArmPower, rightArmPower);
         }
     }
