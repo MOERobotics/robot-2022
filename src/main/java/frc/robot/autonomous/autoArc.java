@@ -32,11 +32,10 @@ public class autoArc extends GenericAutonomous {
     boolean time = false;
     int counter;
     double[] averageX = new double [2];
-    double currentTurretPower = 0;
-    double average;
     int averageTurretXSize = 2;
     boolean breakRobot = false;
     boolean startTimer = false;
+    boolean collect = false;
 
     @Override
     public void autonomousInit(GenericRobot robot) {
@@ -60,13 +59,55 @@ public class autoArc extends GenericAutonomous {
         autonomousStep = 0;
         time = false;
         counter = 0;
+        collect = false;
+        robot.setPipeline(0);
     }
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
 
+        if(robot.isTargetFound()) {
+            averageX[counter % averageTurretXSize] = robot.getTargetX();
+            counter++;
+        }
+
+        double average = 0;
+        for(double i: averageX){
+            average += i;
+        }
+        average /= averageTurretXSize;
+
+        double currentTurretPower = 0;
+
+        if(robot.isTargetFound()){
+            currentTurretPower = turretPIDController.calculate(average);
+        }else{
+            turretPIDController.reset();
+        }
+
+
+        if((!robot.isTargetFound()) && (System.currentTimeMillis() - startingTime < 5000)) {
+            currentTurretPower = .3;
+        }
+        if ((autonomousStep>=4) && (autonomousStep < 8)){
+            if((!robot.isTargetFound()) && (System.currentTimeMillis() - startingTime < 5000)) {
+                currentTurretPower = -.2;
+            }
+        }
+
+        robot.setTurretPowerPct(currentTurretPower);
+
+
         if (autonomousStep >= 1){
-            robot.getCargo();
+            if (autonomousStep <= 4){
+                robot.getCargo();
+            }
+            else if (!collect){
+                robot.setCollectorIntakePercentage(-1);
+            }
+            else{
+                robot.getCargo();
+            }
             robot.shoot();
             robot.setTurretPitchPosition(.38);
         }
@@ -92,7 +133,7 @@ public class autoArc extends GenericAutonomous {
                 leftPower = defaultPower + correction;
                 rightPower = defaultPower - correction;
                 if (currentDistInches - startInches >= rollout-rampDownDist){ //slowdown
-                    double a = rampDown(defaultPower, 0, startInches, rampDownDist, currentDistInches, rollout);
+                    double a = rampDown(defaultPower, 0.1, startInches, rampDownDist, currentDistInches, rollout);
                     leftPower = a;
                     rightPower = a;
                 }
@@ -111,8 +152,7 @@ public class autoArc extends GenericAutonomous {
                 break;
             case 3:
                 if (System.currentTimeMillis() - startingTime >= 1000){
-                    robot.setActivelyShooting(true);
-                    robot.setShooterTargetRPM(500); //super low power to yeet out undesirable cargo
+                    robot.setActivelyShooting(false);
                     autonomousStep += 1;
                 }
                 break;
@@ -126,7 +166,7 @@ public class autoArc extends GenericAutonomous {
                     breakRobot = true;
                 }
 
-                if (Math.abs(Math.abs(currentYaw - startYaw)-pivotDeg) <= 1.5){
+                if (Math.abs(Math.abs(currentYaw - startYaw)-pivotDeg) <= 2){
                     if (!time){
                         startingTime = System.currentTimeMillis();
                         time = true;
@@ -167,8 +207,7 @@ public class autoArc extends GenericAutonomous {
                     autonomousStep += 1;
                 }
                 if (currentDistInches - startInches >= outerArcDist - 24){
-                    robot.setShooterTargetRPM(5000); //set it back to where we want
-                    robot.setActivelyShooting(false);
+                    collect = true;
                 }
                 break;
 
@@ -187,27 +226,7 @@ public class autoArc extends GenericAutonomous {
         }
         robot.drivePercent(leftPower, rightPower);
 
-        if(robot.isTargetFound()) {
-            averageX[counter % averageTurretXSize] = robot.getTargetX();
-            counter++;
-        }
 
-        average = 0;
-        for(double i: averageX){
-            average += i;
-        }
-        average /= averageTurretXSize;
-
-        currentTurretPower = 0;
-        if(robot.isTargetFound()){
-            currentTurretPower = turretPIDController.calculate(average);
-        }else{
-            turretPIDController.reset();
-        }
-        if((!robot.isTargetFound()) && (System.currentTimeMillis() - startingTime < 2000)) {
-            currentTurretPower = .2;
-        }
-        robot.setTurretPowerPct(currentTurretPower);
 
     }
 

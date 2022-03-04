@@ -43,8 +43,8 @@ public class Hang extends GenericCommand{
     int countRight = 0;
     double leftArmPower = 0;
     double rightArmPower = 0;
-    double defaultClimbPowerUp = .5;
-    double defaultClimbPowerDown = -.5;
+    double defaultClimbPowerUp = .75;
+    double defaultClimbPowerDown = -.75;
     boolean leftArrived = false;
     boolean rightArrived = false;
     double startHeightLeft = 0;
@@ -209,14 +209,15 @@ public class Hang extends GenericCommand{
                     countLeft = 0;
                     countRight = 0;
                     if (System.currentTimeMillis() - startingTime >= 5000){
+                        SmartDashboard.putNumber("driveOutputCurrent", robot.getDriveCurrent());
                         commandStep = 2; ///TODO: fix numbering
                     }
 
                     break;
-                case 1:  ///////////unlock rotation piston to send arms forward
+                /*case 1:  ///////////unlock rotation piston to send arms forward
                     robot.setArmsForward(); //TODO: skip step
                     commandStep += 1;
-                    break;
+                    break;*/
                 case 2: //////raise climber arms (skip 10 steps after in case we need to scoot/scoot
 
                     if (!robot.getClimbSensorLeft() && countLeft == 0){
@@ -259,7 +260,7 @@ public class Hang extends GenericCommand{
                     break;
                 case 3:  ///////////unlock rotation piston to send arms back
                     robot.setArmsBackward();
-                    if (System.currentTimeMillis() - startingTime >= 3000) {
+                    if (System.currentTimeMillis() - startingTime >= 1000) {
                         commandStep = 11;
                     }
                     break;
@@ -315,7 +316,7 @@ public class Hang extends GenericCommand{
                         leftArmPower = 0;
                         rightArmPower = 0;
                         //TODO: change
-                        commandStep = 30;
+                        commandStep += 1;
                         leftArrived = false;
                         rightArrived = false;
                         startHeightLeft = robot.armHeightLeft();
@@ -324,11 +325,7 @@ public class Hang extends GenericCommand{
 
                     }
                     break;
-                case 30: //delay :)TODO:change
-                    if (System.currentTimeMillis() - startingTime >= 5000){
-                        commandStep = 12;
-                    }
-                    break;
+
                 case 12:  /////////////raise arms slightly
                     if (Math.abs(robot.armHeightLeft()-startHeightLeft) >= escapeHeight){
                         leftArmPower = 0;
@@ -408,7 +405,7 @@ public class Hang extends GenericCommand{
                     }
                 case 16://///////once in contact move arms back again with the piston and swiiiiing
                     robot.setArmsBackward();
-                    if (System.currentTimeMillis() - startingTime >= 3000) {
+                    if (System.currentTimeMillis() - startingTime >= 1000) {
                         commandStep += 1;//TODO:change back
                     }
                     break;
@@ -478,6 +475,10 @@ public class Hang extends GenericCommand{
         }
         if (robot.getRoll() - level < - leveltol){
             leftArmPower *= .8;
+        }
+        if (Math.abs(robot.getRoll()-level) >= 3*leveltol){
+            rightArmPower = 0;
+            leftArmPower = 0;
         }
         robot.armPower(leftArmPower, rightArmPower);
         }

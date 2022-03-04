@@ -83,6 +83,7 @@ public class Robot extends TimedRobot {
   double turretPitch = 0;
 
 
+
   PIDController turretPIDController;
 
 
@@ -120,8 +121,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("RightACurrentMax", maxCurrentRightA);
     SmartDashboard.putNumber("RightBCurrentMax", maxCurrentRightB);
 
-    SmartDashboard.putNumber("LimelightX", robot.getTargetX());
-    SmartDashboard.putNumber("LimelightY", robot.getTargetY());
+    //SmartDashboard.putNumber("LimelightX", robot.getTargetX());
+    //SmartDashboard.putNumber("LimelightY", robot.getTargetY());
     SmartDashboard.putNumber("LimelightArea", robot.getTargetArea());
 
     SmartDashboard.putNumber("Drive left pct", robot.getDriveLeftPercentage());
@@ -172,7 +173,7 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Turret direction motor pct", robot.getTurretPowerPct());
 
-    SmartDashboard.putNumber("Turret direction motor pct", robot.getTurretPowerPct());
+    //SmartDashboard.putNumber("Turret direction motor pct", robot.getTurretPowerPct());
 
     SmartDashboard.putNumber("Turret pitch position", robot.getTurretPitchPosition());
     SmartDashboard.putNumber("Turret pitch motor pct", robot.getTurretPitchPowerPct());
@@ -253,12 +254,12 @@ public class Robot extends TimedRobot {
         targetRPM = 2000;
         turretPitch = 0.8;
         break;
-      case SOUTH: ////CLOSE SHOT
+      case SOUTH: ////CLOSE SHOT--> collector out
         targetRPM = 3400;
         turretPitch = 0.00;
         break;
       case WEST:
-        targetRPM = 3700;
+        targetRPM = 3700; //////////collector facing
         turretPitch = 0.1;
         break;
     }

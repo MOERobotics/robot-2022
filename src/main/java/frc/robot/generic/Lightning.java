@@ -684,4 +684,9 @@ public class Lightning implements GenericRobot {
     public void setActivelyShooting(boolean isShooting){
         isActivelyShooting = isShooting;
     }
+
+    @Override
+    public double getDriveCurrent(){
+        return leftMotorA.getOutputCurrent();
+    }
 }

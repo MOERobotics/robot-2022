@@ -430,6 +430,9 @@ public interface GenericRobot {
 		//System.out.println("I don't have a climber");
 	}
 
+	public default double getDriveCurrent(){
+		return 0.0;
+	}
 
 
 }
