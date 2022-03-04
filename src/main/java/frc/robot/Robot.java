@@ -82,6 +82,8 @@ public class Robot extends TimedRobot {
   double targetRPM = 0;
   double turretPitch = 0;
 
+  boolean turnTo45 = false;
+  boolean turnTo225 = false;
 
 
   PIDController turretPIDController;
@@ -238,6 +240,8 @@ public class Robot extends TimedRobot {
     hang = false;
     countHang = 0;
     xbox.getRawButtonPressed(3);
+    turnTo45 = false;
+    turnTo225 = false;
   }
 
   @Override
@@ -257,10 +261,14 @@ public class Robot extends TimedRobot {
       case SOUTH: ////CLOSE SHOT--> collector out
         targetRPM = 3400;
         turretPitch = 0.00;
+        turnTo225 = true;
+        turnTo45 = false;
         break;
       case WEST:
         targetRPM = 3700; //////////collector facing
         turretPitch = 0.1;
+        turnTo45 = true;
+        turnTo225 = false;
         break;
     }
 
@@ -330,24 +338,33 @@ public class Robot extends TimedRobot {
         average += averageX[i];
       average /= averageTurretXSize;
 
-      if ((xbox.getRawAxis(2) > 0.10) & robot.isTargetFound()) { ////////////AUTO-AIM
+      if ((xbox.getRawAxis(2) > 0.10) && robot.isTargetFound()) { ////////////AUTO-AIM
         turretPower = turretPIDController.calculate(average);
-      } else {
+        turnTo45 = false;
+        turnTo225 = false;
+      }
+      else if(turnTo45) {
+        turretPower = -turretPIDController.calculate(robot.getAlternateTurretAngle()-45);
+      }
+      else if (turnTo225){
+        turretPower = -turretPIDController.calculate(robot.getAlternateTurretAngle()-225);
+      }
+      else {
         turretPIDController.reset();
         if (xbox.getRawButton(6)) {
           turretPower = -0.45;
+          turnTo45 = false;
+          turnTo225 = false;
         } else if (xbox.getRawButton(5)) {
           turretPower = 0.45;
+          turnTo45 = false;
+          turnTo225 = false;
         } else {
           turretPower = 0.0;
         }
       }
-      if (joystick.getRawButtonPressed(5)){
-          turretPIDController.reset();
-      }
-      if (joystick.getRawButton(5)){
-          turretPower = -turretPIDController.calculate(robot.getAlternateTurretAngle()-45);
-      }
+
+
       /////////////////////////////////////////////////////TURRET CONTROL ENDS
 
 

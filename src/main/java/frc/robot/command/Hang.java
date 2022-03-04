@@ -61,6 +61,10 @@ public class Hang extends GenericCommand{
         commandStep = -1;
         leftSensor = false;
         rightSensor = false;
+        leftArmPower = 0;
+        rightArmPower = 0;
+        leftPower = 0;
+        rightPower = 0;
         lTraveled = 0;
         fwd = 49.5;
         PIDSteering = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
@@ -206,6 +210,8 @@ public class Hang extends GenericCommand{
                     //reset encoders
                     robot.turnOnPTO();
                     robot.resetEncoders();
+                    leftArmPower = 0;
+                    rightArmPower = 0;
                     countLeft = 0;
                     countRight = 0;
                     if (System.currentTimeMillis() - startingTime >= 5000){
