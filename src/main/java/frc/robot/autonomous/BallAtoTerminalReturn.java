@@ -67,7 +67,7 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
         }
         if ((autonomousStep>=4) && (autonomousStep < 10)){
             if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
-                currentTurretPower = -.2;
+                currentTurretPower = .2;
             }
         }
 

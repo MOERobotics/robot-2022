@@ -268,7 +268,7 @@ public class Lightning implements GenericRobot {
     public void shoot(){
         double shooterRPM = defaultShooterTargetRPM;
         setShooterRPM(shooterRPM, shooterRPM);
-        if (getShooterRPMTop() >= (shooterRPM-100) && getShooterRPMBottom() >= (shooterRPM-100)){
+        if (getShooterRPMTop() >= (shooterRPM-300) && getShooterRPMBottom() >= (shooterRPM-300)){
             canShoot = true;
         }
         else{
@@ -680,12 +680,7 @@ public class Lightning implements GenericRobot {
     //TODO: Add check using isReadyToShoot() function?
     @Override
     public boolean isReadyToShoot(){
-        if (Math.abs(getShooterRPMTop() -attemptedRPM) <= 300){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return true;
     }
 
     @Override
