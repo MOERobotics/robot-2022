@@ -16,7 +16,7 @@ public class HangWithoutAlign extends GenericCommand{
     double startDistance;
     double differenceDistance;
 
-    double sensorDist = 12.0;
+    double sensorDist = 21.0;
     double Tapetheta = 0;
 
     double correction;
@@ -29,11 +29,11 @@ public class HangWithoutAlign extends GenericCommand{
 
     double lTraveled;
 
-    double fwd = 71.6;
+    double fwd = 49.5;
     PIDController PIDSteering;
     boolean tapeAlign;
 
-    /////^^^^^^^^^^^Stuff for tapeAlign
+    /////^^^^^^^^^^^Stuff for tapeAlign/
 
 
     //////////////Now the real stuff
@@ -43,12 +43,17 @@ public class HangWithoutAlign extends GenericCommand{
     int countRight = 0;
     double leftArmPower = 0;
     double rightArmPower = 0;
-    double defaultClimbPowerUp = -.5;
-    double defaultClimbPowerDown = .5;
+    double defaultClimbPowerUp = .75;
+    double defaultClimbPowerDown = -.75;
     boolean leftArrived = false;
     boolean rightArrived = false;
     double startHeightLeft = 0;
     double startHeightRight = 0;
+    double turretPower = 0;
+    double level = 7;
+    double leveltol = 2;
+
+    PIDController turretPIDController;
 
 
     public void begin(GenericRobot robot){
@@ -56,31 +61,26 @@ public class HangWithoutAlign extends GenericCommand{
         commandStep = -1;
         leftSensor = false;
         rightSensor = false;
+        leftArmPower = 0;
+        rightArmPower = 0;
+        leftPower = 0;
+        rightPower = 0;
         lTraveled = 0;
-        fwd = 71.6;
+        fwd = 49.5;
         PIDSteering = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
+        turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
         tapeAlign = true;
         firstTime = true;
     }
 
     public void step(GenericRobot robot){
-        SmartDashboard.putNumber("tapetheta", Tapetheta);
-        SmartDashboard.putNumber("ltraveled", lTraveled);
-        SmartDashboard.putNumber("fwd", fwd);
-        SmartDashboard.putNumber("leftEncoderRaw", robot.encoderTicksLeftDriveA());
-        SmartDashboard.putNumber("rightEncoderRaw", robot.encoderTicksRightDriveA());
-        SmartDashboard.putBoolean("leftTapeSensor", robot.getFloorSensorLeft());
-        SmartDashboard.putBoolean("rightTapeSensor", robot.getFloorSensorRight());
-        SmartDashboard.putBoolean("leftCLimberSensor", robot.getClimbSensorLeft());
-        SmartDashboard.putBoolean("rightClimberSensor", robot.getClimbSensorRight());
+
         SmartDashboard.putNumber("countLeft", countLeft);
         SmartDashboard.putNumber("countRight", countRight);
         SmartDashboard.putNumber("startDistance", startDistance);
 
 
-        //////////////////////////start the real stuff now
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        switch (commandStep){
+    switch (commandStep){
             case -1:
                 commandStep += 1;
                 break;
@@ -88,17 +88,20 @@ public class HangWithoutAlign extends GenericCommand{
                 //reset encoders
                 robot.turnOnPTO();
                 robot.resetEncoders();
+                leftArmPower = 0;
+                rightArmPower = 0;
                 countLeft = 0;
                 countRight = 0;
-                if (System.currentTimeMillis() - startingTime >= 50){
-                    commandStep += 1;
+                if (System.currentTimeMillis() - startingTime >= 5000){
+                    SmartDashboard.putNumber("driveOutputCurrent", robot.getDriveCurrent());
+                    commandStep = 2; ///TODO: fix numbering
                 }
 
                 break;
-            case 1:  ///////////unlock rotation piston to send arms forward
-                robot.setArmsForward();
+            /*case 1:  ///////////unlock rotation piston to send arms forward
+                robot.setArmsForward(); //TODO: skip step
                 commandStep += 1;
-                break;
+                break;*/
             case 2: //////raise climber arms (skip 10 steps after in case we need to scoot/scoot
 
                 if (!robot.getClimbSensorLeft() && countLeft == 0){
@@ -133,14 +136,17 @@ public class HangWithoutAlign extends GenericCommand{
                     countRight = 0;
                     leftArmPower = 0;
                     rightArmPower = 0;
+                    startingTime = System.currentTimeMillis();
                     commandStep += 1;
 
                 }
 
                 break;
-            case 3:  ///////////unlock rotation piston to send arms forward
+            case 3:  ///////////unlock rotation piston to send arms back
                 robot.setArmsBackward();
-                commandStep = 11;
+                if (System.currentTimeMillis() - startingTime >= 1000) {
+                    commandStep = 11;
+                }
                 break;
             /*case 2: //////disable PTO
                 robot.turnOffPTO();
@@ -193,7 +199,8 @@ public class HangWithoutAlign extends GenericCommand{
                     countLeft = 0;
                     leftArmPower = 0;
                     rightArmPower = 0;
-                    commandStep = 30;
+                    //TODO: change
+                    commandStep += 1;
                     leftArrived = false;
                     rightArrived = false;
                     startHeightLeft = robot.armHeightLeft();
@@ -202,11 +209,7 @@ public class HangWithoutAlign extends GenericCommand{
 
                 }
                 break;
-            case 30: //delay :)TODO:change
-                if (System.currentTimeMillis() - startingTime >= 5000){
-                    commandStep = 12;
-                }
-                break;
+
             case 12:  /////////////raise arms slightly
                 if (Math.abs(robot.armHeightLeft()-startHeightLeft) >= escapeHeight){
                     leftArmPower = 0;
@@ -267,6 +270,7 @@ public class HangWithoutAlign extends GenericCommand{
                     rightArmPower = 0;
                     leftArmPower = 0;
                     commandStep = 16; //////////skip over step 15
+                    startingTime = System.currentTimeMillis();
                 }
                 break;
             case 15:///change to check with pitch and roll
@@ -285,7 +289,9 @@ public class HangWithoutAlign extends GenericCommand{
                 }
             case 16://///////once in contact move arms back again with the piston and swiiiiing
                 robot.setArmsBackward();
-                commandStep += 1;
+                if (System.currentTimeMillis() - startingTime >= 1000) {
+                    commandStep += 1;//TODO:change back
+                }
                 break;
             case 17://////////go back to case 11 and repeat down to this step
                 if (firstTime){
@@ -340,13 +346,23 @@ public class HangWithoutAlign extends GenericCommand{
                     rightArrived = false;
                     commandStep += 1;
                 }
-
+                break;
             case 19: ////////now we are done. If all goes well, we are on the traversal rung, if not, we no longer have a robot >;(
                 leftArmPower = 0;
                 rightArmPower = 0;
                 break;
 
 
+        }
+        if (robot.getRoll() - level > leveltol){
+            rightArmPower *= .8;
+        }
+        if (robot.getRoll() - level < - leveltol){
+            leftArmPower *= .8;
+        }
+        if (Math.abs(robot.getRoll()-level) >= 3*leveltol){
+            rightArmPower = 0;
+            leftArmPower = 0;
         }
         robot.armPower(leftArmPower, rightArmPower);
     }

@@ -23,9 +23,6 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
     double[] averageTurretX = new double [averageTurretXSize];
     int counter = 0;
 
-    double indexerPct;
-    double collectorPct;
-
     double distanceA = 44.2;
     double distanceTerminal = 259.26;
     double angleA = 88.74;
@@ -33,8 +30,7 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
 
     PIDController PIDDriveStraight;
     PIDController PIDPivot;
-    TurretTracker tracker = new TurretTracker();
-
+    PIDController turretPIDController;
     @Override
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
@@ -44,7 +40,7 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
         readyToShoot = false;
         PIDDriveStraight = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDpivotD());
         PIDPivot = new PIDController(robot.getPIDpivotP(), robot.getPIDpivotI(), robot.getPIDpivotD());
-        tracker.turretInit(robot);
+        turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
         robot.setPipeline(0);
     }
 
@@ -62,17 +58,19 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
         }
         average /= averageTurretXSize;
 
+        currentTurretPower = turretPIDController.calculate(average);
+
         if (autonomousStep < 4){
             if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
                 currentTurretPower = .3;
             }
         }
-        if ((autonomousStep>=4) && (autonomousStep < 8)){
+        if ((autonomousStep>=4) && (autonomousStep < 10)){
             if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
                 currentTurretPower = -.2;
             }
         }
-        robot.setTurretPowerPct(currentTurretPower);
+
 
         if (autonomousStep >= 1){
             robot.getCargo();
@@ -82,10 +80,10 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
             robot.setTurretPitchPosition(.38);
         } else{
             robot.setCollectorIntakePercentage(0);
-            robot.setTurretPowerPct(0);
+            currentTurretPower = 0;
         }
 
-        tracker.turretUpdate(robot);
+        robot.setTurretPowerPct(currentTurretPower);
 
         switch(autonomousStep){
             case 0: //reset
@@ -103,7 +101,7 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
                 }
                 break;
             case 1: //drive to ball A
-                collectorPct = 1;
+
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
@@ -231,6 +229,5 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
                 break;
         }
         robot.drivePercent(leftpower, rightpower);
-        tracker.turretMove(robot);
     }
 }

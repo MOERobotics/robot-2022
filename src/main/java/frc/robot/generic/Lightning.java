@@ -77,6 +77,8 @@ public class Lightning implements GenericRobot {
     //shootReadyTimer is used to check if shooter ready
     long shootReadyTimer;
 
+    double attemptedRPM = 0;
+
     public Lightning(){
         boolean invertLeft = false;
         boolean invertRight = true;
@@ -266,7 +268,7 @@ public class Lightning implements GenericRobot {
     public void shoot(){
         double shooterRPM = defaultShooterTargetRPM;
         setShooterRPM(shooterRPM, shooterRPM);
-        if (getShooterRPMTop() >= (shooterRPM-300) && getShooterRPMBottom() >= (shooterRPM-300)){
+        if (getShooterRPMTop() >= (shooterRPM-100) && getShooterRPMBottom() >= (shooterRPM-100)){
             canShoot = true;
         }
         else{
@@ -339,7 +341,7 @@ public class Lightning implements GenericRobot {
     public double getAlternateTurretAngle(){
         double raw = encoderTurretAlt.getPosition();
         double out;
-        double offset = 185-45+30;
+        double offset = 185-45+30+5+163+15;
         out = (raw *  136.467) - 5.73 - offset;
         if (out>360)
         {
@@ -437,6 +439,7 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void setShooterRPM(double topRPM, double bottomRPM) {
+        attemptedRPM = topRPM;
         setShooterRPMTop(topRPM);
         //setShooterRPMBottom(bottomRPM);
     }
@@ -646,7 +649,7 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double turretPIDgetP() {
-        return 3.0e-2;
+        return 2.0e-2;
     }
 
     @Override
@@ -656,7 +659,7 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double turretPIDgetD() {
-        return 3.0e-4;
+        return 1.0e-3;
     }
 
 
@@ -677,7 +680,12 @@ public class Lightning implements GenericRobot {
     //TODO: Add check using isReadyToShoot() function?
     @Override
     public boolean isReadyToShoot(){
-        return true;
+        if (Math.abs(getShooterRPMTop() -attemptedRPM) <= 300){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     @Override

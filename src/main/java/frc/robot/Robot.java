@@ -11,10 +11,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.command.*;
-import frc.robot.generic.Falcon;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
-import frc.robot.generic.TurretBot;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -27,7 +25,7 @@ public class Robot extends TimedRobot {
   //Add new Autos here when they're authored
   public static final GenericAutonomous
           autoArc = new autoArc(),
-          simpleATerminal = new BallAtoTerminal(),
+          ATerminalReturn = new BallAtoTerminalReturn(),
           simpleBTerminal = new BallBtoTerminal(),
           simpleCTerminal = new BallCtoTerminal(),
           CTerminalReturn = new BallCtoTerminalReturn(),
@@ -40,6 +38,7 @@ public class Robot extends TimedRobot {
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
   GenericAutonomous autonomous = CTerminalReturn;
+  GenericCommand testHang = new HangWithoutAlign();
 
 
   int averageTurretXSize = 2;
@@ -85,6 +84,8 @@ public class Robot extends TimedRobot {
   boolean turnTo45 = false;
   boolean turnTo225 = false;
 
+  boolean isShooting = false;
+
 
   PIDController turretPIDController;
 
@@ -97,6 +98,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+
+    if (countShoot == 0){
+      isShooting = false;
+    }
+    else{
+      isShooting = robot.isReadyToShoot();
+    }
 
     if (robot.getLeftACurrent() > maxCurrentLeftA) {
       maxCurrentLeftA = robot.getLeftACurrent();
@@ -218,6 +226,8 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("CommandStep", command.commandStep);
 
+    SmartDashboard.putBoolean("Robot is Shooting?", isShooting);
+
 
   }
 
@@ -265,7 +275,7 @@ public class Robot extends TimedRobot {
         turnTo45 = false;
         break;
       case WEST:
-        targetRPM = 3700; //////////collector facing
+        targetRPM = 3600; //////////collector facing
         turretPitch = 0.1;
         turnTo45 = true;
         turnTo225 = false;
@@ -339,16 +349,12 @@ public class Robot extends TimedRobot {
       average /= averageTurretXSize;
 
       if ((xbox.getRawAxis(2) > 0.10) && robot.isTargetFound()) { ////////////AUTO-AIM
-        turretPower = turretPIDController.calculate(average);
         turnTo45 = false;
         turnTo225 = false;
+        turretPower = turretPIDController.calculate(average);
+
       }
-      else if(turnTo45) {
-        turretPower = -turretPIDController.calculate(robot.getAlternateTurretAngle()-45);
-      }
-      else if (turnTo225){
-        turretPower = -turretPIDController.calculate(robot.getAlternateTurretAngle()-225);
-      }
+
       else {
         turretPIDController.reset();
         if (xbox.getRawButton(6)) {
@@ -359,7 +365,14 @@ public class Robot extends TimedRobot {
           turretPower = 0.45;
           turnTo45 = false;
           turnTo225 = false;
-        } else {
+        }
+        else if(turnTo45) {
+            turretPower = -turretPIDController.calculate(robot.getAlternateTurretAngle()-45);
+          }
+        else if (turnTo225){
+            turretPower = -turretPIDController.calculate(robot.getAlternateTurretAngle()-225);
+        }
+        else {
           turretPower = 0.0;
         }
       }
@@ -548,11 +561,9 @@ public class Robot extends TimedRobot {
     }
 
     if (joystick.getRawButton(4)) autonomous = autoArc;
-    if (joystick.getRawButton(5)) autonomous = simpleATerminal;
-    if (joystick.getRawButton(6)) autonomous = simpleBTerminal;
-    if (joystick.getRawButton(7)) autonomous = simpleCTerminal;
+    if (joystick.getRawButton(5)) autonomous = ATerminalReturn;
+    if (joystick.getRawButton(6)) autonomous = BTerminalReturn;
     if (joystick.getRawButton(9)) autonomous = CTerminalReturn;
-    if (joystick.getRawButton(11)) autonomous = simpleB;
 
   }
 
@@ -659,6 +670,27 @@ public class Robot extends TimedRobot {
 
     if (joystick.getRawButton(5)) robot.setArmsForward();
     if (joystick.getRawButton(10)) robot.setArmsBackward();
+
+    if (joystick.getRawButtonPressed(4)){
+      countHang = (countHang + 1) % 2;
+    }
+
+    if (countHang == 1) {
+      hang = true;
+    } else {
+      hang = false;
+    }
+
+    if (hang){
+      if (reset) {
+        testHang.begin(robot);
+        reset = false;
+      }
+      testHang.step(robot);
+    }
+    else{
+      reset = true;
+    }
 
 
   }
