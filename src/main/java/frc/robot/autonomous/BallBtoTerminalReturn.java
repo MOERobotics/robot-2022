@@ -17,7 +17,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
     double correction;
 
     double distanceB = 61.5;
-    double distanceTerminal = 154.6;
+    double distanceTerminal = 142.6;
     double rampDownDist = 10;
 
     PIDController PIDTurret;
@@ -69,6 +69,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
         if (autonomousStep >= 1){
             robot.getCargo();
             robot.shoot();
+            robot.setShooterTargetRPM(3700);
         }
         if (autonomousStep >= 1 && autonomousStep <=10){
             robot.setTurretPitchPosition(.38);

@@ -100,7 +100,6 @@ public class Hang extends GenericCommand{
                 }
             }
             robot.setTurretPowerPct(turretPower);
-            robot.raiseCollector();
             switch (commandStep) { /////////////tapeAlign Code
                 case -1:
                     robot.resetEncoders();
@@ -214,7 +213,7 @@ public class Hang extends GenericCommand{
                     rightArmPower = 0;
                     countLeft = 0;
                     countRight = 0;
-                    if (System.currentTimeMillis() - startingTime >= 5000){
+                    if (System.currentTimeMillis() - startingTime >= 2000){
                         SmartDashboard.putNumber("driveOutputCurrent", robot.getDriveCurrent());
                         commandStep = 2; ///TODO: fix numbering
                     }
@@ -482,10 +481,10 @@ public class Hang extends GenericCommand{
         if (robot.getRoll() - level < - leveltol){
             leftArmPower *= .8;
         }
-        if (Math.abs(robot.getRoll()-level) >= 3*leveltol){
+        /*if (Math.abs(robot.getRoll()-level) >= 3*leveltol){
             rightArmPower = 0;
             leftArmPower = 0;
-        }
+        }*/
         robot.armPower(leftArmPower, rightArmPower);
         }
     }

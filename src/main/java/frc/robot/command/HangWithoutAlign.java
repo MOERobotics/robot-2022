@@ -360,10 +360,7 @@ public class HangWithoutAlign extends GenericCommand{
         if (robot.getRoll() - level < - leveltol){
             leftArmPower *= .8;
         }
-        if (Math.abs(robot.getRoll()-level) >= 3*leveltol){
-            rightArmPower = 0;
-            leftArmPower = 0;
-        }
+
         robot.armPower(leftArmPower, rightArmPower);
     }
 

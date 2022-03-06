@@ -31,7 +31,8 @@ public class Robot extends TimedRobot {
           CTerminalReturn = new BallCtoTerminalReturn(),
           BTerminalReturn = new BallBtoTerminalReturn(),
           simpleB         = new BallSimpleB(),
-          calibration = new Calibration();
+          calibration = new Calibration(),
+          shortRun = new ShortRun();
 
   GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
@@ -564,11 +565,13 @@ public class Robot extends TimedRobot {
     if (joystick.getRawButton(5)) autonomous = ATerminalReturn;
     if (joystick.getRawButton(6)) autonomous = BTerminalReturn;
     if (joystick.getRawButton(9)) autonomous = CTerminalReturn;
+    if (joystick.getRawButton(7)) autonomous = shortRun;
 
   }
 
   @Override
   public void testInit() {
+    joystick.getRawButtonPressed(4);
   }
 
   @Override

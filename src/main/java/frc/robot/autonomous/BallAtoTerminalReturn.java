@@ -75,6 +75,7 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
         if (autonomousStep >= 1){
             robot.getCargo();
             robot.shoot();
+            robot.setShooterTargetRPM(3700);
         }
         if (autonomousStep >= 1 && autonomousStep <=10){
             robot.setTurretPitchPosition(.38);
