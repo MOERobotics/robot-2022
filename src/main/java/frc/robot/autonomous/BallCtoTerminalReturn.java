@@ -96,7 +96,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 robot.setShooterTargetRPM(3700);
             }
             else{
-                robot.setShooterTargetRPM(3900);
+                robot.setShooterTargetRPM(4000);
             }
         }
         if (autonomousStep >= 1 && autonomousStep <=10){
@@ -115,7 +115,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 PIDDriveStraight.enableContinuousInput(-180,180);
                 robot.resetEncoders();
                 robot.resetAttitude();
-                if (System.currentTimeMillis() - startTime > 500){
+                if (System.currentTimeMillis() - startTime > 1000){
                     autonomousStep += 1;
                     startingYaw = robot.getYaw();
                     startDistance = robot.getDriveDistanceInchesLeft();
@@ -222,8 +222,8 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 leftpower = -1*(defaultPower - correction);
                 rightpower = -1*(defaultPower + correction);
 
-                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal - rampDownDist){
-                    double ramp = rampDown(defaultPower, 0, startDistance, 10,
+                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal - 20){
+                    double ramp = rampDown(defaultPower, 0.1, startDistance, 20,
                             robot.getDriveDistanceInchesLeft(), distanceTerminal);
                     leftpower = -ramp;
                     rightpower = -ramp;

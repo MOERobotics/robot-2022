@@ -490,6 +490,7 @@ public class Robot extends TimedRobot {
       /* Some code for setting up the collector after flight check. */
       double flightCheckTol = 5.0;
       double storagePosition = 317;
+      double straightAhead = 45;
       
       if (joystick.getRawButton(13)) {
         if (robot.getAlternateTurretAngle()>storagePosition+flightCheckTol)
@@ -507,7 +508,8 @@ public class Robot extends TimedRobot {
       }
 
       if (joystick.getRawButton(11) && joystick.getRawButton(12) &&
-              (Math.abs(robot.getAlternateTurretAngle()-storagePosition)<flightCheckTol) )
+              ( (Math.abs(robot.getAlternateTurretAngle()-storagePosition)<flightCheckTol) ||
+                      (Math.abs(robot.getAlternateTurretAngle()-straightAhead)<flightCheckTol)) )
       {
         robot.raiseCollector();
       }
@@ -516,6 +518,14 @@ public class Robot extends TimedRobot {
         robot.lowerCollector();
       }
 
+      //////////////MANUAL OVERRIDE
+
+      if (xbox.getRawButton(7)){
+        curIndexer = 1;
+      }
+      if (xbox.getRawButton(8)){
+        curCollector = 1;
+      }
 
       //////////////////////////////////////////////////COLLECTOR LOGIC ENDS
 
