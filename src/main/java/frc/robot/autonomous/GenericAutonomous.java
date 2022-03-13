@@ -7,7 +7,7 @@ import frc.robot.generic.GenericRobot;
 
 public abstract class GenericAutonomous {
 
-    public int autonomousStep;
+    public int autonomousStep = 0;
 
     public void autonomousInit(GenericRobot robot) {
         //System.out.println("I don't have autonomousInit in my autonomous program :'(");
@@ -19,7 +19,7 @@ public abstract class GenericAutonomous {
 
 
     public double rampDown(double startPower, double endPower, double startDistance, double rolloutDistance, double currentDist, double endDist){
-        double power = (endDist-currentDist+startDistance)*(startPower-endPower)/rolloutDistance+endPower;
+        double power = (endDist-Math.abs(currentDist-startDistance))*(startPower-endPower)/rolloutDistance+endPower;
         return power;
     }
 }

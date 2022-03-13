@@ -7,11 +7,16 @@ import edu.wpi.first.wpilibj.*;
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
 public class Lightning implements GenericRobot {
-    public static final double TICKS_PER_INCH_DRIVE = 0.96;
+    public static final double TICKS_PER_INCH_DRIVE = 0.875;
     public static final double TICKS_PER_DEGREE_TURRET = 116;
     public static final double TICKS_PER_DEGREE_TURRET2 = 136.467;
-    public static final double TICKS_PER_REVOLUTION_SHOOTERA = 116;
-    public static final double TICKS_PER_REVOLUTION_SHOOTERB = 116;
+    public static final double TICKS_PER_REVOLUTION_SHOOTERA = 1;
+    public static final double TICKS_PER_REVOLUTION_SHOOTERB = 1;
+
+    public static  final double LEFTATOLERANCE = 0;
+    public static  final double LEFTBTOLERANCE = 0;
+    public static  final double RIGHTATOLERANCE = 0;
+    public static  final double RIGHTBTOLERANCE = 0;
 
     AHRS navx = new AHRS(SPI.Port.kMXP, (byte) 50);
 
@@ -26,19 +31,26 @@ public class Lightning implements GenericRobot {
     CANSparkMax rightMotorA       = new CANSparkMax(18, kBrushless);
     CANSparkMax rightMotorB       = new CANSparkMax(19, kBrushless);
 
+    //TODO: update servo ports
+    //servo left was initially set to channel 9, don't know if that means anything
     Servo       elevationLeft     = new Servo(9);
+    Servo       elevationRight     = new Servo(8);
 
-    RelativeEncoder encoderRight  = rightMotorA.getEncoder();
-    RelativeEncoder encoderLeft   = leftMotorA.getEncoder();
+
+    RelativeEncoder encoderRightA  = rightMotorA.getEncoder();
+    RelativeEncoder encoderLeftA   = leftMotorA.getEncoder();
+    RelativeEncoder encoderRightB = rightMotorB.getEncoder();
+    RelativeEncoder encoderLeftB = leftMotorB.getEncoder();
     RelativeEncoder encoderTurret = turretRotator.getEncoder();
     SparkMaxAnalogSensor encoderTurretAlt = turretRotator.getAnalog(SparkMaxAnalogSensor.Mode.kAbsolute);
     RelativeEncoder encoderShootA = shooterA.getEncoder();
     RelativeEncoder encoderShootB = shooterB.getEncoder();
 
+
     //DigitalInput ballSensor = new DigitalInput(0);
     DoubleSolenoid PTO = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 4, 5);
     DoubleSolenoid arms = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
-    Solenoid collectorPosition = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+    DoubleSolenoid collectorPosition = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6,7);
 
     SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
     SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
@@ -54,12 +66,18 @@ public class Lightning implements GenericRobot {
     SparkMaxLimitSwitch limitSwitchLeftBForward = leftMotorB.getForwardLimitSwitch(lstype);
     SparkMaxLimitSwitch limitSwitchLeftBReverse = leftMotorB.getReverseLimitSwitch(lstype);
 
+    double defaultShooterTargetRPM = 4000;
+
     boolean isPTOonArms;
+
     //True = robot is in the process of and committed to shooting a cargo at mach 12
     boolean isActivelyShooting;
+    boolean canShoot;
 
     //shootReadyTimer is used to check if shooter ready
     long shootReadyTimer;
+
+    double attemptedRPM = 0;
 
     public Lightning(){
         boolean invertLeft = false;
@@ -69,12 +87,36 @@ public class Lightning implements GenericRobot {
         rightMotorA.setInverted(invertRight);
         rightMotorB.setInverted(invertRight);
 
+        turretRotator.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
+        leftMotorA.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        leftMotorB.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        rightMotorA.setIdleMode(CANSparkMax.IdleMode.kBrake);
+        rightMotorB.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
         indexer.setInverted(true);
         collector.setInverted(false);
-        shooterB.setInverted(false);
+        //shooterB.setInverted(false);
         shooterA.setInverted(true);
 
+        shooterB.follow(shooterA, true);
+
         elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+        elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+
+        shooterAPIDController.setP(5.0e-4);
+        shooterAPIDController.setI(5.0e-7);
+        shooterAPIDController.setD(5.0e-1);
+        shooterAPIDController.setFF(1.7e-4);
+        shooterAPIDController.getIZone(500);
+        shooterAPIDController.getDFilter(0);
+
+        /*shooterBPIDController.setP(5.0e-4);
+        shooterBPIDController.setI(5.0e-7);
+        shooterBPIDController.setD(5.0e-1);
+        shooterBPIDController.setFF(1.7e-4);
+        shooterBPIDController.getIZone(500);
+        shooterBPIDController.getDFilter(0);*/
 
         shootReadyTimer = System.currentTimeMillis();
 
@@ -83,6 +125,9 @@ public class Lightning implements GenericRobot {
 
         indexer.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
+        shooterA.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        shooterB.setIdleMode(CANSparkMax.IdleMode.kCoast);
+
         limitSwitchIndexerForward.enableLimitSwitch(false);
         limitSwitchIndexerReverse.enableLimitSwitch(false);
         limitSwitchRightAForward.enableLimitSwitch(false);
@@ -90,6 +135,10 @@ public class Lightning implements GenericRobot {
 
         limitSwitchLeftBForward.enableLimitSwitch(false);
         limitSwitchLeftBReverse.enableLimitSwitch(false);
+
+        elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+        elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+
 
     }
 
@@ -113,14 +162,33 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double getDriveLeftRPM() {
-        return encoderLeft.getVelocity()/encoderLeftDriveTicksPerInch();
+        return encoderLeftA.getVelocity()/encoderLeftDriveTicksPerInch();
     }
 
     @Override
     public double getDriveRightRPM() {
-        return encoderRight.getVelocity()/encoderRightDriveTicksPerInch();
+        return encoderRightA.getVelocity()/encoderRightDriveTicksPerInch();
     }
 
+    @Override
+    public double getLeftACurrent(){
+        return leftMotorA.getOutputCurrent();
+    }
+
+    @Override
+    public double getLeftBCurrent(){
+        return leftMotorB.getOutputCurrent();
+    }
+
+    @Override
+    public double getRightACurrent(){
+        return rightMotorA.getOutputCurrent();
+    }
+
+    @Override
+    public double getRightBCurrent(){
+        return rightMotorB.getOutputCurrent();
+    }
 
     @Override
     public double encoderLeftDriveTicksPerInch() {
@@ -133,13 +201,23 @@ public class Lightning implements GenericRobot {
     }
 
     @Override
-    public double encoderTicksLeftDrive() {
-        return encoderLeft.getPosition();
+    public double encoderTicksLeftDriveA() {
+        return encoderLeftA.getPosition();
     }
 
     @Override
-    public double encoderTicksRightDrive() {
-        return encoderRight.getPosition();
+    public double encoderTicksRightDriveA() {
+        return encoderRightA.getPosition();
+    }
+
+    @Override
+    public double encoderTicksLeftDriveB(){
+        return encoderLeftB.getPosition();
+    }
+
+    @Override
+    public double encoderTicksRightDriveB(){
+        return encoderRightB.getPosition();
     }
 
     @Override
@@ -149,12 +227,12 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double getPitch() {
-        return navx.getPitch();
+        return navx.getRoll();
     }
 
     @Override
     public double getRoll() {
-        return navx.getRoll();
+        return -navx.getPitch();
     }
 
     @Override
@@ -164,6 +242,43 @@ public class Lightning implements GenericRobot {
     @Override
     public boolean getLowerCargo() {
         return limitSwitchIndexerForward.isPressed();
+    }
+
+    @Override
+    public void getCargo(){
+        double collectorPct = 1;
+        double indexerPct = 1;
+        if (getUpperCargo()){
+            if (isActivelyShooting){
+                indexerPct = 1;
+            }
+            else{
+                indexerPct = 0;
+            }
+            if (getLowerCargo()){
+                collectorPct = 0;
+            }
+        }
+        setIndexerIntakePercentage(indexerPct);
+        setCollectorIntakePercentage(collectorPct);
+
+    }
+
+    @Override
+    public void shoot(){
+        double shooterRPM = defaultShooterTargetRPM;
+        setShooterRPM(shooterRPM, shooterRPM);
+        if (getShooterRPMTop() >= (shooterRPM-300) && getShooterRPMBottom() >= (shooterRPM-300)){
+            canShoot = true;
+        }
+        else{
+            canShoot = false;
+        }
+    }
+
+    @Override
+    public boolean canShoot(){
+        return canShoot;
     }
 
 
@@ -214,10 +329,29 @@ public class Lightning implements GenericRobot {
     }
 
     //Measured range 0.042 - 2.68
+
+    /*
+    Offset is to set the turret encoder origin.  It is the difference between a desired turret angle and the actual one.
+    Sample calculation:
+      Point the turret straight forward which is supposed to be 045.
+      Read the Alternate Turret Angle Degrees on the smart dashboard.  Suppose it reads "52.5"
+      Offset = 52.5-45 = 12.5
+     */
     @Override
     public double getAlternateTurretAngle(){
         double raw = encoderTurretAlt.getPosition();
-        return (raw *  136.467) - 5.73;
+        double out;
+        double offset = 78 + 15;
+        out = (raw *  136.467) - 5.73 - offset;
+        if (out>360)
+        {
+            out = out-360;
+        }
+        else if (out<0)
+        {
+            out = out+360;
+        }
+        return (out);
     }
 
     @Override
@@ -236,7 +370,15 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void setTurretPowerPct(double powerPct) {
-        turretRotator.set(powerPct);
+        if ( (getAlternateTurretAngle()>350) & (powerPct<0))
+        {
+            powerPct = 0;
+        }
+        if ( (getAlternateTurretAngle()<10) & (powerPct>0))
+        {
+            powerPct = 0;
+        }
+        turretRotator.set(-powerPct);
     }
 
     @Override
@@ -245,8 +387,20 @@ public class Lightning implements GenericRobot {
     }
 
     @Override
-    public void setTurretPitchPowerPct(double speed){
-        elevationLeft.setSpeed(speed);
+    public double getTurretPitchPosition(){
+
+        //TODO: getSpeed()? getPosition()? getAngle()? don't know which to use
+        return elevationLeft.get();
+    }
+    @Override
+    public void setTurretPitchPosition(double position){
+        if(position < 0) position = 0;
+        if(position > 1) position = 1;
+
+
+        //TODO: figure out use setSpeed() or set()
+        elevationLeft.set(position);
+        elevationRight.set(position);
     }
 
 
@@ -285,18 +439,24 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void setShooterRPM(double topRPM, double bottomRPM) {
+        attemptedRPM = topRPM;
         setShooterRPMTop(topRPM);
-        setShooterRPMBottom(bottomRPM);
+        //setShooterRPMBottom(bottomRPM);
     }
 
     @Override
     public void setShooterRPMTop(double rpm) {
+        if (rpm < 10){
+            shooterA.set(0);
+        }
+        else{
         shooterAPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
+        }
     }
 
     @Override
     public void setShooterRPMBottom(double rpm) {
-        shooterBPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
+        shooterBPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);//
     }
 
 
@@ -325,7 +485,12 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double getShooterTargetRPM(){
-        return 1000;
+        return defaultShooterTargetRPM;
+    }
+
+    @Override
+    public void setShooterTargetRPM(double rpm){
+        defaultShooterTargetRPM = rpm;
     }
 
     @Override
@@ -341,12 +506,12 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void raiseCollector(){
-        collectorPosition.set(true);
+        collectorPosition.set(DoubleSolenoid.Value.kForward);
     }
 
     @Override
     public void lowerCollector(){
-        collectorPosition.set(false);
+        collectorPosition.set(DoubleSolenoid.Value.kReverse);
     }
 
     //CONNECTS MOTORS TO CLIMB ARMS
@@ -378,6 +543,58 @@ public class Lightning implements GenericRobot {
     }
 
     @Override
+    public void armPower(double leftPower, double rightPower) {
+        leftMotorB.set(leftPower);
+        leftMotorA.set(leftPower);
+        rightMotorA.set(rightPower);
+        rightMotorB.set(rightPower);
+    }
+    @Override
+    public void raiseClimberArms(double rightPower, double leftPower){
+        //System.out.println("I don't have a climber");
+        armPower(leftPower, rightPower);
+    }
+    @Override
+    public void lowerClimberArms(double rightPower, double leftPower){
+        //System.out.println("I don't have a climber");
+        armPower(-leftPower, -rightPower);
+    }
+
+    @Override
+    public double armHeightLeft() {
+        //TODO: put in conversion
+        //Maybe use some sensor. Do NOT want to use encoders for this.
+        return -encoderTicksLeftDriveA()*.24937;
+    }
+
+    @Override
+    public double armHeightRight(){
+        //TODO: put in conversion
+        return -encoderTicksRightDriveA()*.24937;
+    }
+
+    @Override
+    public boolean armInContact() {
+        //TODO: find tolerances
+       /* if (leftMotorA.getOutputCurrent() > LEFTATOLERANCE && leftMotorB.getOutputCurrent() > LEFTBTOLERANCE
+                && rightMotorA.getOutputCurrent() > RIGHTATOLERANCE && rightMotorB.getOutputCurrent() > RIGHTBTOLERANCE){
+            return true;
+        }
+        else{
+            return false;
+        }*/
+        return true;
+    }
+
+
+
+    @Override
+    public boolean inTheRightPlace(){
+        //TODO: maybe a sensor??
+        return false;
+    }
+
+    @Override
     public boolean getClimbSensorLeft(){
         return limitSwitchLeftBReverse.isPressed();
     }
@@ -388,32 +605,32 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double getPIDmaneuverP() {
-        return GenericRobot.super.getPIDmaneuverP();
+        return 1.0e-2;
     }
 
     @Override
     public double getPIDmaneuverI() {
-        return GenericRobot.super.getPIDmaneuverI();
+        return 0;
     }
 
     @Override
     public double getPIDmaneuverD() {
-        return GenericRobot.super.getPIDmaneuverD();
+        return 1.0e-4;
     }
 
     @Override
     public double getPIDpivotP() {
-        return GenericRobot.super.getPIDpivotP();
+        return 1.5e-2;
     }
 
     @Override
     public double getPIDpivotI() {
-        return GenericRobot.super.getPIDpivotI();
+        return 0;
     }
 
     @Override
     public double getPIDpivotD() {
-        return GenericRobot.super.getPIDpivotD();
+        return 0;
     }
 
     @Override
@@ -429,19 +646,20 @@ public class Lightning implements GenericRobot {
         navx.reset();
     }
 
+
     @Override
     public double turretPIDgetP() {
-        return GenericRobot.super.turretPIDgetP();
+        return 2.0e-2;
     }
 
     @Override
     public double turretPIDgetI() {
-        return GenericRobot.super.turretPIDgetI();
+        return 0;
     }
 
     @Override
     public double turretPIDgetD() {
-        return GenericRobot.super.turretPIDgetD();
+        return 1.0e-3;
     }
 
 
@@ -461,7 +679,17 @@ public class Lightning implements GenericRobot {
 
     //TODO: Add check using isReadyToShoot() function?
     @Override
+    public boolean isReadyToShoot(){
+        return true;
+    }
+
+    @Override
     public void setActivelyShooting(boolean isShooting){
         isActivelyShooting = isShooting;
+    }
+
+    @Override
+    public double getDriveCurrent(){
+        return leftMotorA.getOutputCurrent();
     }
 }

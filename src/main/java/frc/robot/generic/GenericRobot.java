@@ -12,6 +12,10 @@ public interface GenericRobot {
 	NetworkTableEntry ta = table.getEntry("ta");
 	NetworkTableEntry tv = table.getEntry("tv");
 
+	public default void setPipeline(int id)
+	{
+		table.getEntry("pipeline").setNumber(id);
+	}
 
 	public void drivePercent(
 		double leftPercent,
@@ -41,11 +45,24 @@ public interface GenericRobot {
 	};
 
 	public default double getDriveDistanceInchesLeft(){
-		return encoderTicksLeftDrive()/encoderLeftDriveTicksPerInch();
+		return encoderTicksLeftDriveA()/encoderLeftDriveTicksPerInch();
 	}
 
 	public default double getDriveDistanceInchesRight(){
-		return encoderTicksRightDrive()/encoderRightDriveTicksPerInch();
+		return encoderTicksRightDriveB()/encoderRightDriveTicksPerInch();
+	}
+
+	public default double getLeftACurrent(){
+		return 0.0;
+	}
+	public default double getLeftBCurrent(){
+		return 0.0;
+	}
+	public default double getRightACurrent(){
+		return 0.0;
+	}
+	public default double getRightBCurrent(){
+		return 0.0;
 	}
 
 	public default double encoderLeftDriveTicksPerInch(){
@@ -58,13 +75,21 @@ public interface GenericRobot {
 		return 1.0;
 	}
 
-	public default double encoderTicksLeftDrive(){
+	public default double encoderTicksLeftDriveA(){
 		//System.out.println("I don't have an encoder");
 		return 0;
 	}
 
-	public default double encoderTicksRightDrive(){
+	public default double encoderTicksRightDriveA(){
 		//System.out.println("I don't have an encoder");
+		return 0;
+	}
+
+	public default double encoderTicksLeftDriveB(){
+		return 0;
+	}
+
+	public default double encoderTicksRightDriveB(){
 		return 0;
 	}
 
@@ -108,10 +133,22 @@ public interface GenericRobot {
 		System.out.println("I don't have a navx");
 	}
 
+
 	public enum TeamColor {
 		RED,
 		BLUE,
 		UNKNOWN;
+	}
+
+	public default void getCargo(){
+
+	}
+	public default void shoot(){
+
+	}
+
+	public default boolean canShoot(){
+		return false;
 	}
 
 	public default boolean getUpperCargo(){
@@ -129,7 +166,7 @@ public interface GenericRobot {
 	}
 	public default double getCollectorIntakePercentage() {
 		return 0;
-	};
+	}
 
 	public void setIndexerIntakePercentage(
 			double percentage
@@ -200,9 +237,7 @@ public interface GenericRobot {
 	public default double getAlternateTurretAngle(){
 		return 0;
 	}
-	public default double getAlternateTurretAngleDegrees(){
-		return getAlternateTurretAngle()/encoderTurretTicksPerDegree();
-	}
+
 
 
 	public default void setTurretAngleRelative(double angleChange){
@@ -219,12 +254,20 @@ public interface GenericRobot {
 		return 0;
 	}
 
+    public default double getTurretPitchPosition(){
+        return 0;
+    }
+
 	public default double getTurretPitchAngle(){
 		return 0;
 	}
 	public default double getTurretPitchPowerPct(){
 		return 0;
 	}
+
+    public default void setTurretPitchPosition(double position){
+        //System.out.println("I don't have a turret");
+    }
 
 	public default void setTurretPitchAngle(){
 		//System.out.println("I don't have a turret");
@@ -252,6 +295,8 @@ public interface GenericRobot {
 		return 0;
 	}
 	public default double getShooterTargetRPM() { return 0; }
+
+	public default void setShooterTargetRPM(double rpm){}
 
 	public default void setShooterRPM(double topRPM, double bottomRPM){
 		//System.out.println("I don't have a shooter");
@@ -305,6 +350,10 @@ public interface GenericRobot {
 		//System.out.println("I don't have a climber");
 	}
 
+	public default void armPower(double powerOne, double powerTwo){
+
+	}
+
 	//returns true if PTO set to arms, return false if PTO set to drive
 	public default boolean getPTOState(){
 		return false;
@@ -338,8 +387,12 @@ public interface GenericRobot {
 		if(error > tolerance) shooterNotReady();
 
 		//we haven't called shooterNotReady() in the last "time" milliseconds
-		if(System.currentTimeMillis() - getShootReadyTimer() > time) return true;
-		return false;
+		if(System.currentTimeMillis() - getShootReadyTimer() > time) {
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 
 	public default boolean isActivelyShooting(){
@@ -348,4 +401,38 @@ public interface GenericRobot {
 	public default void setActivelyShooting(boolean isShooting){
 
 	}
+	public default void raiseClimberArms(double rightPower, double leftPower){
+		//System.out.println("I don't have a climber");
+	}
+	public default void lowerClimberArms(double rightPower, double leftPower){
+		//System.out.println("I don't have a climber");
+	}
+	public default void armPower(double power){
+		//System.out.println("Elbow Grease");
+	}
+
+	public default double armHeightLeft(){
+		return 0.0;
+		//System.out.println("I don't have a climber");
+	}
+	public default double armHeightRight(){
+		return 0.0;
+	}
+
+
+	public default boolean armInContact(){
+		return false;
+		//System.out.println("I don't have a climber");
+	}
+
+	public default boolean inTheRightPlace(){
+		return false;
+		//System.out.println("I don't have a climber");
+	}
+
+	public default double getDriveCurrent(){
+		return 0.0;
+	}
+
+
 }

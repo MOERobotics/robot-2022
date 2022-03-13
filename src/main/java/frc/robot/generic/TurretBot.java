@@ -4,11 +4,6 @@ import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.ControlType;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
 
 import static com.revrobotics.CANSparkMax.IdleMode.kBrake;
@@ -108,12 +103,12 @@ public class TurretBot implements GenericRobot {
 
 	@Override
 	public double getDriveDistanceInchesLeft() {
-		return encoderTicksLeftDrive() / encoderLeftDriveTicksPerInch();
+		return encoderTicksLeftDriveA() / encoderLeftDriveTicksPerInch();
 	}
 
 	@Override
 	public double getDriveDistanceInchesRight() {
-		return encoderTicksRightDrive() / encoderRightDriveTicksPerInch();
+		return encoderTicksRightDriveA() / encoderRightDriveTicksPerInch();
 	}
 
 	@Override
@@ -127,12 +122,12 @@ public class TurretBot implements GenericRobot {
 	}
 
 	@Override
-	public double encoderTicksLeftDrive() {
+	public double encoderTicksLeftDriveA() {
 		return encoderLeft.getPosition();
 	}
 
 	@Override
-	public double encoderTicksRightDrive() {
+	public double encoderTicksRightDriveA() {
 		return encoderRight.getPosition();
 	}
 
