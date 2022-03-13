@@ -10,27 +10,12 @@ public class TurretTracker {
     int averageTurretXSize = 2;
     double[] averageTurretX = new double [averageTurretXSize];
     double turretx;
-    double turrety;
-    double turretarea;
     double turretv;
     int counter = 0;
     PIDController turretPIDController;
 
     public void turretInit(GenericRobot robot) {
         turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
-    }
-
-    public void turretUpdate(GenericRobot robot) {
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-        NetworkTableEntry tx = table.getEntry("tx");
-        NetworkTableEntry ty = table.getEntry("ty");
-        NetworkTableEntry ta = table.getEntry("ta");
-        NetworkTableEntry tv = table.getEntry("tv");
-
-        turretx = tx.getDouble(0.0);
-        turrety = ty.getDouble(0.0);
-        turretarea = ta.getDouble(0.0);
-        turretv = tv.getDouble(0.0);
     }
 
     public void turretMove(GenericRobot robot) {

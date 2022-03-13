@@ -8,7 +8,7 @@ import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball C, closest ball to the hangar, and driving to the ball at terminal
 //Setup: Line the robot straight between ball C and the center point of the hub
-public class BallCtoTerminalReturn extends GenericAutonomous {
+public class BallCtoTerminaltoB extends GenericAutonomous {
     double startingYaw;
     double startDistance;
     double startTime;
@@ -21,7 +21,9 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
 
     double distanceC = 47.9;
     double distanceTerminal = 219;
+    double distanceB;
     double angleC = 84.74;
+    double angleTerminal;
     double rampDownDist = 10;
 
     PIDController PIDDriveStraight;
@@ -210,16 +212,38 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                     startTime = System.currentTimeMillis();
                 }
                 break;
-            case 8: //collect Ball Terminal & stop to collect another ball from player
-                if(System.currentTimeMillis() - startTime >= 500) {
+            case 8: //collect Ball Terminal
                     leftpower = 0;
                     rightpower = 0;
                     autonomousStep += 1;
                     robot.setPipeline(0);
-                }
-                //TODO: at some point test how long we actually have to wait to collect the other ball
                 break;
-            case 9: //Drive back to Ball C
+            case 9: //Turn to Ball B
+                correction = PIDPivot.calculate(angleTerminal + robot.getYaw() - startingYaw);
+                leftpower = correction;
+                rightpower = -correction;
+                robot.setPipeline(1);
+                //turning left
+                if (Math.abs(Math.abs(robot.getYaw() - startingYaw)-angleTerminal) <= 1.5){
+                    if (!time){
+                        startTime = System.currentTimeMillis();
+                        time = true;
+                    }
+                }
+                else{
+                    startTime = System.currentTimeMillis();
+                    time = false;
+                }
+                if (System.currentTimeMillis() - startTime >= 50){
+                    leftpower = 0;
+                    rightpower = 0;
+                    autonomousStep += 1;
+                    startingYaw = -angleTerminal;
+                    startDistance = robot.getDriveDistanceInchesLeft();
+                    startTime = System.currentTimeMillis();
+                }
+                break;
+            case 10: //Drive to Ball B
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = -1*(defaultPower - correction);
@@ -237,20 +261,20 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                     autonomousStep += 1;
                 }
                 break;
-            case 10: //shoot it :)
+            case 11: //shoot it :)
                 if (robot.canShoot()){
                     robot.setActivelyShooting(true);
                     startTime = System.currentTimeMillis();
                     autonomousStep += 1.00;
                 }
                 break;
-            case 11: //shoot part 2
+            case 12: //shoot part 2
                 if (System.currentTimeMillis() - startTime >= 1000){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1.0;
                 }
                 break;
-            case 12: //End of autonomous, wait for Teleop
+            case 13: //End of autonomous, wait for Teleop
                 leftpower = 0;
                 rightpower = 0;
                 break;

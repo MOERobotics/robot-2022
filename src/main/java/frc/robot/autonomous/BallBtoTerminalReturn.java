@@ -151,13 +151,17 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                     autonomousStep += 1;
                     leftpower = 0;
                     rightpower = 0;
+                    startTime = System.currentTimeMillis();
                 }
                 break;
             case 7:
                 leftpower = 0;
                 rightpower = 0;
                 startDistance = robot.getDriveDistanceInchesLeft();
-                autonomousStep += 1.0;
+                if (System.currentTimeMillis() -startTime >= 2000){
+                    autonomousStep += 1;
+                }
+                //TODO:check timing
                 break;
             case 8:
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
