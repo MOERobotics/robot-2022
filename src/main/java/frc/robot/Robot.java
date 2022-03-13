@@ -263,22 +263,22 @@ public class Robot extends TimedRobot {
     switch (POVDirection.getDirection(xbox.getPOV())) {
       case NORTH: //MEDIUM SHOT RANGE
         targetRPM = 4000;
-        turretPitch = 0.38;
+        turretPitch = 0.5;
         break;
       case EAST:
         targetRPM = 2000;
-        turretPitch = 0.8;
+        turretPitch = 0.25;
         break;
       case SOUTH: ////CLOSE SHOT--> collector out
         targetRPM = 3400;
         turretPitch = 0.00;
-        turnTo225 = true;
+        turnTo225 = false;
         turnTo45 = false;
         break;
       case WEST:
         targetRPM = 3600; //////////collector facing
-        turretPitch = 0.1;
-        turnTo45 = true;
+        turretPitch = 0.75;
+        turnTo45 = false;
         turnTo225 = false;
         break;
     }
@@ -411,6 +411,14 @@ public class Robot extends TimedRobot {
       else{
         shoot = true;
       }
+
+      if (xbox.getRawAxis(1) < -.5){
+        targetRPM += 5;
+      }
+      else if (xbox.getRawAxis(1) > .5){
+        targetRPM -= 5;
+      }
+
       if (shoot){
         shooterTargetRPM = targetRPM;
       } else {
