@@ -25,6 +25,7 @@ public class Lightning implements GenericRobot {
     CANSparkMax turretRotator     = new CANSparkMax( 2, kBrushless);
     CANSparkMax shooterA          = new CANSparkMax( 5, kBrushless);
     CANSparkMax shooterB          = new CANSparkMax( 6, kBrushless);
+    CANSparkMax shooterC          = new CANSparkMax( 7, kBrushless);
 
     CANSparkMax leftMotorA        = new CANSparkMax(20, kBrushless);
     CANSparkMax leftMotorB        = new CANSparkMax( 1, kBrushless);
@@ -54,6 +55,7 @@ public class Lightning implements GenericRobot {
 
     SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
     SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
+    SparkMaxPIDController shooterCPIDController = shooterC.getPIDController();
 
     SparkMaxLimitSwitch.Type lstype = SparkMaxLimitSwitch.Type.kNormallyClosed;
 
@@ -98,6 +100,7 @@ public class Lightning implements GenericRobot {
         collector.setInverted(false);
         //shooterB.setInverted(false);
         shooterA.setInverted(true);
+        shooterB.setInverted(true);
 
         shooterB.follow(shooterA, true);
 
@@ -110,6 +113,13 @@ public class Lightning implements GenericRobot {
         shooterAPIDController.setFF(1.7e-4);
         shooterAPIDController.setIZone(200);
         shooterAPIDController.setDFilter(0);
+
+        shooterCPIDController.setP(3.0e-4);
+        shooterCPIDController.setI(1.0e-7);
+        shooterCPIDController.setD(9.0e-4);
+        shooterCPIDController.setFF(1.7e-4);
+        shooterCPIDController.setIZone(200);
+        shooterCPIDController.setDFilter(0);
 
         /*shooterBPIDController.setP(5.0e-4);
         shooterBPIDController.setI(5.0e-7);
@@ -441,7 +451,7 @@ public class Lightning implements GenericRobot {
     public void setShooterRPM(double topRPM, double bottomRPM) {
         attemptedRPM = topRPM;
         setShooterRPMTop(topRPM);
-        //setShooterRPMBottom(bottomRPM);
+        setShooterRPMBottom(bottomRPM/2);
     }
 
     @Override
@@ -456,8 +466,14 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void setShooterRPMBottom(double rpm) {
-        shooterBPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);//
+        if (rpm < 10){
+            shooterC.set(0);
+        }
+        else {
+            shooterCPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
+        }
     }
+
 
 
 
