@@ -12,6 +12,7 @@ public class Lightning implements GenericRobot {
     public static final double TICKS_PER_DEGREE_TURRET2 = 136.467;
     public static final double TICKS_PER_REVOLUTION_SHOOTERA = 1;
     public static final double TICKS_PER_REVOLUTION_SHOOTERB = 1;
+    public static final double TICKS_PER_REVOLUTION_SHOOTERC = 1;
 
     public static  final double LEFTATOLERANCE = 0;
     public static  final double LEFTBTOLERANCE = 0;
@@ -46,6 +47,7 @@ public class Lightning implements GenericRobot {
     SparkMaxAnalogSensor encoderTurretAlt = turretRotator.getAnalog(SparkMaxAnalogSensor.Mode.kAbsolute);
     RelativeEncoder encoderShootA = shooterA.getEncoder();
     RelativeEncoder encoderShootB = shooterB.getEncoder();
+    RelativeEncoder encoderShootC = shooterC.getEncoder();
 
 
     //DigitalInput ballSensor = new DigitalInput(0);
@@ -100,7 +102,7 @@ public class Lightning implements GenericRobot {
         collector.setInverted(false);
         //shooterB.setInverted(false);
         shooterA.setInverted(true);
-        shooterB.setInverted(true);
+        shooterC.setInverted(false);
 
         shooterB.follow(shooterA, true);
 
@@ -111,15 +113,17 @@ public class Lightning implements GenericRobot {
         shooterAPIDController.setI(1.0e-7);
         shooterAPIDController.setD(9.0e-4);
         shooterAPIDController.setFF(1.7e-4);
-        shooterAPIDController.setIZone(200);
+        shooterAPIDController.setIZone(500);
         shooterAPIDController.setDFilter(0);
+        shooterAPIDController.setOutputRange(0,1);
 
         shooterCPIDController.setP(3.0e-4);
         shooterCPIDController.setI(1.0e-7);
         shooterCPIDController.setD(9.0e-4);
         shooterCPIDController.setFF(1.7e-4);
-        shooterCPIDController.setIZone(200);
+        shooterCPIDController.setIZone(500);
         shooterCPIDController.setDFilter(0);
+        shooterCPIDController.setOutputRange(0, 1);
 
         /*shooterBPIDController.setP(5.0e-4);
         shooterBPIDController.setI(5.0e-7);
@@ -137,6 +141,7 @@ public class Lightning implements GenericRobot {
 
         shooterA.setIdleMode(CANSparkMax.IdleMode.kCoast);
         shooterB.setIdleMode(CANSparkMax.IdleMode.kCoast);
+        shooterC.setIdleMode(CANSparkMax.IdleMode.kCoast);
 
         limitSwitchIndexerForward.enableLimitSwitch(false);
         limitSwitchIndexerReverse.enableLimitSwitch(false);
@@ -425,6 +430,9 @@ public class Lightning implements GenericRobot {
     }
 
     @Override
+    public double getShooterRPMC() {return encoderShootC.getVelocity() / TICKS_PER_REVOLUTION_SHOOTERC;}
+
+    @Override
     public double getShooterPowerPctTop() {
         return shooterA.get();
     }
@@ -470,6 +478,7 @@ public class Lightning implements GenericRobot {
             shooterC.set(0);
         }
         else {
+            System.out.printf("Kevin was wrong %f\n", rpm);
             shooterCPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
         }
     }

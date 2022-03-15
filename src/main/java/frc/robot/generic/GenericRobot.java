@@ -282,6 +282,7 @@ public interface GenericRobot {
 	public default double getShooterRPMBottom(){
 		return 0;
 	}
+	public default double getShooterRPMC(){return 0;}
 	public default double getShooterPowerPctTop(){
 		return 0;
 	}

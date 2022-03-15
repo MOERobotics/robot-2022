@@ -194,6 +194,7 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Shooter top motor rpm", robot.getShooterRPMTop());
     SmartDashboard.putNumber("Shooter bottom motor rpm", robot.getShooterRPMBottom());
+    SmartDashboard.putNumber("Shooter C motor rpm", robot.getShooterRPMC());
 
     SmartDashboard.putNumber("Shooter calculate distance", robot.getShooterTargetDistance());
     SmartDashboard.putNumber("Shooter calculate height", robot.getShooterTargetHeight());
