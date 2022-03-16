@@ -151,6 +151,19 @@ public class Pixycam extends Thread {
 			PIXY_CARGO_RED,
 			PIXY_CARGO_BLUE
 		}
+
+		public String toString(){
+			return  "offset=" + (x-157) +
+					" age=" + age +
+					" id=" + id +
+					" clr=" + color +
+					" area=" + (w*h) +
+					" x=" + x +
+					" y=" + y +
+					" w=" + w +
+					" h=" + h;
+
+		}
 	}
 
 }

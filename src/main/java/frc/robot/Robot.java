@@ -13,6 +13,7 @@ import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.command.*;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
+import frc.robot.generic.Pixycam;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -89,6 +90,7 @@ public class Robot extends TimedRobot {
 
 
   PIDController turretPIDController;
+  Pixycam pixycam = new Pixycam();
 
 
   @Override
@@ -99,6 +101,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+
+    Pixycam.PixyCargo[] foundCargo = pixycam.getCargo();
+    SmartDashboard.putNumber("Nnumber of cargo on Pixy", foundCargo.length);
+    for(int i = 0; i < foundCargo.length; i++){
+      String msg = "PIXY CARGO #" + i + "; ID " + foundCargo[i].getId();
+      SmartDashboard.putString(msg, foundCargo[i].toString());
+    }
 
     if (countShoot == 0){
       isShooting = false;
