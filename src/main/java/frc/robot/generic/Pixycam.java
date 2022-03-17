@@ -9,6 +9,7 @@ import lombok.Value;
 import java.util.concurrent.Semaphore;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 
 import static io.github.pseudoresonance.pixy2api.Pixy2.*;
@@ -26,6 +27,8 @@ public class Pixycam extends Thread {
 	private final PixyCargo[] NO_CARGO = new PixyCargo[0];
 	private AtomicReference<PixyCargo[]> pixyCargos = new AtomicReference<>(NO_CARGO);
 
+	String status = "";
+
 	@Override @SneakyThrows
 	public void run() {
 		int retc = 0;
@@ -34,31 +37,38 @@ public class Pixycam extends Thread {
 		switch (retc) {
 			case PIXY_RESULT_OK:
 				//I'm happy
+				status = "PIXY INIT: Success!";
 				System.out.println("PIXY INIT: Success!");
 				break;
 			default:
 			case PIXY_RESULT_ERROR:
 				//I'm not happy
+				status = "PIXY INIT: General Error";
 				System.out.println("PIXY INIT: General Error");
 				return;
 			case PIXY_RESULT_BUSY:
 				//I'm not happy
+				status = "PIXY INIT: Busy Error";
 				System.out.println("PIXY INIT: Busy Error");
 				return;
 			case PIXY_RESULT_CHECKSUM_ERROR:
 				//I'm not happy
+				status = "PIXY INIT: Checksum Error";
 				System.out.println("PIXY INIT: Checksum Error");
 				return;
 			case PIXY_RESULT_TIMEOUT:
 				//I'm not happy
+				status = "PIXY INIT: Timeout Error";
 				System.out.println("PIXY INIT: Timeout Error");
 				return;
 			case PIXY_RESULT_BUTTON_OVERRIDE:
 				//I'm not happy
+				status = "PIXY INIT: Button Override Error";
 				System.out.println("PIXY INIT: Button Override Error");
 				return;
 			case PIXY_RESULT_PROG_CHANGING:
 				//I'm not happy
+				status = "PIXY INIT: Program Change Error";
 				System.out.println("PIXY INIT: Program Change Error");
 				return;
 		}
@@ -71,37 +81,45 @@ public class Pixycam extends Thread {
 			switch (blockCount) {
 				case 0:
 					//I'm happyish
-					//Todo: stop this from spamming
-					System.out.println("PIXY INIT: No Cargo Found");
+					status = "PIXY RUN: No Cargo Found";
+					//Comment out to stop spam
+					//System.out.println("PIXY RUN: No Cargo Found");
 					break;
 				case PIXY_RESULT_ERROR:
 					//I'm not happy
-					System.out.println("PIXY INIT: General Error");
+					status = "PIXY RUN: General Error";
+					System.out.println("PIXY RUN: General Error");
 					return;
 				case PIXY_RESULT_BUSY:
 					//I'm not happy
-					System.out.println("PIXY INIT: Busy Error");
+					status = "PIXY RUN: Busy Error";
+					System.out.println("PIXY RUN: Busy Error");
 					return;
 				case PIXY_RESULT_CHECKSUM_ERROR:
 					//I'm not happy
-					System.out.println("PIXY INIT: Checksum Error");
+					status = "PIXY RUN: Checksum Error";
+					System.out.println("PIXY RUN: Checksum Error");
 					return;
 				case PIXY_RESULT_TIMEOUT:
 					//I'm not happy
-					System.out.println("PIXY INIT: Timeout Error");
+					status = "PIXY RUN: Timeout Error";
+					System.out.println("PIXY RUN: Timeout Error");
 					return;
 				case PIXY_RESULT_BUTTON_OVERRIDE:
 					//I'm not happy
-					System.out.println("PIXY INIT: Button Override Error");
+					status = "PIXY RUN: Button Override Error";
+					System.out.println("PIXY RUN: Button Override Error");
 					return;
 				case PIXY_RESULT_PROG_CHANGING:
 					//I'm not happy
-					System.out.println("PIXY INIT: Program Change Error");
+					status = "PIXY RUN: Program Change Error";
+					System.out.println("PIXY RUN: Program Change Error");
 					return;
 				default:
 					//I'm happy
 					PixyCargo[] cargosFound = new PixyCargo[blockCount];
 					ArrayList<Pixy2CCC.Block> blocksFound = ccc.getBlockCache();
+
 					int i = 0;
 					for(Pixy2CCC.Block block : blocksFound){
 						PixyCargo pcargo = new PixyCargo(
@@ -120,6 +138,7 @@ public class Pixycam extends Thread {
 						cargosFound[i++] = pcargo;
 					}
 					//DO NOT SET THIS UNTIL WE'RE DONE LOOKING
+
 					this.pixyCargos.set(cargosFound);
 					break;
 			}
@@ -133,6 +152,10 @@ public class Pixycam extends Thread {
 		//Give us a permit to conduct a new cargo search
 		cargoSearchPermit.release();
 		return result;
+	}
+
+	public String getStatus(){
+		return status;
 	}
 
 
@@ -155,7 +178,6 @@ public class Pixycam extends Thread {
 		public String toString(){
 			return  "offset=" + (x-157) +
 					" age=" + age +
-					" id=" + id +
 					" clr=" + color +
 					" area=" + (w*h) +
 					" x=" + x +

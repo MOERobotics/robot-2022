@@ -15,8 +15,7 @@ import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
 import frc.robot.generic.Pixycam;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -99,15 +98,31 @@ public class Robot extends TimedRobot {
     robot.setTurretPitchPosition(0);
   }
 
+  Set<String> lastKeys = Collections.emptySet();
+
   @Override
   public void robotPeriodic() {
 
+    SmartDashboard.putString("PIXY STATUS: ", pixycam.getStatus());
+
     Pixycam.PixyCargo[] foundCargo = pixycam.getCargo();
-    SmartDashboard.putNumber("Nnumber of cargo on Pixy", foundCargo.length);
+    SmartDashboard.putNumber("Number of cargo on Pixy", foundCargo.length);
+
+    Set<String> currentKeys = new HashSet<>();
+
     for(int i = 0; i < foundCargo.length; i++){
-      String msg = "PIXY CARGO #" + i + "; ID " + foundCargo[i].getId();
+      String msg = "PIXY CARGO ID " + foundCargo[i].getId();
       SmartDashboard.putString(msg, foundCargo[i].toString());
+      lastKeys.remove(msg);
+      currentKeys.add(msg);
     }
+
+    for (String key : lastKeys) {
+      SmartDashboard.delete(key);
+    }
+
+    lastKeys = currentKeys;
+
 
     if (countShoot == 0){
       isShooting = false;
