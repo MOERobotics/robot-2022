@@ -117,11 +117,11 @@ public class Lightning implements GenericRobot {
         shooterAPIDController.setDFilter(0);
         shooterAPIDController.setOutputRange(0,1);
 
-        shooterCPIDController.setP(3.0e-4);
-        shooterCPIDController.setI(1.0e-7);
-        shooterCPIDController.setD(9.0e-4);
-        shooterCPIDController.setFF(1.7e-4);
-        shooterCPIDController.setIZone(500);
+        shooterCPIDController.setP(1.8e-4);
+        shooterCPIDController.setI(2.0e-7);
+        shooterCPIDController.setD(3.0);
+        shooterCPIDController.setFF(1.08e-4);
+        shooterCPIDController.setIZone(1000);
         shooterCPIDController.setDFilter(0);
         shooterCPIDController.setOutputRange(0, 1);
 
@@ -459,7 +459,7 @@ public class Lightning implements GenericRobot {
     public void setShooterRPM(double topRPM, double bottomRPM) {
         attemptedRPM = topRPM;
         setShooterRPMTop(topRPM);
-        setShooterRPMBottom(bottomRPM/2);
+        setShooterRPMBottom(bottomRPM*2.1);
     }
 
     @Override
