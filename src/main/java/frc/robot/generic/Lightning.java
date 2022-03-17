@@ -459,7 +459,7 @@ public class Lightning implements GenericRobot {
     public void setShooterRPM(double topRPM, double bottomRPM) {
         attemptedRPM = topRPM;
         setShooterRPMTop(topRPM);
-        setShooterRPMBottom(bottomRPM*2.1);
+        setShooterRPMBottom(bottomRPM*2.4);
     }
 
     @Override
