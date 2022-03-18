@@ -41,7 +41,6 @@ public class BallAtoTerminal extends GenericAutonomous {
 
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
-        tracker.turretUpdate(robot);
 
         if (autonomousStep >= 1){
             robot.getCargo();

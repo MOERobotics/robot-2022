@@ -13,6 +13,7 @@ import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.command.*;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
+import frc.robot.generic.TurretBot;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class Robot extends TimedRobot {
   //Instantiate autonomous once, don't create unnecessary duplicates
   //Add new Autos here when they're authored
   public static final GenericAutonomous
-          autoArc = new autoArc(),
+          autoArc = new AutoArc5Ball(),
           ATerminalReturn = new BallAtoTerminalReturn(),
           simpleBTerminal = new BallBtoTerminal(),
           simpleCTerminal = new BallCtoTerminal(),

@@ -6,19 +6,19 @@ import frc.robot.generic.GenericRobot;
 
 //insert blurb
 public class AutoArc5Ball extends GenericAutonomous {
-    double rollout = 72; //center of rotation changes per robot. Test value per robot
+    double rollout = 50; //TODO: may fail //center of rotation changes per robot. Test value per robot
     double radius = 153;
     double wheelBase = 28;
     double innerRadius = radius - wheelBase/2;
     double outerRadius = radius + wheelBase/2;
     double outerArcDist = 180;
-    double defaultPower = .4;
+    double defaultPower = .5;
     double pivotDeg = 90;
     double rampDownDist = 10;
-    double arcAngleA = 163.495;
-    double arcAngleB = 71.437;
-    double radiusA = 57.077/2;
-    double radiusB = 95.079;
+    double arcAngleA = 147.51;
+    double arcAngleB = 61.01;
+    double radiusA = 27.38;
+    double radiusB = 69.82;
     double distanceTerminal = 150; //TODO: go ask cad NICELY for numbers
 
     double radiusRatio;
@@ -73,6 +73,8 @@ public class AutoArc5Ball extends GenericAutonomous {
     @Override
     public void autonomousPeriodic(GenericRobot robot) {
 
+        SmartDashboard.putNumber("radius", radius);
+
         if(robot.isTargetFound()) {
             averageX[counter % averageTurretXSize] = robot.getTargetX();
             counter++;
@@ -84,7 +86,7 @@ public class AutoArc5Ball extends GenericAutonomous {
         }
         average /= averageTurretXSize;
 
-        double currentTurretPower = 0;
+       double currentTurretPower = 0;
 
         if(robot.isTargetFound()){
             currentTurretPower = turretPIDController.calculate(average);
@@ -93,7 +95,7 @@ public class AutoArc5Ball extends GenericAutonomous {
         }
 
 
-        if((!robot.isTargetFound()) && (System.currentTimeMillis() - startingTime < 5000)) {
+        if((!robot.isTargetFound()) && (System.currentTimeMillis() - startingTime < 5000) && autonomousStep <4) {
             currentTurretPower = .3;
         }
         if ((autonomousStep>=4) && (autonomousStep < 8)){
@@ -168,12 +170,8 @@ public class AutoArc5Ball extends GenericAutonomous {
                 correction = PIDPivot.calculate(pivotDeg + currentYaw - startYaw);
                 leftPower = correction;
                 rightPower = -correction; //TODO: on lightning, change to abs encoder
-                if (!robot.isTargetFound() && !breakRobot) {
-                    startingTime = System.currentTimeMillis();
-                    breakRobot = true;
-                }
 
-                if (Math.abs(Math.abs(currentYaw - startYaw)-pivotDeg) <= 2){
+                if (Math.abs(Math.abs(currentYaw - startYaw)-pivotDeg) <= 3.5){
                     if (!time){
                         startingTime = System.currentTimeMillis();
                         time = true;
@@ -290,9 +288,8 @@ public class AutoArc5Ball extends GenericAutonomous {
                 PIDPivot.enableContinuousInput(-180, 180);
                 startYaw = robot.getYaw();
                 startInches = robot.getDriveDistanceInchesLeft();
-                autonomousStep += 1;
                 if (System.currentTimeMillis() -startingTime >= 2000){
-                    autonomousStep += 1;
+                    autonomousStep = 18;
                 }
                 //TODO: change the time waited after testing
                 break;
