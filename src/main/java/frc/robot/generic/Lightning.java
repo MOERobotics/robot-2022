@@ -692,4 +692,26 @@ public class Lightning implements GenericRobot {
     public double getDriveCurrent(){
         return leftMotorA.getOutputCurrent();
     }
+
+
+    public Pixycam getPixyCam(){
+        //System.out.println("What even is a pixycam");
+        return null;
+    }
+
+    public int pixyCargoCount(){
+        Pixycam pixycam = getPixyCam();
+        Pixycam.PixyCargo[] pixycargos = pixycam.getCargo(false);
+        return pixycargos.length;
+    }
+
+    //Gets the pixycam offest of the largest (aka closest) ball
+    //Range is from -1 (far left) to +1 (far right), 0 is centered
+    public double pixyOffsetOfClosest(){
+        Pixycam pixycam = getPixyCam();
+        Pixycam.PixyCargo[] pixycargos = pixycam.getCargo(false);
+        if(pixycargos.length == 0) return 0;
+        Pixycam.PixyCargo closestCargo = pixycargos[0];
+        return closestCargo.getProportionalOffset();
+    }
 }

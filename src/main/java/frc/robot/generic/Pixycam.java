@@ -72,6 +72,7 @@ public class Pixycam extends Thread {
 				System.out.println("PIXY INIT: Program Change Error");
 				return;
 		}
+		//pixycam.setLamp(0x01);
 		Pixy2CCC ccc = pixycam.getCCC();
 		while(isRunning) {
 			//If nobody has seen our old data,
@@ -117,6 +118,8 @@ public class Pixycam extends Thread {
 					return;
 				default:
 					//I'm happy
+					status = "PIXY RUN: Target sighted";
+
 					PixyCargo[] cargosFound = new PixyCargo[blockCount];
 					ArrayList<Pixy2CCC.Block> blocksFound = ccc.getBlockCache();
 
@@ -137,22 +140,29 @@ public class Pixycam extends Thread {
 
 						cargosFound[i++] = pcargo;
 					}
-					//DO NOT SET THIS UNTIL WE'RE DONE LOOKING
 
+					//DO NOT SET THIS UNTIL WE'RE DONE LOOKING
 					this.pixyCargos.set(cargosFound);
 					break;
 			}
 		}
 	}
 
-	
-	public PixyCargo[] getCargo() {
+	public PixyCargo[] getCargo(){
+		return this.getCargo(false);
+	}
+
+	//Refresh = true only if call is from robot-periodic, controls 50 semaphore sets/second
+	public PixyCargo[] getCargo(boolean refresh) {
 		PixyCargo[] result = pixyCargos.get();
 
 		//Give us a permit to conduct a new cargo search
-		cargoSearchPermit.release();
+		if(refresh) cargoSearchPermit.release();
 		return result;
 	}
+
+
+
 
 	public String getStatus(){
 		return status;
@@ -176,15 +186,21 @@ public class Pixycam extends Thread {
 		}
 
 		public String toString(){
+			String shortColor = (color == PixyCargoColor.PIXY_CARGO_RED) ? "RED" : "BLU";
 			return  "offset=" + (x-157) +
 					" age=" + age +
-					" clr=" + color +
+					" clr=" + shortColor +
 					" area=" + (w*h) +
+					" asp.=" + (w/h) +
 					" x=" + x +
 					" y=" + y +
 					" w=" + w +
 					" h=" + h;
 
+		}
+
+		public int getProportionalOffset(){
+			return (x-157)/157;
 		}
 	}
 

@@ -96,32 +96,30 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     System.out.println("Klaatu barada nikto");
     robot.setTurretPitchPosition(0);
+    Thread t = new Thread(pixycam);
+    t.start();
   }
 
-  Set<String> lastKeys = Collections.emptySet();
 
   @Override
   public void robotPeriodic() {
 
     SmartDashboard.putString("PIXY STATUS: ", pixycam.getStatus());
 
-    Pixycam.PixyCargo[] foundCargo = pixycam.getCargo();
+    Pixycam.PixyCargo[] foundCargo = pixycam.getCargo(true);
     SmartDashboard.putNumber("Number of cargo on Pixy", foundCargo.length);
 
-    Set<String> currentKeys = new HashSet<>();
 
-    for(int i = 0; i < foundCargo.length; i++){
-      String msg = "PIXY CARGO ID " + foundCargo[i].getId();
-      SmartDashboard.putString(msg, foundCargo[i].toString());
-      lastKeys.remove(msg);
-      currentKeys.add(msg);
+    for(int i = 0; i < 10; i++){
+      String msg = "PIXY CARGO " + (i+1);
+      if(i < foundCargo.length){
+        SmartDashboard.putString(msg, foundCargo[i].toString());
+      }else{
+        SmartDashboard.putString(msg, "no such cargo");
+
+      }
+
     }
-
-    for (String key : lastKeys) {
-      SmartDashboard.delete(key);
-    }
-
-    lastKeys = currentKeys;
 
 
     if (countShoot == 0){

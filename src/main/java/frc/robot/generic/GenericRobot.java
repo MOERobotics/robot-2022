@@ -4,6 +4,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
+
 public interface GenericRobot {
 
 	NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -432,6 +433,22 @@ public interface GenericRobot {
 
 	public default double getDriveCurrent(){
 		return 0.0;
+	}
+
+	public default Pixycam getPixyCam(){
+		//System.out.println("What even is a pixycam");
+		return null;
+	}
+
+
+	public default int pixyCargoCount(){
+		//System.out.println("What even is a pixycam");
+		return 0;
+	}
+
+	public default double pixyOffsetOfClosest(){
+		//System.out.println("What even is a pixycam");
+		return 0;
 	}
 
 
