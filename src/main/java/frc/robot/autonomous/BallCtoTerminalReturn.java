@@ -93,14 +93,17 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
             robot.getCargo();
             robot.shoot();
             if (autonomousStep <= 8){
-                robot.setShooterTargetRPM(3700);
+                robot.setShooterTargetRPM(2760);
             }
             else{
-                robot.setShooterTargetRPM(3900);
+                robot.setShooterTargetRPM(3406);
             }
         }
-        if (autonomousStep >= 1 && autonomousStep <=11){
-            robot.setTurretPitchPosition(.38);
+        if (autonomousStep >= 1 && autonomousStep <=6){
+            robot.setTurretPitchPosition(.262);
+        }
+        else if (autonomousStep >= 7 && autonomousStep <= 11){
+            robot.setTurretPitchPosition(.406);
         }
         else{
             robot.setCollectorIntakePercentage(0);
