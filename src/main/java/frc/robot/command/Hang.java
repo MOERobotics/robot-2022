@@ -107,6 +107,8 @@ public class Hang extends GenericCommand{
                     turretPIDController.disableContinuousInput();
 
                     if (System.currentTimeMillis() >= startingTime + 100) {
+                        System.out.print("We are going to step 0 of the align at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep += 1;
                     }
                     break;
@@ -115,17 +117,11 @@ public class Hang extends GenericCommand{
                     startDistance = robot.getDriveDistanceInchesLeft();
                     PIDSteering.reset();
                     PIDSteering.enableContinuousInput(-180, 180);
+                    System.out.print("We are going to step 1 of the align at ");
+                    System.out.println(System.currentTimeMillis()%1000000);
                     commandStep += 1;//TODO:change back
                     break;
-                case 12: //TODO: tester case, remove when necessary
-                    leftPower = defaultPower;
-                    rightPower = defaultPower;
-                    if (Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= 12){
-                         commandStep = 5;
-                         leftPower = 0;
-                         rightPower = 0;
-                    }
-                    break;
+
                 case 1:
                     correction = PIDSteering.calculate(robot.getYaw() - startAngle);
                     leftPower = defaultPower + correction; //didn't we stop doing this?
@@ -133,15 +129,21 @@ public class Hang extends GenericCommand{
 
                     if (!robot.getFloorSensorLeft() && !robot.getFloorSensorRight()){
                         Tapetheta = 0;
+                        System.out.print("Already straight, we are going to step 3 of the align at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep = 3;
                     }
                     else if (!robot.getFloorSensorLeft()) {
                         startDistance = robot.getDriveDistanceInchesLeft();
                         leftSensor = true;
+                        System.out.print("Pointed to the right, We are going to step 2 of the align at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep += 1;
                     } else if (!robot.getFloorSensorRight()) {
                         startDistance = robot.getDriveDistanceInchesLeft();
                         rightSensor = true;
+                        System.out.print("Pointed to the left, we are going to step 2 of the align at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep += 1;
                     }
                     break;
@@ -153,10 +155,14 @@ public class Hang extends GenericCommand{
                     if (!rightSensor && !robot.getFloorSensorRight()) {
                         differenceDistance = Math.abs(robot.getDriveDistanceInchesLeft() - startDistance);
                         Tapetheta = (Math.atan(differenceDistance / sensorDist) * 180 / Math.PI);
+                        System.out.print("We are going to step 3 of the align at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep += 1;
                     } else if (!leftSensor && !robot.getFloorSensorLeft()) {
                         differenceDistance = Math.abs(robot.getDriveDistanceInchesLeft() - startDistance);
                         Tapetheta = (Math.atan(differenceDistance / sensorDist) * 180 / Math.PI);
+                        System.out.print("We are going to step 3 of the align at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep += 1;
                     }
                     break;
@@ -171,6 +177,8 @@ public class Hang extends GenericCommand{
                     PIDSteering.reset();
                     PIDSteering.enableContinuousInput(-180, 180);
                     startDistance = robot.getDriveDistanceInchesLeft();
+                    System.out.print("We are going to step 4 of the align at ");
+                    System.out.println(System.currentTimeMillis()%1000000);
                     commandStep += 1;
                     break;
                 case 4:
@@ -185,6 +193,8 @@ public class Hang extends GenericCommand{
                     if (Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= (fwd)) {
                         leftPower = 0;
                         rightPower = 0;
+                        System.out.print("We are going to step 5 of the align at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep += 1;
                     }
                     break;
@@ -192,6 +202,8 @@ public class Hang extends GenericCommand{
                     leftPower = 0;
                     rightPower = 0;
                     tapeAlign = false;
+                    System.out.print("We are going to start the climb at ");
+                    System.out.println(System.currentTimeMillis()%1000000);
                     commandStep = -1;
                     startingTime = System.currentTimeMillis();
                     break;
@@ -204,6 +216,8 @@ public class Hang extends GenericCommand{
             switch (commandStep){
                 case -1:
                     commandStep += 1;
+                    System.out.print("We are going to step 0 of the climb at ");
+                    System.out.println(System.currentTimeMillis()%1000000);
                     break;
                 case 0:///reset and enable PTO
                     //reset encoders
@@ -215,14 +229,13 @@ public class Hang extends GenericCommand{
                     countRight = 0;
                     if (System.currentTimeMillis() - startingTime >= 2000){
                         SmartDashboard.putNumber("driveOutputCurrent", robot.getDriveCurrent());
+                        System.out.print("We are going to step 2 of the climb at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep = 2; ///TODO: fix numbering
                     }
 
                     break;
-                /*case 1:  ///////////unlock rotation piston to send arms forward
-                    robot.setArmsForward(); //TODO: skip step
-                    commandStep += 1;
-                    break;*/
+
                 case 2: //////raise climber arms (skip 10 steps after in case we need to scoot/scoot
 
                     if (!robot.getClimbSensorLeft() && countLeft == 0){
@@ -258,6 +271,8 @@ public class Hang extends GenericCommand{
                         leftArmPower = 0;
                         rightArmPower = 0;
                         startingTime = System.currentTimeMillis();
+                        System.out.print("We are going to step 3 of the climb at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep += 1;
 
                     }
@@ -266,29 +281,12 @@ public class Hang extends GenericCommand{
                 case 3:  ///////////unlock rotation piston to send arms back
                     robot.setArmsBackward();
                     if (System.currentTimeMillis() - startingTime >= 1000) {
+                        System.out.print("We are going to step 11 of the climb at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep = 11;
                     }
                     break;
-                /*case 2: //////disable PTO
-                    robot.turnOffPTO();
-                    commandStep += 1;
-                    break;
-                case 3: //////reset
-                    startDistance = robot.getDriveDistanceInchesLeft();
-                    commandStep += 1;
-                    break;
-                case 4: //go back 8 in
-                    leftArmPower = -.1; //see if we should change to drive stuff
-                    rightArmPower = -.1;
-                    if (Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= 8){
-                        leftArmPower = 0;
-                        rightArmPower = 0;
-                        commandStep += 1;
-                    }
-                case 5: //////enable PTO
-                    robot.turnOnPTO();
-                    commandStep = 11;
-                    break;*/
+
                 case 11: ////////lower climber arms
 
                     if (!robot.getClimbSensorLeft() && countLeft == 0){
@@ -321,6 +319,8 @@ public class Hang extends GenericCommand{
                         leftArmPower = 0;
                         rightArmPower = 0;
                         //TODO: change
+                        System.out.print("We are going to step 12 of the climb at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep += 1;
                         leftArrived = false;
                         rightArrived = false;
@@ -351,11 +351,15 @@ public class Hang extends GenericCommand{
                         leftArmPower = 0;
                         rightArrived = false;
                         leftArrived = false;
+                        System.out.print("We are going to step 13 of the climb at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep += 1;
                     }
                     break;
                 case 13:  ///////////unlock rotation piston to send arms forward
                     robot.setArmsForward();
+                    System.out.print("We are going to step 14 of the climb at ");
+                    System.out.println(System.currentTimeMillis()%1000000);
                     commandStep += 1;
                     break;
                 case 14: ///////////move arms forward
@@ -390,32 +394,25 @@ public class Hang extends GenericCommand{
                         countRight = 0;
                         rightArmPower = 0;
                         leftArmPower = 0;
+                        System.out.print("We are going to step 16 of the climb at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep = 16; //////////skip over step 15
                         startingTime = System.currentTimeMillis();
                     }
                     break;
-                case 15:///change to check with pitch and roll
-                    // actually don't even need this step :)
-                    if (robot.getPitch() >= -10){
-                    //if (robot.armInContact()){
-                        commandStep += 1;
-                        leftArmPower = 0;
-                        rightArmPower = 0;
-                        rightArrived = false;
-                        leftArrived = false;
-                    }
-                    else{
-                        leftArmPower = -.1;
-                        rightArmPower = -.1;
-                    }
+
                 case 16://///////once in contact move arms back again with the piston and swiiiiing
                     robot.setArmsBackward();
                     if (System.currentTimeMillis() - startingTime >= 1000) {
+                        System.out.print("We are going to step 17 of the climb at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep += 1;//TODO:change back
                     }
                     break;
                 case 17://////////go back to case 11 and repeat down to this step
                     if (firstTime){
+                        System.out.print("We are going to step 11 of the climb at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep = 11;
                         countRight = 0;
                         countLeft = 0;
@@ -424,47 +421,40 @@ public class Hang extends GenericCommand{
                         firstTime = false;
                     }
                     else{
+                        System.out.print("We are going to step 18 of the climb at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep += 1;
                         leftArmPower = 0;
                         rightArrived = false;
                         leftArrived = false;
                         rightArmPower = 0;
+                        startHeightLeft = robot.armHeightLeft();
+                        startHeightRight = robot.armHeightRight();
                     }
                     break;
                 case 18:///////lift all the way up to be extra secure
 
-                    if (!robot.getClimbSensorLeft() && countLeft == 0){
-                        countLeft = 1;
-                    }
-
-                    if (robot.getClimbSensorLeft() && countLeft == 1){
+                    if (Math.abs(robot.armHeightLeft()-startHeightLeft) >= escapeHeight + 10){
                         leftArmPower = 0;
                         leftArrived = true;
                     }
                     else{
                         leftArmPower = defaultClimbPowerDown;
                     }
-
-
-                    if (!robot.getClimbSensorRight() && countRight == 0){
-                        countRight = 1;
-                    }
-
-                    if (robot.getClimbSensorRight() && countRight == 1){
+                    if (Math.abs(robot.armHeightRight()-startHeightRight) >= escapeHeight + 10){
                         rightArmPower = 0;
                         rightArrived = true;
                     }
                     else{
                         rightArmPower = defaultClimbPowerDown;
                     }
-
-                    if (robot.armInContact() && leftArrived && rightArrived){
-                        countRight = 0;
-                        countLeft = 0;
-                        leftArmPower = 0;
+                    if (rightArrived && leftArrived){
                         rightArmPower = 0;
-                        leftArrived = false;
+                        leftArmPower = 0;
                         rightArrived = false;
+                        leftArrived = false;
+                        System.out.print("We are going to step 19 of the climb at ");
+                        System.out.println(System.currentTimeMillis()%1000000);
                         commandStep += 1;
                     }
                     break;

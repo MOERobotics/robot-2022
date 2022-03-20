@@ -127,7 +127,10 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("XBOX AXIS DEBUG - 2 ", xbox.getRawAxis(2));
     SmartDashboard.putNumber("XBOX AXIS DEBUG - 3 ", xbox.getRawAxis(3));
 
-
+    SmartDashboard.putNumber("LeftACurrCurrent", robot.getLeftACurrent());
+    SmartDashboard.putNumber("LeftBCurrCurrent", robot.getLeftBCurrent());
+    SmartDashboard.putNumber("RightACurrCurrent", robot.getRightACurrent());
+    SmartDashboard.putNumber("RightBCurrCurrent", robot.getRightBCurrent());
     SmartDashboard.putNumber("LeftACurrentMax", maxCurrentLeftA);
     SmartDashboard.putNumber("LeftBCurrentMax", maxCurrentLeftB);
     SmartDashboard.putNumber("RightACurrentMax", maxCurrentRightA);
@@ -633,15 +636,31 @@ public class Robot extends TimedRobot {
 
     if (robot.getPTOState()) {
       if (xbox.getRawAxis(leftAxis) > tolerance) {
+        System.out.print("LeftA Motor Current Up- ");
+        System.out.println(robot.getLeftACurrent());
+        System.out.print("LeftB Motor Current Up- ");
+        System.out.println(robot.getLeftBCurrent());
         driveLeft = drivePower;
       } else if (xbox.getRawAxis(leftAxis) < -tolerance) {
         driveLeft = -drivePower;
+        System.out.print("LeftA Motor Current Down- ");
+        System.out.println(robot.getLeftACurrent());
+        System.out.print("LeftB Motor Current Down- ");
+        System.out.println(robot.getLeftBCurrent());
       }
 
       if (xbox.getRawAxis(rightAxis) > tolerance) {
         driveRight = drivePower;
+        System.out.print("RightA Motor Current Up- ");
+        System.out.println(robot.getRightACurrent());
+        System.out.print("RightB Motor Current Up- ");
+        System.out.println(robot.getRightBCurrent());
       } else if (xbox.getRawAxis(rightAxis) < -tolerance) {
         driveRight = -drivePower;
+        System.out.print("RightA Motor Current Down- ");
+        System.out.println(robot.getRightACurrent());
+        System.out.print("RightB Motor Current Down- ");
+        System.out.println(robot.getRightBCurrent());
       }
       robot.drivePercent(driveLeft, driveRight);
     }

@@ -356,7 +356,7 @@ public class Lightning implements GenericRobot {
     public double getAlternateTurretAngle(){
         double raw = encoderTurretAlt.getPosition();
         double out;
-        double offset = 78 + 15;
+        double offset = 43;
         out = (raw *  136.467) - 5.73 - offset;
         if (out>360)
         {
@@ -459,7 +459,7 @@ public class Lightning implements GenericRobot {
     public void setShooterRPM(double topRPM, double bottomRPM) {
         attemptedRPM = topRPM;
         setShooterRPMTop(topRPM);
-        setShooterRPMBottom(bottomRPM*2.4);
+        setShooterRPMBottom(bottomRPM*2.6);
     }
 
     @Override
