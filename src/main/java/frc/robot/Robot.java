@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
@@ -589,7 +590,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-
+    LiveWindow.setEnabled(false);
     double pitchChange = 0;
     if (xbox.getRawButton(1)) {
       pitchChange = 0.02;

@@ -37,7 +37,7 @@ public class Hang extends GenericCommand{
 
 
     //////////////Now the real stuff
-    double escapeHeight = 10;///TODO:what is this??
+    double escapeHeight = 10*.875/.24937;///TODO:what is this??
     boolean firstTime = true;
     int countLeft = 0;
     int countRight = 0;
@@ -52,6 +52,7 @@ public class Hang extends GenericCommand{
     double turretPower = 0;
     double level = 7;
     double leveltol = 2;
+    double topHeight = 200;
 
     PIDController turretPIDController;
 
@@ -227,6 +228,8 @@ public class Hang extends GenericCommand{
                     rightArmPower = 0;
                     countLeft = 0;
                     countRight = 0;
+                    startHeightLeft = robot.armHeightLeft();
+                    startHeightRight = robot.armHeightRight();
                     if (System.currentTimeMillis() - startingTime >= 2000){
                         SmartDashboard.putNumber("driveOutputCurrent", robot.getDriveCurrent());
                         System.out.print("We are going to step 2 of the climb at ");
@@ -238,11 +241,11 @@ public class Hang extends GenericCommand{
 
                 case 2: //////raise climber arms (skip 10 steps after in case we need to scoot/scoot
 
-                    if (!robot.getClimbSensorLeft() && countLeft == 0){
-                        countLeft = 1;
+                    if (robot.getClimbSensorLeft() && countLeft == 0){
+                        startHeightLeft = robot.armHeightLeft();
                     }
 
-                    if (robot.getClimbSensorLeft() && countLeft == 1){
+                    if ((robot.armHeightLeft() - startHeightLeft) >= topHeight){
                         leftArmPower = 0;
                         leftArrived = true;
                     }
@@ -251,11 +254,12 @@ public class Hang extends GenericCommand{
                     }
 
 
-                    if (!robot.getClimbSensorRight() && countRight == 0){
+                    if (robot.getClimbSensorRight() && countRight == 0){
                         countRight = 1;
+                        startHeightRight = robot.armHeightRight();
                     }
 
-                    if (robot.getClimbSensorRight() && countRight == 1){
+                    if ((robot.armHeightRight() - startHeightRight) > topHeight){
                         rightArmPower = 0;
                         rightArrived = true;
                     }
@@ -289,11 +293,11 @@ public class Hang extends GenericCommand{
 
                 case 11: ////////lower climber arms
 
-                    if (!robot.getClimbSensorLeft() && countLeft == 0){
+                    if (robot.getClimbSensorLeft() && countLeft == 0){
                         countLeft = 1;
                     }
 
-                    if (robot.getClimbSensorLeft() && countLeft == 1){
+                    if (!robot.getClimbSensorLeft() && countLeft == 1){
                         leftArmPower = 0;
                         leftArrived = true;
                     }
@@ -302,11 +306,11 @@ public class Hang extends GenericCommand{
                     }
 
 
-                    if (!robot.getClimbSensorRight() && countRight == 0){
+                    if (robot.getClimbSensorRight() && countRight == 0){
                         countRight = 1;
                     }
 
-                    if (robot.getClimbSensorRight() && countRight == 1){
+                    if (!robot.getClimbSensorRight() && countRight == 1){
                         rightArmPower = 0;
                         rightArrived = true;
                     }
@@ -362,13 +366,10 @@ public class Hang extends GenericCommand{
                     System.out.println(System.currentTimeMillis()%1000000);
                     commandStep += 1;
                     break;
-                case 14: ///////////move arms forward
+                case 14: ///////////bring arms up
 
-                    if (!robot.getClimbSensorLeft() && countLeft == 0){
-                        countLeft = 1;
-                    }
 
-                    if (robot.getClimbSensorLeft() && countLeft == 1){
+                    if (robot.armHeightLeft() - startHeightLeft >= topHeight){
                         leftArmPower = 0;
                         leftArrived = true;
                     }
@@ -377,11 +378,7 @@ public class Hang extends GenericCommand{
                     }
 
 
-                    if (!robot.getClimbSensorRight() && countRight == 0){
-                        countRight = 1;
-                    }
-
-                    if (robot.getClimbSensorRight() && countRight == 1){
+                    if (robot.armHeightRight() - startHeightRight >= topHeight){
                         rightArmPower = 0;
                         rightArrived = true;
                     }
@@ -432,16 +429,16 @@ public class Hang extends GenericCommand{
                         startHeightRight = robot.armHeightRight();
                     }
                     break;
-                case 18:///////lift all the way up to be extra secure
+                case 18:///////lift part of the way up to be extra secure
 
-                    if (Math.abs(robot.armHeightLeft()-startHeightLeft) >= escapeHeight + 10){
+                    if (Math.abs(robot.armHeightLeft()-startHeightLeft) >= escapeHeight + 20){
                         leftArmPower = 0;
                         leftArrived = true;
                     }
                     else{
                         leftArmPower = defaultClimbPowerDown;
                     }
-                    if (Math.abs(robot.armHeightRight()-startHeightRight) >= escapeHeight + 10){
+                    if (Math.abs(robot.armHeightRight()-startHeightRight) >= escapeHeight + 20){
                         rightArmPower = 0;
                         rightArrived = true;
                     }
