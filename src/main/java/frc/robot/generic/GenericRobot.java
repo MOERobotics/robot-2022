@@ -45,7 +45,7 @@ public interface GenericRobot {
 	};
 
 	public default double getDriveDistanceInchesLeft(){
-		return encoderTicksLeftDriveA()/encoderLeftDriveTicksPerInch();
+		return encoderTicksLeftDriveB()/encoderLeftDriveTicksPerInch();
 	}
 
 	public default double getDriveDistanceInchesRight(){
@@ -434,6 +434,19 @@ public interface GenericRobot {
 	public default double getDriveCurrent(){
 		return 0.0;
 	}
+
+	public default double findDistHub(){
+		return 0.0;
+	}
+
+	public default double findShooterRPM(){
+		return 0.0;
+	}
+
+	public default double findShooterPitch(){
+		return 0.0;
+	}
+
 
 
 }

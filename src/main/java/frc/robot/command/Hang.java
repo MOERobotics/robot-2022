@@ -37,7 +37,7 @@ public class Hang extends GenericCommand{
 
 
     //////////////Now the real stuff
-    double escapeHeight = 10*.875/.24937;///TODO:what is this??
+    double escapeHeight = 6;///TODO:what is this??
     boolean firstTime = true;
     int countLeft = 0;
     int countRight = 0;
@@ -52,7 +52,7 @@ public class Hang extends GenericCommand{
     double turretPower = 0;
     double level = 7;
     double leveltol = 2;
-    double topHeight = 200;
+    double topHeight = 27;
 
     PIDController turretPIDController;
 
@@ -243,6 +243,7 @@ public class Hang extends GenericCommand{
 
                     if (robot.getClimbSensorLeft() && countLeft == 0){
                         startHeightLeft = robot.armHeightLeft();
+                        countLeft = 1;
                     }
 
                     if ((robot.armHeightLeft() - startHeightLeft) >= topHeight){
@@ -431,14 +432,14 @@ public class Hang extends GenericCommand{
                     break;
                 case 18:///////lift part of the way up to be extra secure
 
-                    if (Math.abs(robot.armHeightLeft()-startHeightLeft) >= escapeHeight + 20){
+                    if (Math.abs(robot.armHeightLeft()-startHeightLeft) >= escapeHeight + 10){
                         leftArmPower = 0;
                         leftArrived = true;
                     }
                     else{
                         leftArmPower = defaultClimbPowerDown;
                     }
-                    if (Math.abs(robot.armHeightRight()-startHeightRight) >= escapeHeight + 20){
+                    if (Math.abs(robot.armHeightRight()-startHeightRight) >= escapeHeight + 10){
                         rightArmPower = 0;
                         rightArrived = true;
                     }

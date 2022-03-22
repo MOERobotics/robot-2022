@@ -7,7 +7,8 @@ import edu.wpi.first.wpilibj.*;
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
 public class Lightning implements GenericRobot {
-    public static final double TICKS_PER_INCH_DRIVE = 0.875;
+    public static final double TICKS_PER_INCH_DRIVE = 0.89;
+    public static final double INCHES_PER_TICK_ARMS = .18;
     public static final double TICKS_PER_DEGREE_TURRET = 116;
     public static final double TICKS_PER_DEGREE_TURRET2 = 136.467;
     public static final double TICKS_PER_REVOLUTION_SHOOTERA = 1;
@@ -589,13 +590,13 @@ public class Lightning implements GenericRobot {
     public double armHeightLeft() {
         //TODO: put in conversion
         //Maybe use some sensor. Do NOT want to use encoders for this.
-        return getDriveDistanceInchesLeft();
+        return encoderTicksLeftDriveB()*INCHES_PER_TICK_ARMS;
     }
 
     @Override
     public double armHeightRight(){
         //TODO: put in conversion
-        return getDriveDistanceInchesRight();
+        return encoderTicksRightDriveA()*INCHES_PER_TICK_ARMS;
     }
 
     @Override
@@ -717,4 +718,23 @@ public class Lightning implements GenericRobot {
     public double getDriveCurrent(){
         return leftMotorA.getOutputCurrent();
     }
+
+    @Override
+    public double findDistHub(){
+        double x = getTargetY();
+        return (.413*Math.pow(x,2)-11.9*x+221);
+    }
+
+    @Override
+    public double findShooterRPM(){
+        double x = findDistHub()/12.0;
+        return (-3020 + 1364*x + -109*Math.pow(x,2) + 2.93*Math.pow(x,3));
+    }
+
+    @Override
+    public double findShooterPitch(){
+        double x = findDistHub()/12.0;
+        return (-0.217 + 0.0503*x + -8.84e-04*Math.pow(x,2));
+    }
+
 }

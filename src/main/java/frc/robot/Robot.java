@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = CTerminalReturn;
+  GenericAutonomous autonomous = calibration;
   GenericCommand testHang = new HangWithoutAlign();
 
 
@@ -268,12 +268,12 @@ public class Robot extends TimedRobot {
 
     switch (POVDirection.getDirection(xbox.getPOV())) {
       case NORTH: //MEDIUM SHOT RANGE
-        targetRPM = 4750;
-        turretPitch = 0.56;
+        targetRPM = 2611;
+        turretPitch = 0.25;
         break;
       case EAST:
-        targetRPM = 2000;
-        turretPitch = 0.8;
+        targetRPM = 1700;
+        turretPitch = 1.0;
         break;
       case SOUTH: ////CLOSE SHOT--> collector out
         targetRPM = 3400*.7;
@@ -282,8 +282,8 @@ public class Robot extends TimedRobot {
         turnTo45 = false;
         break;
       case WEST:
-        targetRPM = 2600; //////////collector facing
-        turretPitch = 0.1;
+        targetRPM = 2340; //////////collector facing
+        turretPitch = 0.08;
         turnTo45 = true;
         turnTo225 = false;
         break;
@@ -359,6 +359,8 @@ public class Robot extends TimedRobot {
         turnTo45 = false;
         turnTo225 = false;
         turretPower = turretPIDController.calculate(average);
+        targetRPM = robot.findShooterRPM();
+        turretPitch = robot.findShooterPitch();
 
       }
 
