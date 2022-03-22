@@ -46,6 +46,7 @@ public class Lightning implements GenericRobot {
     RelativeEncoder encoderShootA = shooterA.getEncoder();
     RelativeEncoder encoderShootB = shooterB.getEncoder();
 
+    Pixycam pixycam = new Pixycam();
 
     //DigitalInput ballSensor = new DigitalInput(0);
     DoubleSolenoid PTO = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 4, 5);
@@ -695,12 +696,12 @@ public class Lightning implements GenericRobot {
 
 
     public Pixycam getPixyCam(){
-        //System.out.println("What even is a pixycam");
-        return null;
+        return pixycam;
     }
 
     public int pixyCargoCount(){
         Pixycam pixycam = getPixyCam();
+        if(pixycam == null) return 0;
         Pixycam.PixyCargo[] pixycargos = pixycam.getCargo(false);
         return pixycargos.length;
     }
@@ -709,9 +710,12 @@ public class Lightning implements GenericRobot {
     //Range is from -1 (far left) to +1 (far right), 0 is centered
     public double pixyOffsetOfClosest(){
         Pixycam pixycam = getPixyCam();
+        if(pixycam == null) return 0;
         Pixycam.PixyCargo[] pixycargos = pixycam.getCargo(false);
         if(pixycargos.length == 0) return 0;
-        Pixycam.PixyCargo closestCargo = pixycargos[0];
+        Pixycam.PixyCargo closestCargo = pixycam.identifyClosestCargo(pixycargos);
         return closestCargo.getProportionalOffset();
     }
+
+
 }

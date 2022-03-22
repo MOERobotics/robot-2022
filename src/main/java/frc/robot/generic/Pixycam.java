@@ -78,7 +78,7 @@ public class Pixycam extends Thread {
 			//If nobody has seen our old data,
 			//We don't have permission to get new data
 			cargoSearchPermit.acquire();
-			int blockCount = ccc.getBlocks();
+			int blockCount = ccc.getBlocks(true);
 			switch (blockCount) {
 				case 0:
 					//I'm happyish
@@ -119,6 +119,7 @@ public class Pixycam extends Thread {
 				default:
 					//I'm happy
 					status = "PIXY RUN: Target sighted";
+					System.out.println(status);
 
 					PixyCargo[] cargosFound = new PixyCargo[blockCount];
 					ArrayList<Pixy2CCC.Block> blocksFound = ccc.getBlockCache();
@@ -169,6 +170,14 @@ public class Pixycam extends Thread {
 	}
 
 
+	public PixyCargo identifyClosestCargo(){
+		return identifyClosestCargo(getCargo(false));
+	}
+
+	public PixyCargo identifyClosestCargo(PixyCargo[] cargoList){
+		if(cargoList.length == 0) return null;
+		return cargoList[0];
+	}
 
 	@Value
 	public static class PixyCargo {

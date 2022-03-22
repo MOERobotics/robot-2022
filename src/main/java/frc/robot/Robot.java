@@ -89,14 +89,13 @@ public class Robot extends TimedRobot {
 
 
   PIDController turretPIDController;
-  Pixycam pixycam = new Pixycam();
 
 
   @Override
   public void robotInit() {
     System.out.println("Klaatu barada nikto");
     robot.setTurretPitchPosition(0);
-    Thread t = new Thread(pixycam);
+    Thread t = new Thread(robot.getPixyCam());
     t.start();
   }
 
@@ -104,9 +103,14 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
 
-    SmartDashboard.putString("PIXY STATUS: ", pixycam.getStatus());
+    SmartDashboard.putString("PIXY STATUS: ", robot.getPixyCam().getStatus());
 
-    Pixycam.PixyCargo[] foundCargo = pixycam.getCargo(true);
+    Pixycam.PixyCargo[] foundCargo = new Pixycam.PixyCargo[0];
+
+    if(robot.getPixyCam() != null){
+      foundCargo = robot.getPixyCam().getCargo(true);
+    }
+    SmartDashboard.putBoolean("Is Pixy Null", robot.getPixyCam() == null);
     SmartDashboard.putNumber("Number of cargo on Pixy", foundCargo.length);
 
 
@@ -120,6 +124,21 @@ public class Robot extends TimedRobot {
       }
 
     }
+
+    Pixycam.PixyCargo trackedCargo = robot.getPixyCam().identifyClosestCargo();
+
+    if (trackedCargo != null) {
+      //proportional offset is most important var for reading deviations
+      //round to 2 decimal places
+      double pOS = Math.round(trackedCargo.getProportionalOffset()*100)/100;
+      String msg = "pOS= "+pOS+ " " +trackedCargo.toString();
+      SmartDashboard.putString("PIXY Tracked Cargo ", msg);
+    }
+    else{
+      SmartDashboard.putString("PIXY Tracked Cargo ", "Cargo Not Found :(");
+    }
+
+
 
 
     if (countShoot == 0){
