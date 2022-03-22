@@ -92,6 +92,9 @@ public class Robot extends TimedRobot {
 
   PIDController turretPIDController;
 
+  boolean armReset = false;
+  double timerForPTO;
+
 
   @Override
   public void robotInit() {
@@ -392,17 +395,23 @@ public class Robot extends TimedRobot {
 
       /////////////////////////////////////////////////////CLIMBER WHEN PTO
 
-      if (robot.getPTOState()) {
-        if (xbox.getRawAxis(leftAxis) > tolerance) {
-          driveLeft = defaultClimbPower;
-        } else if (xbox.getRawAxis(leftAxis) < -tolerance) {
-          driveLeft = -defaultClimbPower;
+      if (joystick.getRawButtonPressed(9)) {
+        armReset = true;
+        robot.turnOnPTO();
+        timerForPTO = System.currentTimeMillis();
+      }
+      if (armReset && (System.currentTimeMillis() - timerForPTO)>=1000){
+        driveLeft = -.2;
+        driveRight = -.2;
+        if (!robot.getClimbSensorRight()){
+          driveRight = 0;
         }
-
-        if (xbox.getRawAxis(rightAxis) > tolerance) {
-          driveRight = defaultClimbPower;
-        } else if (xbox.getRawAxis(rightAxis) < -tolerance) {
-          driveRight = -defaultClimbPower;
+        if (!robot.getClimbSensorLeft()){
+          driveLeft = 0;
+        }
+        if (driveRight == 0 && driveLeft == 0){
+          robot.turnOffPTO();
+          armReset = false;
         }
       }
       /////////////////////////////////////////////////////CLIMBER CODE ENDS
