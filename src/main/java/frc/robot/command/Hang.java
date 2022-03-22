@@ -53,6 +53,7 @@ public class Hang extends GenericCommand{
     double level = 7;
     double leveltol = 2;
     double topHeight = 27;
+    double topExtend = 30;
 
     PIDController turretPIDController;
 
@@ -370,7 +371,7 @@ public class Hang extends GenericCommand{
                 case 14: ///////////bring arms up
 
 
-                    if (robot.armHeightLeft() - startHeightLeft >= topHeight){
+                    if (robot.armHeightLeft() - startHeightLeft >= topExtend){
                         leftArmPower = 0;
                         leftArrived = true;
                     }
@@ -379,7 +380,7 @@ public class Hang extends GenericCommand{
                     }
 
 
-                    if (robot.armHeightRight() - startHeightRight >= topHeight){
+                    if (robot.armHeightRight() - startHeightRight >= topExtend){
                         rightArmPower = 0;
                         rightArrived = true;
                     }

@@ -650,6 +650,9 @@ public class Robot extends TimedRobot {
         System.out.println(robot.getLeftACurrent());
         System.out.print("LeftB Motor Current Down- ");
         System.out.println(robot.getLeftBCurrent());
+        if (!robot.getClimbSensorLeft()){
+          driveLeft = 0;
+        }
       }
 
       if (xbox.getRawAxis(rightAxis) > tolerance) {
@@ -664,6 +667,9 @@ public class Robot extends TimedRobot {
         System.out.println(robot.getRightACurrent());
         System.out.print("RightB Motor Current Down- ");
         System.out.println(robot.getRightBCurrent());
+        if (!robot.getClimbSensorRight()){
+          driveRight = 0;
+        }
       }
       robot.drivePercent(driveLeft, driveRight);
     }
