@@ -397,22 +397,7 @@ public class Robot extends TimedRobot {
 
       if (joystick.getRawButtonPressed(9)) {
         armReset = true;
-        robot.turnOnPTO();
         timerForPTO = System.currentTimeMillis();
-      }
-      if (armReset && (System.currentTimeMillis() - timerForPTO)>=1000){
-        driveLeft = -.2;
-        driveRight = -.2;
-        if (!robot.getClimbSensorRight()){
-          driveRight = 0;
-        }
-        if (!robot.getClimbSensorLeft()){
-          driveLeft = 0;
-        }
-        if (driveRight == 0 && driveLeft == 0){
-          robot.turnOffPTO();
-          armReset = false;
-        }
       }
       /////////////////////////////////////////////////////CLIMBER CODE ENDS
 
@@ -556,6 +541,23 @@ public class Robot extends TimedRobot {
 
       //////////////////////////////////////////////////POWER SETTERS END
 
+    }
+    if (armReset){
+      robot.turnOnPTO();
+      if (armReset && (System.currentTimeMillis() - timerForPTO)>=1000){
+        driveLeft = -.2;
+        driveRight = -.2;
+        if (!robot.getClimbSensorRight()){
+          driveRight = 0;
+        }
+        if (!robot.getClimbSensorLeft()){
+          driveLeft = 0;
+        }
+        if (driveRight == 0 && driveLeft == 0){
+          robot.turnOffPTO();
+          armReset = false;
+        }
+      }
     }
     if (hang) {
       ///////////////////////////////////////////RUN AUTO-CLIMB
