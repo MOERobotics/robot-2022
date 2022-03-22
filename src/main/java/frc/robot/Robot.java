@@ -302,7 +302,7 @@ public class Robot extends TimedRobot {
       hang = false;
     }
 
-    if (!hang) {
+    if (!hang && !armReset) {
       reset = true;
       robot.turnOffPTO();
 
@@ -544,7 +544,7 @@ public class Robot extends TimedRobot {
     }
     if (armReset){
       robot.turnOnPTO();
-      if (armReset && (System.currentTimeMillis() - timerForPTO)>=1000){
+      if (armReset && (System.currentTimeMillis() - timerForPTO)>=2000){
         driveLeft = -.2;
         driveRight = -.2;
         if (!robot.getClimbSensorRight()){
@@ -553,11 +553,13 @@ public class Robot extends TimedRobot {
         if (!robot.getClimbSensorLeft()){
           driveLeft = 0;
         }
-        if (driveRight == 0 && driveLeft == 0){
+        if (!robot.getClimbSensorLeft() && !robot.getClimbSensorRight()){
           robot.turnOffPTO();
           armReset = false;
         }
+        robot.drivePercent(driveLeft, driveRight);
       }
+
     }
     if (hang) {
       ///////////////////////////////////////////RUN AUTO-CLIMB
