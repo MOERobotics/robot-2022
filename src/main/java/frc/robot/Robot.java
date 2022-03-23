@@ -11,8 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.command.*;
-import frc.robot.generic.GenericRobot;
-import frc.robot.generic.Lightning;
+import frc.robot.generic.*;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -34,7 +33,7 @@ public class Robot extends TimedRobot {
           calibration = new Calibration(),
           shortRun = new ShortRun();
 
-  GenericRobot robot = new Lightning();
+  GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
@@ -121,115 +120,115 @@ public class Robot extends TimedRobot {
     }
 
 
-    SmartDashboard.putNumber("XBOX AXIS DEBUG - 0 ", xbox.getRawAxis(0));
-    SmartDashboard.putNumber("XBOX AXIS DEBUG - 1 ", xbox.getRawAxis(1));
-    SmartDashboard.putNumber("XBOX AXIS DEBUG - 2 ", xbox.getRawAxis(2));
-    SmartDashboard.putNumber("XBOX AXIS DEBUG - 3 ", xbox.getRawAxis(3));
+    SmarterDashboard.sendNumber("XBOX AXIS DEBUG - 0 ", xbox.getRawAxis(0));
+    SmarterDashboard.sendNumber("XBOX AXIS DEBUG - 1 ", xbox.getRawAxis(1));
+    SmarterDashboard.sendNumber("XBOX AXIS DEBUG - 2 ", xbox.getRawAxis(2));
+    SmarterDashboard.sendNumber("XBOX AXIS DEBUG - 3 ", xbox.getRawAxis(3));
 
 
-    SmartDashboard.putNumber("LeftACurrentMax", maxCurrentLeftA);
-    SmartDashboard.putNumber("LeftBCurrentMax", maxCurrentLeftB);
-    SmartDashboard.putNumber("RightACurrentMax", maxCurrentRightA);
-    SmartDashboard.putNumber("RightBCurrentMax", maxCurrentRightB);
+    SmarterDashboard.sendNumber("LeftACurrentMax", maxCurrentLeftA);
+    SmarterDashboard.sendNumber("LeftBCurrentMax", maxCurrentLeftB);
+    SmarterDashboard.sendNumber("RightACurrentMax", maxCurrentRightA);
+    SmarterDashboard.sendNumber("RightBCurrentMax", maxCurrentRightB);
 
-    //SmartDashboard.putNumber("LimelightX", robot.getTargetX());
-    //SmartDashboard.putNumber("LimelightY", robot.getTargetY());
-    SmartDashboard.putNumber("LimelightArea", robot.getTargetArea());
+    //SmarterDashboard.sendNumber("LimelightX", robot.getTargetX());
+    //SmarterDashboard.sendNumber("LimelightY", robot.getTargetY());
+    SmarterDashboard.sendNumber("LimelightArea", robot.getTargetArea());
 
-    SmartDashboard.putNumber("Drive left pct", robot.getDriveLeftPercentage());
-    SmartDashboard.putNumber("Drive right pct", robot.getDriveRightPercentage());
-    SmartDashboard.putNumber("Drive left rpm", robot.getDriveLeftRPM());
-    SmartDashboard.putNumber("Drive right rpm", robot.getDriveRightRPM());
+    SmarterDashboard.sendNumber("Drive left pct", robot.getDriveLeftPercentage());
+    SmarterDashboard.sendNumber("Drive right pct", robot.getDriveRightPercentage());
+    SmarterDashboard.sendNumber("Drive left rpm", robot.getDriveLeftRPM());
+    SmarterDashboard.sendNumber("Drive right rpm", robot.getDriveRightRPM());
 
-    SmartDashboard.putNumber("Left encoder Ticks A", robot.encoderTicksLeftDriveA());
-    SmartDashboard.putNumber("Right encoder Ticks A", robot.encoderTicksRightDriveA());
+    SmarterDashboard.sendNumber("Left encoder Ticks A", robot.encoderTicksLeftDriveA());
+    SmarterDashboard.sendNumber("Right encoder Ticks A", robot.encoderTicksRightDriveA());
 
-    SmartDashboard.putNumber("Left encoder Ticks B", robot.encoderTicksLeftDriveB());
-    SmartDashboard.putNumber("Right encoder Ticks B", robot.encoderTicksRightDriveB());
+    SmarterDashboard.sendNumber("Left encoder Ticks B", robot.encoderTicksLeftDriveB());
+    SmarterDashboard.sendNumber("Right encoder Ticks B", robot.encoderTicksRightDriveB());
 
-    SmartDashboard.putNumber("Left encoder Inches", robot.getDriveDistanceInchesLeft());
-    SmartDashboard.putNumber("Right encoder Inches", robot.getDriveDistanceInchesRight());
+    SmarterDashboard.sendNumber("Left encoder Inches", robot.getDriveDistanceInchesLeft());
+    SmarterDashboard.sendNumber("Right encoder Inches", robot.getDriveDistanceInchesRight());
 
-    SmartDashboard.putNumber("Yaw", robot.getYaw());
-    SmartDashboard.putNumber("Pitch", robot.getPitch());
-    SmartDashboard.putNumber("Rollll", robot.getRoll());
-    SmartDashboard.putNumber("Linear speed", robot.getLinearVelocity());
+    SmarterDashboard.sendNumber("Yaw", robot.getYaw());
+    SmarterDashboard.sendNumber("Pitch", robot.getPitch());
+    SmarterDashboard.sendNumber("Rollll", robot.getRoll());
+    SmarterDashboard.sendNumber("Linear speed", robot.getLinearVelocity());
 
-    SmartDashboard.putBoolean("Have upper cargo? (indexer reverse)", robot.getUpperCargo());
-    SmartDashboard.putBoolean("Have lower cargo? (indexer forward)", robot.getLowerCargo());
+    SmarterDashboard.sendBoolean("Have upper cargo? (indexer reverse)", robot.getUpperCargo());
+    SmarterDashboard.sendBoolean("Have lower cargo? (indexer forward)", robot.getLowerCargo());
 
-    SmartDashboard.putBoolean("Trip left climb sensor? (leftB reverse)", robot.getClimbSensorLeft());
-    SmartDashboard.putBoolean("Trip right climb sensor? (rightA reverse)", robot.getClimbSensorRight());
+    SmarterDashboard.sendBoolean("Trip left climb sensor? (leftB reverse)", robot.getClimbSensorLeft());
+    SmarterDashboard.sendBoolean("Trip right climb sensor? (rightA reverse)", robot.getClimbSensorRight());
 
-    SmartDashboard.putBoolean("Trip left floor sensor? (leftB forward)", robot.getFloorSensorLeft());
-    SmartDashboard.putBoolean("Trip right floor sensor? (rightA forward)", robot.getFloorSensorRight());
+    SmarterDashboard.sendBoolean("Trip left floor sensor? (leftB forward)", robot.getFloorSensorLeft());
+    SmarterDashboard.sendBoolean("Trip right floor sensor? (rightA forward)", robot.getFloorSensorRight());
 
-    //SmartDashboard.putBoolean("Has detected cargo?", robot.hasFoundCargo());
+    //SmarterDashboard.sendBoolean("Has detected cargo?", robot.hasFoundCargo());
 
-    SmartDashboard.putNumber("Collector intake power", robot.getCollectorIntakePercentage());
-    SmartDashboard.putNumber("Indexer   intake power", robot.getIndexerIntakePercentage());
+    SmarterDashboard.sendNumber("Collector intake power", robot.getCollectorIntakePercentage());
+    SmarterDashboard.sendNumber("Indexer   intake power", robot.getIndexerIntakePercentage());
 
     //SmartDashboard.getBoolean("Sees target?", robot.isTargetFound());
 
-    SmartDashboard.putBoolean("Vision target found", robot.isTargetFound());
-    SmartDashboard.putNumber("Vision target x", robot.getTargetX());
-    SmartDashboard.putNumber("Vision target Average", average);
-    SmartDashboard.putNumber("Vision target y", robot.getTargetY());
-    SmartDashboard.putNumber("Vision target angle", robot.getTargetAngle());
-    SmartDashboard.putNumber("Vision target dist", robot.getTargetDistance());
+    SmarterDashboard.sendBoolean("Vision target found", robot.isTargetFound());
+    SmarterDashboard.sendNumber("Vision target x", robot.getTargetX());
+    SmarterDashboard.sendNumber("Vision target Average", average);
+    SmarterDashboard.sendNumber("Vision target y", robot.getTargetY());
+    SmarterDashboard.sendNumber("Vision target angle", robot.getTargetAngle());
+    SmarterDashboard.sendNumber("Vision target dist", robot.getTargetDistance());
 
-    //SmartDashboard.putNumber("Turret direction angle ticks", robot.getTurretAngle());
-    //SmartDashboard.putNumber("Turret direction angle degrees", robot.getTurretAngleDegrees());
-    SmartDashboard.putNumber("Alternate turret angle degrees", robot.getAlternateTurretAngle());
+    //SmarterDashboard.sendNumber("Turret direction angle ticks", robot.getTurretAngle());
+    //SmarterDashboard.sendNumber("Turret direction angle degrees", robot.getTurretAngleDegrees());
+    SmarterDashboard.sendNumber("Alternate turret angle degrees", robot.getAlternateTurretAngle());
 
-    SmartDashboard.putNumber("Turret direction motor pct", robot.getTurretPowerPct());
+    SmarterDashboard.sendNumber("Turret direction motor pct", robot.getTurretPowerPct());
 
-    //SmartDashboard.putNumber("Turret direction motor pct", robot.getTurretPowerPct());
+    //SmarterDashboard.sendNumber("Turret direction motor pct", robot.getTurretPowerPct());
 
-    SmartDashboard.putNumber("Turret pitch position", robot.getTurretPitchPosition());
-    SmartDashboard.putNumber("Turret pitch motor pct", robot.getTurretPitchPowerPct());
+    SmarterDashboard.sendNumber("Turret pitch position", robot.getTurretPitchPosition());
+    SmarterDashboard.sendNumber("Turret pitch motor pct", robot.getTurretPitchPowerPct());
 
-    SmartDashboard.putNumber("Shooter top motor pct", robot.getShooterPowerPctTop());
-    SmartDashboard.putNumber("Shooter bottom motor pct", robot.getShooterPowerPctBottom());
+    SmarterDashboard.sendNumber("Shooter top motor pct", robot.getShooterPowerPctTop());
+    SmarterDashboard.sendNumber("Shooter bottom motor pct", robot.getShooterPowerPctBottom());
 
-    SmartDashboard.putNumber("Shooter top motor rpm", robot.getShooterRPMTop());
-    SmartDashboard.putNumber("Shooter bottom motor rpm", robot.getShooterRPMBottom());
+    SmarterDashboard.sendNumber("Shooter top motor rpm", robot.getShooterRPMTop());
+    SmarterDashboard.sendNumber("Shooter bottom motor rpm", robot.getShooterRPMBottom());
 
-    SmartDashboard.putNumber("Shooter calculate distance", robot.getShooterTargetDistance());
-    SmartDashboard.putNumber("Shooter calculate height", robot.getShooterTargetHeight());
-    SmartDashboard.putNumber("Shooter target RPM", robot.getShooterTargetRPM());
+    SmarterDashboard.sendNumber("Shooter calculate distance", robot.getShooterTargetDistance());
+    SmarterDashboard.sendNumber("Shooter calculate height", robot.getShooterTargetHeight());
+    SmarterDashboard.sendNumber("Shooter target RPM", robot.getShooterTargetRPM());
 
-    SmartDashboard.putNumber("Shooter Ready Timer", robot.getShootReadyTimer());
-    SmartDashboard.putBoolean("Shooter is Ready?", robot.isReadyToShoot());
-    SmartDashboard.putBoolean("Shooter is Actively Firing?", robot.isActivelyShooting());
-
-
-    SmartDashboard.putBoolean("Is PTO set to climb arms?", robot.getPTOState());
-
-    SmartDashboard.putNumber("Joystick raw X", joystick.getX());
-    SmartDashboard.putNumber("Joystick raw Y", joystick.getY());
-
-    SmartDashboard.putNumber("Autonomous Step", autonomous.autonomousStep);
-    SmartDashboard.putString("Autonomous Program", autonomous.getClass().getName());
-
-    SmartDashboard.putNumber("leftEncoderRaw", robot.encoderTicksLeftDriveA());
-    SmartDashboard.putNumber("rightEncoderRaw", robot.encoderTicksRightDriveA());
-    SmartDashboard.putBoolean("leftTapeSensor", robot.getFloorSensorLeft());
-    SmartDashboard.putBoolean("rightTapeSensor", robot.getFloorSensorRight());
-    SmartDashboard.putBoolean("leftCLimberSensor", robot.getClimbSensorLeft());
-    SmartDashboard.putBoolean("rightClimberSensor", robot.getClimbSensorRight());
-
-    SmartDashboard.putNumber("rightArmEncoder", robot.armHeightRight());
-    SmartDashboard.putNumber("leftArmEncoder", robot.armHeightLeft());
-
-    SmartDashboard.putBoolean("hang", hang);
-    SmartDashboard.putNumber("count", countHang);
-
-    SmartDashboard.putNumber("CommandStep", command.commandStep);
-
-    SmartDashboard.putBoolean("Robot is Shooting?", isShooting);
+    SmarterDashboard.sendNumber("Shooter Ready Timer", robot.getShootReadyTimer());
+    SmarterDashboard.sendBoolean("Shooter is Ready?", robot.isReadyToShoot());
+    SmarterDashboard.sendBoolean("Shooter is Actively Firing?", robot.isActivelyShooting());
 
 
+    SmarterDashboard.sendBoolean("Is PTO set to climb arms?", robot.getPTOState());
+
+    SmarterDashboard.sendNumber("Joystick raw X", joystick.getX());
+    SmarterDashboard.sendNumber("Joystick raw Y", joystick.getY());
+
+    SmarterDashboard.sendNumber("Autonomous Step", autonomous.autonomousStep);
+    SmarterDashboard.sendString("Autonomous Program", autonomous.getClass().getName());
+
+    SmarterDashboard.sendNumber("leftEncoderRaw", robot.encoderTicksLeftDriveA());
+    SmarterDashboard.sendNumber("rightEncoderRaw", robot.encoderTicksRightDriveA());
+    SmarterDashboard.sendBoolean("leftTapeSensor", robot.getFloorSensorLeft());
+    SmarterDashboard.sendBoolean("rightTapeSensor", robot.getFloorSensorRight());
+    SmarterDashboard.sendBoolean("leftCLimberSensor", robot.getClimbSensorLeft());
+    SmarterDashboard.sendBoolean("rightClimberSensor", robot.getClimbSensorRight());
+
+    SmarterDashboard.sendNumber("rightArmEncoder", robot.armHeightRight());
+    SmarterDashboard.sendNumber("leftArmEncoder", robot.armHeightLeft());
+
+    SmarterDashboard.sendBoolean("hang", hang);
+    SmarterDashboard.sendNumber("count", countHang);
+
+    SmarterDashboard.sendNumber("CommandStep", command.commandStep);
+
+    SmarterDashboard.sendBoolean("Robot is Shooting?", isShooting);
+
+    SmarterDashboard.transmit();
   }
 
   @Override
@@ -535,7 +534,7 @@ public class Robot extends TimedRobot {
     if (hang) {
       ///////////////////////////////////////////RUN AUTO-CLIMB
       ActuallyHanging = true;
-      SmartDashboard.putBoolean("we really are hanging", ActuallyHanging);
+      SmarterDashboard.sendBoolean("we really are hanging", ActuallyHanging);
       if (reset) {
         command.begin(robot);
         reset = false;
