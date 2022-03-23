@@ -12,9 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.command.*;
-import frc.robot.generic.GenericRobot;
-import frc.robot.generic.Lightning;
-import frc.robot.generic.TurretBot;
+import frc.robot.generic.*;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -42,6 +40,9 @@ public class Robot extends TimedRobot {
   Joystick xbox = new Joystick(1);
   GenericAutonomous autonomous = calibration;
   GenericCommand testHang = new HangWithoutAlign();
+
+  Lidar asdf = new Lidar();
+
 
 
   int averageTurretXSize = 2;
@@ -243,6 +244,11 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putBoolean("Robot is Shooting?", isShooting);
 
+
+    SmartDashboard.putNumber("Lidar A", asdf.getDistance(0));
+    SmartDashboard.putNumber("Lidar B", asdf.getDistance(1));
+    SmartDashboard.putNumber("Lidar C", asdf.getDistance(2));
+    SmartDashboard.putNumber("Lidar D", asdf.getDistance(3));
 
   }
 
