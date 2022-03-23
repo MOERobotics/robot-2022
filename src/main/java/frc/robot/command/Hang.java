@@ -53,7 +53,8 @@ public class Hang extends GenericCommand{
     double level = 7;
     double leveltol = 2;
     double topHeight = 27;
-    double topExtend = 30;
+    double topExtend = 31;
+    boolean swingTime = false;
 
     PIDController turretPIDController;
 
@@ -401,10 +402,15 @@ public class Hang extends GenericCommand{
                     break;
 
                 case 16://///////once in contact move arms back again with the piston and swiiiiing
-                    robot.setArmsBackward();
-                    if (System.currentTimeMillis() - startingTime >= 1000) {
+                    if (robot.getPitch()>=-42 && !swingTime) {
+                        robot.setArmsBackward();
+                        startingTime = System.currentTimeMillis();
+                        swingTime = true;
+                    }
+                    if (System.currentTimeMillis() - startingTime >= 1000 && swingTime) {
                         System.out.print("We are going to step 17 of the climb at ");
                         System.out.println(System.currentTimeMillis()%1000000);
+                        swingTime = false;
                         commandStep += 1;//TODO:change back
                     }
                     break;

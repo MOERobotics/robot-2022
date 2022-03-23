@@ -94,6 +94,11 @@ public class Robot extends TimedRobot {
 
   boolean armReset = false;
   double timerForPTO;
+  boolean delayLeft = false;
+  boolean delayRight = false;
+  double leftTime;
+  double rightTime;
+
 
 
   @Override
@@ -395,7 +400,7 @@ public class Robot extends TimedRobot {
 
       /////////////////////////////////////////////////////CLIMBER WHEN PTO
 
-      if (joystick.getRawButtonPressed(9)) {
+      if (joystick.getRawButtonPressed(9) && joystick.getRawButtonPressed(10)) {
         armReset = true;
         timerForPTO = System.currentTimeMillis();
       }
@@ -547,15 +552,28 @@ public class Robot extends TimedRobot {
       if (armReset && (System.currentTimeMillis() - timerForPTO)>=2000){
         driveLeft = -.2;
         driveRight = -.2;
-        if (!robot.getClimbSensorRight()){
-          driveRight = 0;
+        if (!robot.getClimbSensorRight() && !delayRight){
+          delayRight = true;
+          rightTime = System.currentTimeMillis();
         }
-        if (!robot.getClimbSensorLeft()){
+        if (!robot.getClimbSensorLeft() && !delayLeft){
+          delayLeft = true;
+          leftTime = System.currentTimeMillis();
+        }
+        if (!robot.getClimbSensorLeft() && (System.currentTimeMillis() - leftTime >= 100)){
           driveLeft = 0;
         }
-        if (!robot.getClimbSensorLeft() && !robot.getClimbSensorRight()){
+        if (!robot.getClimbSensorRight() && (System.currentTimeMillis() - rightTime >= 100)){
+          driveRight = 0;
+        }
+
+        if (!robot.getClimbSensorLeft() && !robot.getClimbSensorRight()
+                && (System.currentTimeMillis() - leftTime >= 100)
+                && (System.currentTimeMillis() - rightTime >= 100)){
           robot.turnOffPTO();
           armReset = false;
+          delayRight = false;
+          delayLeft = false;
         }
         robot.drivePercent(driveLeft, driveRight);
       }
@@ -581,6 +599,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    joystick.getRawButtonPressed(10);
+    joystick.getRawButtonPressed(9);
     xbox.getRawButtonPressed(3);
     joystick.getRawButtonPressed(8);
     hang = false;
