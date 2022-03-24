@@ -87,23 +87,15 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 currentTurretPower = -.2;
             }
         }
-        robot.setTurretPowerPct(currentTurretPower);
+        if (autonomousStep <= 11){
+            robot.setTurretPowerPct(currentTurretPower);
+        }
 
-        if (autonomousStep >= 1){
+        if (autonomousStep >= 1 && autonomousStep <= 11){
             robot.getCargo();
             robot.shoot();
-            if (autonomousStep <= 8){
-                robot.setShooterTargetRPM(2760);
-            }
-            else{
-                robot.setShooterTargetRPM(3406);
-            }
-        }
-        if (autonomousStep >= 1 && autonomousStep <=6){
-            robot.setTurretPitchPosition(.262);
-        }
-        else if (autonomousStep >= 7 && autonomousStep <= 11){
-            robot.setTurretPitchPosition(.406);
+            robot.setShooterTargetRPM(robot.findShooterRPM());
+            robot.setTurretPitchPosition(robot.findShooterPitch());
         }
         else{
             robot.setCollectorIntakePercentage(0);
@@ -139,6 +131,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC){
                     autonomousStep += 1;
+                    robot.setPipeline(1);
                     startTime = System.currentTimeMillis();
                 }
                 break;
@@ -173,7 +166,6 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 correction = PIDPivot.calculate(angleC + robot.getYaw() - startingYaw );
                 leftpower = correction;
                 rightpower = -correction;
-                robot.setPipeline(1);
                 //turning left
                 if (Math.abs(Math.abs(robot.getYaw() - startingYaw)-angleC) <= 1.5){
                     if (!time){

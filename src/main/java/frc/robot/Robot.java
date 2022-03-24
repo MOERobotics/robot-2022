@@ -272,7 +272,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     turretPower = 0;
-
+    robot.setPipeline(1);
 
     switch (POVDirection.getDirection(xbox.getPOV())) {
       case NORTH: //MEDIUM SHOT RANGE
@@ -284,8 +284,8 @@ public class Robot extends TimedRobot {
         turretPitch = 1.0;
         break;
       case SOUTH: ////CLOSE SHOT--> collector out
-        targetRPM = 3400*.7;
-        turretPitch = 0.00;
+        targetRPM = 2165;
+        turretPitch = 0.028;
         turnTo225 = true;
         turnTo45 = false;
         break;
