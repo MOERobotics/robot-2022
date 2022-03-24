@@ -37,7 +37,7 @@ public class Hang extends GenericCommand{
 
 
     //////////////Now the real stuff
-    double escapeHeight = 6;///TODO:what is this??
+    double escapeHeight = 7;///TODO:what is this??
     boolean firstTime = true;
     int countLeft = 0;
     int countRight = 0;
@@ -52,7 +52,7 @@ public class Hang extends GenericCommand{
     double turretPower = 0;
     double level = 7;
     double leveltol = 2;
-    double topHeight = 27;
+    double topHeight = 26;
     double topExtend = 31;
     boolean swingTime = false;
     double origPitch;
@@ -416,6 +416,7 @@ public class Hang extends GenericCommand{
                         System.out.print("We are going to step 17 of the climb at ");
                         System.out.println(System.currentTimeMillis()%1000000);
                         swingTime = false;
+                        origPitch = robot.getPitch();
                         commandStep += 1;//TODO:change back
                     }
                     break;
@@ -423,7 +424,12 @@ public class Hang extends GenericCommand{
                     if (firstTime){
                         System.out.print("We are going to step 11 of the climb at ");
                         System.out.println(System.currentTimeMillis()%1000000);
-                        commandStep = 11;
+                        if (robot.getPitch() >= -42 && robot.getPitch() > origPitch){
+                            commandStep = 11;
+                        }
+                        else{
+                            origPitch = robot.getPitch();
+                        }
                         countRight = 0;
                         countLeft = 0;
                         rightArrived = false;
@@ -433,7 +439,12 @@ public class Hang extends GenericCommand{
                     else{
                         System.out.print("We are going to step 18 of the climb at ");
                         System.out.println(System.currentTimeMillis()%1000000);
-                        commandStep += 1;
+                        if (robot.getPitch() >= -42 && robot.getPitch() > origPitch){
+                            commandStep += 1;
+                        }
+                        else{
+                            origPitch = robot.getPitch();
+                        }
                         leftArmPower = 0;
                         rightArrived = false;
                         leftArrived = false;

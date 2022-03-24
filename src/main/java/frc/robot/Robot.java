@@ -560,16 +560,16 @@ public class Robot extends TimedRobot {
           delayLeft = true;
           leftTime = System.currentTimeMillis();
         }
-        if (!robot.getClimbSensorLeft() && (System.currentTimeMillis() - leftTime >= 100)){
+        if (!robot.getClimbSensorLeft() && (System.currentTimeMillis() - leftTime >= 200)){
           driveLeft = 0;
         }
-        if (!robot.getClimbSensorRight() && (System.currentTimeMillis() - rightTime >= 100)){
+        if (!robot.getClimbSensorRight() && (System.currentTimeMillis() - rightTime >= 200)){
           driveRight = 0;
         }
 
         if (!robot.getClimbSensorLeft() && !robot.getClimbSensorRight()
-                && (System.currentTimeMillis() - leftTime >= 100)
-                && (System.currentTimeMillis() - rightTime >= 100)){
+                && (System.currentTimeMillis() - leftTime >= 200)
+                && (System.currentTimeMillis() - rightTime >= 200)){
           robot.turnOffPTO();
           armReset = false;
           delayRight = false;
