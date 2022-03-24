@@ -47,8 +47,7 @@ public class PixyTesting extends GenericAutonomous {
                 if(offset > tolerance){
                     leftPower += steer;
                     rightPower -= steer;
-                }
-                else if(offset < -tolerance){
+                } else if(offset < -tolerance){
                     leftPower -= steer;
                     rightPower += steer;
                 }

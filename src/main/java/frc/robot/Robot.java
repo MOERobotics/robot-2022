@@ -14,6 +14,7 @@ import frc.robot.command.*;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
 import frc.robot.generic.Pixycam;
+import frc.robot.generic.TurretBot;
 
 import java.util.*;
 import java.util.function.Function;
@@ -26,6 +27,7 @@ public class Robot extends TimedRobot {
   public static final GenericAutonomous
           autoArc = new autoArc(),
           ATerminalReturn = new BallAtoTerminalReturn(),
+          PixyTesting = new PixyTesting(),
           simpleBTerminal = new BallBtoTerminal(),
           simpleCTerminal = new BallCtoTerminal(),
           CTerminalReturn = new BallCtoTerminalReturn(),
@@ -34,11 +36,11 @@ public class Robot extends TimedRobot {
           calibration = new Calibration(),
           shortRun = new ShortRun();
 
-  GenericRobot robot = new Lightning();
+  GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = CTerminalReturn;
+  GenericAutonomous autonomous = PixyTesting;
   GenericCommand testHang = new HangWithoutAlign();
 
 
@@ -95,8 +97,13 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     System.out.println("Klaatu barada nikto");
     robot.setTurretPitchPosition(0);
-    Thread t = new Thread(robot.getPixyCam());
-    t.start();
+
+    Pixycam pixycam = robot.getPixyCam();
+    if(pixycam != null){
+      pixycam.start();
+    } else {
+      System.err.println("NO PIXYCAM");
+    }
   }
 
 
@@ -130,7 +137,7 @@ public class Robot extends TimedRobot {
     if (trackedCargo != null) {
       //proportional offset is most important var for reading deviations
       //round to 2 decimal places
-      double pOS = Math.round(trackedCargo.getProportionalOffset()*100)/100;
+      double pOS = Math.round(trackedCargo.getProportionalOffsetX()*100)/100;
       String msg = "pOS= "+pOS+ " " +trackedCargo.toString();
       SmartDashboard.putString("PIXY Tracked Cargo ", msg);
     }
@@ -294,6 +301,7 @@ public class Robot extends TimedRobot {
     xbox.getRawButtonPressed(3);
     turnTo45 = false;
     turnTo225 = false;
+
   }
 
   @Override
@@ -310,7 +318,7 @@ public class Robot extends TimedRobot {
         targetRPM = 2000;
         turretPitch = 0.8;
         break;
-      case SOUTH: ////CLOSE SHOT--> collector out
+      case SOUTH: ////CLOSE SHOT --> collector out
         targetRPM = 3400;
         turretPitch = 0.00;
         turnTo225 = true;
