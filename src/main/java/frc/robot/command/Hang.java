@@ -37,7 +37,7 @@ public class Hang extends GenericCommand{
 
 
     //////////////Now the real stuff
-    double escapeHeight = 7;///TODO:what is this??
+    double escapeHeight = 5;///TODO:what is this??
     boolean firstTime = true;
     int countLeft = 0;
     int countRight = 0;
@@ -233,7 +233,7 @@ public class Hang extends GenericCommand{
                     countRight = 0;
                     startHeightLeft = robot.armHeightLeft();
                     startHeightRight = robot.armHeightRight();
-                    if (System.currentTimeMillis() - startingTime >= 2000){
+                    if (System.currentTimeMillis() - startingTime >= 1000){
                         SmartDashboard.putNumber("driveOutputCurrent", robot.getDriveCurrent());
                         System.out.print("We are going to step 2 of the climb at ");
                         System.out.println(System.currentTimeMillis()%1000000);
@@ -426,6 +426,7 @@ public class Hang extends GenericCommand{
                         System.out.println(System.currentTimeMillis()%1000000);
                         if (robot.getPitch() >= -42 && robot.getPitch() > origPitch){
                             commandStep = 11;
+                            firstTime = false;
                         }
                         else{
                             origPitch = robot.getPitch();
@@ -434,7 +435,6 @@ public class Hang extends GenericCommand{
                         countLeft = 0;
                         rightArrived = false;
                         leftArrived = false;
-                        firstTime = false;
                     }
                     else{
                         System.out.print("We are going to step 18 of the climb at ");

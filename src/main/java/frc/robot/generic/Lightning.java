@@ -357,7 +357,7 @@ public class Lightning implements GenericRobot {
     public double getAlternateTurretAngle(){
         double raw = encoderTurretAlt.getPosition();
         double out;
-        double offset = 43;
+        double offset = 57;
         out = (raw *  136.467) - 5.73 - offset;
         if (out>360)
         {
