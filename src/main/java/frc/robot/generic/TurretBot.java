@@ -294,8 +294,6 @@ public class TurretBot implements GenericRobot {
 		shooterBPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
 	}
 
-
-
 	@Override
 	public void setShooterPowerPct(double topPCT, double bottomPCT) {
 		setShooterPowerPctTop(topPCT);

@@ -17,7 +17,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
     double correction;
 
     double distanceB = 61.5;
-    double distanceTerminal = 142.6;
+    double distanceTerminal = 159.6;
     double rampDownDist = 10;
 
     PIDController PIDTurret;
@@ -174,7 +174,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                     leftpower = -ramp;
                     rightpower = -ramp;
                 }
-                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal) {
+                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal - 1000) {
                     autonomousStep += 1;
                     leftpower = 0;
                     rightpower = 0;
@@ -198,8 +198,6 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 break;
         }
         robot.drivePercent(leftpower, rightpower);
-
-
 
     }
 }

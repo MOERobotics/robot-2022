@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = calibration;
+  GenericAutonomous autonomous = CTerminalReturn;
   GenericCommand testHang = new HangWithoutAlign();
 
 
