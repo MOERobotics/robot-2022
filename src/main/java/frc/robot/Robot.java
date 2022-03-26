@@ -131,6 +131,7 @@ public class Robot extends TimedRobot {
     }
 
 
+    SmartDashboard.putNumber("FindDistance", robot.findDistHub());
     SmartDashboard.putNumber("XBOX AXIS DEBUG - 0 ", xbox.getRawAxis(0));
     SmartDashboard.putNumber("XBOX AXIS DEBUG - 1 ", xbox.getRawAxis(1));
     SmartDashboard.putNumber("XBOX AXIS DEBUG - 2 ", xbox.getRawAxis(2));
@@ -264,6 +265,7 @@ public class Robot extends TimedRobot {
     turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     hang = false;
     countHang = 0;
+    armReset = false;
     xbox.getRawButtonPressed(3);
     turnTo45 = false;
     turnTo225 = false;
@@ -284,8 +286,8 @@ public class Robot extends TimedRobot {
         turretPitch = 1.0;
         break;
       case SOUTH: ////CLOSE SHOT--> collector out
-        targetRPM = 2165;
-        turretPitch = 0.028;
+        targetRPM = 2175;
+        turretPitch = 0.03;
         turnTo225 = true;
         turnTo45 = false;
         break;
