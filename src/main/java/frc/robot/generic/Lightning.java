@@ -19,6 +19,7 @@ public class Lightning implements GenericRobot {
     public static  final double LEFTBTOLERANCE = 0;
     public static  final double RIGHTATOLERANCE = 0;
     public static  final double RIGHTBTOLERANCE = 0;
+    public static double DistHub = 0;
 
     AHRS navx = new AHRS(SPI.Port.kMXP, (byte) 50);
 
@@ -357,7 +358,7 @@ public class Lightning implements GenericRobot {
     public double getAlternateTurretAngle(){
         double raw = encoderTurretAlt.getPosition();
         double out;
-        double offset = 57;
+        double offset = 50;
         out = (raw *  136.467) - 5.73 - offset;
         if (out>360)
         {
@@ -722,13 +723,21 @@ public class Lightning implements GenericRobot {
     @Override
     public double findDistHub(){
         double x = getTargetY();
-        return (.413*Math.pow(x,2)-11.9*x+221);
+        if (x != 0){
+            DistHub = (.413*Math.pow(x,2)-11.9*x+221);
+        }
+        return DistHub;
     }
 
     @Override
     public double findShooterRPM(){
         double x = findDistHub()/12.0;
-        return (-3020 + 1364*x + -109*Math.pow(x,2) + 2.93*Math.pow(x,3)); /*+(320/4.5*(x-14)+80)*/
+        if(x*12 <= 160){
+            return (-3020 + 1364*x + -109*Math.pow(x,2) + 2.93*Math.pow(x,3));
+        }
+        else {
+            return (-3020 + 1364 * x + -109 * Math.pow(x, 2) + 2.93 * Math.pow(x, 3)) - ((x- 160/12.0)*50/((203-160)/12.0));
+        }
     }
 
     @Override
