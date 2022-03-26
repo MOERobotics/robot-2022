@@ -6,6 +6,8 @@ import frc.robot.generic.GenericRobot;
 public abstract class GenericCommand {
     public int commandStep = -1;
 
+    public void altBegin(GenericRobot robot){}
+
     public void begin(GenericRobot robot) {
         System.out.println("I don't define begin() steps in my command :'(");
     }

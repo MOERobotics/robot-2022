@@ -59,6 +59,24 @@ public class Hang extends GenericCommand{
 
     PIDController turretPIDController;
 
+    public void altBegin(GenericRobot robot){
+        robot.raiseCollector();
+        robot.setArmsForward();
+        startingTime = System.currentTimeMillis();
+        commandStep = -1;
+        leftSensor = false;
+        rightSensor = false;
+        leftArmPower = 0;
+        rightArmPower = 0;
+        leftPower = 0;
+        rightPower = 0;
+        lTraveled = 0;
+        fwd = 49.5;
+        PIDSteering = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
+        turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
+        tapeAlign = false;
+        firstTime = true;
+    }
 
     public void begin(GenericRobot robot){
         startingTime = System.currentTimeMillis();

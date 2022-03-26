@@ -98,6 +98,9 @@ public class Robot extends TimedRobot {
   boolean delayRight = false;
   double leftTime;
   double rightTime;
+  boolean altHang = false;
+  int countAltHang = 0;
+  double altHangStartTime;
 
 
 
@@ -131,6 +134,7 @@ public class Robot extends TimedRobot {
     }
 
 
+    SmartDashboard.putNumber("FindDistance", robot.findDistHub());
     SmartDashboard.putNumber("XBOX AXIS DEBUG - 0 ", xbox.getRawAxis(0));
     SmartDashboard.putNumber("XBOX AXIS DEBUG - 1 ", xbox.getRawAxis(1));
     SmartDashboard.putNumber("XBOX AXIS DEBUG - 2 ", xbox.getRawAxis(2));
@@ -264,6 +268,10 @@ public class Robot extends TimedRobot {
     turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     hang = false;
     countHang = 0;
+    altHang = false;
+    countAltHang = 0;
+    armReset = false;
+
     xbox.getRawButtonPressed(3);
     turnTo45 = false;
     turnTo225 = false;
@@ -284,8 +292,8 @@ public class Robot extends TimedRobot {
         turretPitch = 1.0;
         break;
       case SOUTH: ////CLOSE SHOT--> collector out
-        targetRPM = 2165;
-        turretPitch = 0.028;
+        targetRPM = 2175;
+        turretPitch = 0.03;
         turnTo225 = true;
         turnTo45 = false;
         break;
@@ -297,17 +305,31 @@ public class Robot extends TimedRobot {
         break;
     }
 
+    if (joystick.getRawButtonPressed(5) && joystick.getRawButtonPressed(6)){
+      countAltHang = (countAltHang + 1)%2;
+    }
+
+    if (countAltHang == 1){
+      altHang = true;
+      countHang = 0;
+    }
+    else{
+      altHang = false;
+    }
+
     if (joystick.getRawButtonPressed(8)) {
       countHang = (countHang + 1) % 2;
     }
 
     if (countHang == 1) {
       hang = true;
+      countAltHang = 0;
+
     } else {
       hang = false;
     }
 
-    if (!hang && !armReset) {
+    if (!hang && !armReset && !altHang) {
       reset = true;
       robot.turnOffPTO();
 
@@ -547,6 +569,16 @@ public class Robot extends TimedRobot {
       //////////////////////////////////////////////////POWER SETTERS END
 
     }
+    if (altHang){
+     if (reset){
+       command.altBegin(robot);
+       reset = false;
+     }
+     else{
+       command.step(robot);
+     }
+
+    }
     if (armReset){
       robot.turnOnPTO();
       if (armReset && (System.currentTimeMillis() - timerForPTO)>=2000){
@@ -601,6 +633,8 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
     joystick.getRawButtonPressed(10);
     joystick.getRawButtonPressed(9);
+    joystick.getRawButtonPressed(5);
+    joystick.getRawButtonPressed(6);
     xbox.getRawButtonPressed(3);
     joystick.getRawButtonPressed(8);
     hang = false;

@@ -386,11 +386,11 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void setTurretPowerPct(double powerPct) {
-        if ( (getAlternateTurretAngle()>350) & (powerPct<0))
+        if ( (getAlternateTurretAngle()>345) & (powerPct<0))
         {
             powerPct = 0;
         }
-        if ( (getAlternateTurretAngle()<10) & (powerPct>0))
+        if ( (getAlternateTurretAngle()<15) & (powerPct>0))
         {
             powerPct = 0;
         }
@@ -728,13 +728,13 @@ public class Lightning implements GenericRobot {
     @Override
     public double findShooterRPM(){
         double x = findDistHub()/12.0;
-        return (-3020 + 1364*x + -109*Math.pow(x,2) + 2.93*Math.pow(x,3));
+        return (-3020 + 1364*x + -109*Math.pow(x,2) + 2.93*Math.pow(x,3)); /*+ (320/4.5*(x-14)+80))*/
     }
 
     @Override
     public double findShooterPitch(){
         double x = findDistHub()/12.0;
-        return (-0.217 + 0.0503*x + -8.84e-04*Math.pow(x,2));
+        return (-0.217 + 0.0503*x + -8.84e-04*Math.pow(x,2));/*+ (.02/4.5*(x-14)+.01))*/
     }
 
 }
