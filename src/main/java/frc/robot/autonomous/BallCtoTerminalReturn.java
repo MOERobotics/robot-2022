@@ -15,12 +15,12 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
 
     double leftpower;
     double rightpower;
-    double defaultPower = .6;
+    double defaultPower = .75;
     double correction;
     boolean time = false;
 
     double distanceC = 47.9;
-    double distanceTerminal = 219;
+    double distanceTerminal = 223;
     double angleC = 84.74;
     double rampDownDist = 10;
 
@@ -87,11 +87,11 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 currentTurretPower = -.2;
             }
         }
-        if (autonomousStep <= 11){
+        if (autonomousStep <= 13){
             robot.setTurretPowerPct(currentTurretPower);
         }
 
-        if (autonomousStep >= 1 && autonomousStep <= 11){
+        if (autonomousStep >= 1 && autonomousStep <= 13){
             robot.getCargo();
             robot.shoot();
             robot.setShooterTargetRPM(robot.findShooterRPM());
@@ -208,11 +208,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
             case 8: //collect Ball Terminal & stop to collect another ball from player
                 leftpower = 0;
                 rightpower = 0;
-                if(System.currentTimeMillis() - startTime >= 2000) {
-                    leftpower = 0;
-                    rightpower = 0;
-                    autonomousStep += 1;
-                }
+                autonomousStep += 1;
                 //TODO: at some point test how long we actually have to wait to collect the other ball
                 break;
             case 9: //Drive back to Ball C
@@ -221,32 +217,51 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 leftpower = -1*(defaultPower - correction);
                 rightpower = -1*(defaultPower + correction);
 
-                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal-110 - rampDownDist){ ///TODO: change
+                if (Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) <= rampDownDist){
+                    double rampUp = rampDown(defaultPower, 0.1, startDistance, rampDownDist,
+                            robot.getDriveDistanceInchesLeft(), rampDownDist);
+                    leftpower = defaultPower - rampUp;
+                    rightpower = defaultPower - rampUp;
+                }
+
+
+
+                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal-50 - rampDownDist){
                     double ramp = rampDown(defaultPower, 0, startDistance, 10,
-                            robot.getDriveDistanceInchesLeft(), distanceTerminal-150/*+40*/);
+
+                            robot.getDriveDistanceInchesLeft(), distanceTerminal-50);
                     leftpower = -ramp;
                     rightpower = -ramp;
                 }
-                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal-110){
+                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal-98){
                     leftpower = 0;
                     rightpower = 0;
                     autonomousStep += 1;
+                    startTime = System.currentTimeMillis();
                 }
                 break;
-            case 10: //shoot it :)
+            case 10: //delay
+                if (System.currentTimeMillis() - startTime >= 400){
+                    autonomousStep += 1;
+                }
+            case 11: //shoot it :)
                 if (robot.canShoot()){
                     robot.setActivelyShooting(true);
                     startTime = System.currentTimeMillis();
                     autonomousStep += 1.00;
                 }
                 break;
-            case 11: //shoot part 2
+            case 12: //shoot part 2
+                System.out.print("I see a target, this is my rpm: ");
+                System.out.print(robot.getShooterRPMTop());
+                System.out.print(" and my pitch: ");
+                System.out.println(robot.getTurretPitchPosition());
                 if (System.currentTimeMillis() - startTime >= 2000){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1.0;
                 }
                 break;
-            case 12: //End of autonomous, wait for Teleop
+            case 13: //End of autonomous, wait for Teleop
                 leftpower = 0;
                 rightpower = 0;
                 break;

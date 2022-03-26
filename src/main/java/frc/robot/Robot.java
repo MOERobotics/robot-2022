@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
           autoArc = new AutoArc5Ball(),
           ATerminalReturn = new BallAtoTerminalReturn(),
           simpleBTerminal = new BallBtoTerminal(),
-          simpleCTerminal = new BallCtoTerminal(),
+          simpleC = new BallSimpleC(),
           CTerminalReturn = new BallCtoTerminalReturn(),
           BTerminalReturn = new BallBtoTerminalReturn(),
           simpleB         = new BallSimpleB(),
@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = calibration;
+  GenericAutonomous autonomous = CTerminalReturn;
   GenericCommand testHang = new HangWithoutAlign();
 
 
@@ -268,6 +268,7 @@ public class Robot extends TimedRobot {
     turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     hang = false;
     countHang = 0;
+    armReset = false;
     altHang = false;
     countAltHang = 0;
     armReset = false;
@@ -299,7 +300,7 @@ public class Robot extends TimedRobot {
         break;
       case WEST:
         targetRPM = 2340; //////////collector facing
-        turretPitch = 0.08;
+        turretPitch = 0.064;
         turnTo45 = true;
         turnTo225 = false;
         break;
@@ -648,7 +649,7 @@ public class Robot extends TimedRobot {
     if (joystick.getRawButton(5)) autonomous = ATerminalReturn;
     if (joystick.getRawButton(6)) autonomous = BTerminalReturn;
     if (joystick.getRawButton(9)) autonomous = CTerminalReturn;
-    if (joystick.getRawButton(7)) autonomous = shortRun;
+    if (joystick.getRawButton(7)) autonomous = simpleC;
 
   }
 
