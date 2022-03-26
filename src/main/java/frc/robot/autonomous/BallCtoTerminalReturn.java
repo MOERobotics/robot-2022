@@ -218,8 +218,10 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 rightpower = -1*(defaultPower + correction);
 
                 if (Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) <= rampDownDist){
-                    double rampUp = rampDown(0, defaultPower, startDistance, rampDownDist,
+                    double rampUp = rampDown(defaultPower, 0.1, startDistance, rampDownDist,
                             robot.getDriveDistanceInchesLeft(), rampDownDist);
+                    leftpower = defaultPower - rampUp;
+                    rightpower = defaultPower - rampUp;
                 }
 
 
@@ -250,6 +252,10 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 }
                 break;
             case 12: //shoot part 2
+                System.out.print("I see a target, this is my rpm: ");
+                System.out.print(robot.getShooterRPMTop());
+                System.out.print(" and my pitch: ");
+                System.out.println(robot.getTurretPitchPosition());
                 if (System.currentTimeMillis() - startTime >= 2000){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1.0;

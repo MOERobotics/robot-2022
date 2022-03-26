@@ -480,7 +480,6 @@ public class Lightning implements GenericRobot {
             shooterC.set(0);
         }
         else {
-            System.out.printf("Kevin was wrong %f\n", rpm);
             shooterCPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
         }
     }
