@@ -37,6 +37,7 @@ public class BallSimpleC extends GenericAutonomous {
 
     double indexerPct;
     double collectorPct;
+    boolean targetFoundA = false;
 
 
 
@@ -53,6 +54,7 @@ public class BallSimpleC extends GenericAutonomous {
         PIDPivot = new PIDController(robot.getPIDpivotP(), robot.getPIDpivotI(), robot.getPIDpivotD());
         PIDTurret = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
         robot.setPipeline(0);
+        targetFoundA = false;
     }
 
     @Override
@@ -77,7 +79,7 @@ public class BallSimpleC extends GenericAutonomous {
             PIDTurret.reset();
         }
 
-        if (autonomousStep < 4){
+        if (autonomousStep < 4 && !targetFoundA){
             if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
                 currentTurretPower = .3;
             }
@@ -117,6 +119,9 @@ public class BallSimpleC extends GenericAutonomous {
                 }
                 break;
             case 1: //drive to ball C
+                if (robot.isTargetFound()){
+                    targetFoundA = true;
+                }
                 collectorPct = 1;
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
@@ -136,13 +141,21 @@ public class BallSimpleC extends GenericAutonomous {
                 }
                 break;
             case 2: //stop
+                if (robot.isTargetFound()){
+                    targetFoundA = true;
+                }
                 leftpower = 0;
                 rightpower = 0;
                 startDistance = robot.getDriveDistanceInchesLeft();
-                autonomousStep += 1;
+                if (System.currentTimeMillis() - startTime >= 500){
+                    autonomousStep += 1;
+                }
                 time = false;
                 break;
             case 3: //create a target shooter value and see if shooter reaches it.
+                if (robot.isTargetFound()){
+                    targetFoundA = true;
+                }
                 if (robot.isTargetFound() && robot.canShoot() && (-5 < average) && (average< 5)){
                     robot.setActivelyShooting(true);
                     startTime = System.currentTimeMillis();

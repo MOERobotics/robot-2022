@@ -22,7 +22,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
     double distanceC = 47.9;
     double distanceTerminal = 223;
     double angleC = 84.74;
-    double rampDownDist = 10;
+    double rampDownDist = 20;
 
     PIDController PIDDriveStraight;
     PIDController PIDTurret;
@@ -182,9 +182,6 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 autonomousStep +=1;
                 break;
             case 6: //turn to go to Ball Terminal
-                if(robot.isTargetFound()){
-                    targetFoundB = true;
-                }
                 correction = PIDPivot.calculate(angleC + robot.getYaw() - startingYaw );
                 leftpower = correction;
                 rightpower = -correction;

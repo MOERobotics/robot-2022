@@ -680,12 +680,12 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double turretPIDgetI() {
-        return 0;
+        return 1.0e-3;
     }
 
     @Override
     public double turretPIDgetD() {
-        return 1.0e-3;
+        return 2.0e-3;
     }
 
 
