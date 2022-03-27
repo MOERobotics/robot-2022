@@ -29,6 +29,8 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
 
     PIDController PIDDriveStraight;
 
+    boolean targetFoundA = false;
+
     @Override
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
@@ -61,8 +63,8 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
         }else{
             PIDTurret.reset();
         }
-        if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 2000)) {
-            currentTurretPower = .4;
+        if((!robot.isTargetFound()) && !targetFoundA) {
+            currentTurretPower = .2;
         }
         robot.setTurretPowerPct(currentTurretPower);
         //////////AUTO TRACK STUFF
@@ -95,6 +97,9 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 break;
 
             case 1: //drive to ball B
+                if (robot.isTargetFound()){
+                    targetFoundA = false;
+                }
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
@@ -113,11 +118,17 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 }
                 break;
             case 2: //stop
+                if (robot.isTargetFound()){
+                    targetFoundA = false;
+                }
                 leftpower = 0;
                 rightpower = 0;
                 autonomousStep += 1;
                 break;
             case 3:
+                if (robot.isTargetFound()){
+                    targetFoundA = false;
+                }
                 if (robot.isTargetFound() && robot.canShoot() && (-5 < average) && (average < 5)){
                     robot.setActivelyShooting(true);
                     startTime = System.currentTimeMillis();
