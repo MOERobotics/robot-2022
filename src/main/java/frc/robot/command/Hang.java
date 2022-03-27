@@ -512,10 +512,21 @@ public class Hang extends GenericCommand{
 
             }
         if (robot.armHeightLeft() - robot.armHeightRight() > 1){
-            leftArmPower = 0;
+            if (rightArmPower == defaultClimbPowerUp){
+                leftArmPower = 0;
+            }
+            else{
+                rightArmPower = 0;
+            }
         }
         else if (robot.armHeightRight() - robot.armHeightLeft() > 1){
-            rightArmPower = 0;
+            if (rightArmPower == defaultClimbPowerUp){
+                rightArmPower = 0;
+            }
+            else{
+                leftArmPower = 0;
+            }
+
         }
 
 
