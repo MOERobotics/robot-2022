@@ -105,6 +105,13 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= rampDownDist){
+                    double rampUp = rampDown(defaultPower, 0.1, startDistance, rampDownDist,
+                            robot.getDriveDistanceInchesLeft(), rampDownDist);
+                    leftpower = defaultPower - rampUp;
+                    rightpower = defaultPower - rampUp;
+                }
+
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB - rampDownDist){
                     double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist,
                             robot.getDriveDistanceInchesLeft(), distanceB);
@@ -156,6 +163,13 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= rampDownDist){
+                    double rampUp = rampDown(defaultPower, 0.1, startDistance, rampDownDist,
+                            robot.getDriveDistanceInchesLeft(), rampDownDist);
+                    leftpower = defaultPower - rampUp;
+                    rightpower = defaultPower - rampUp;
+                }
+
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal - rampDownDist){
                     double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist, robot.getDriveDistanceInchesLeft(), distanceTerminal);
                     leftpower = ramp;
@@ -182,6 +196,13 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
 
                 leftpower = -defaultPower + correction;
                 rightpower = -defaultPower - correction;
+
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= rampDownDist){
+                    double rampUp = rampDown(defaultPower, 0.1, startDistance, rampDownDist,
+                            robot.getDriveDistanceInchesLeft(), rampDownDist);
+                    leftpower = -defaultPower + rampUp;
+                    rightpower = -defaultPower + rampUp;
+                }
 
                 if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal - rampDownDist){
                     double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist, robot.getDriveDistanceInchesLeft(), distanceTerminal);

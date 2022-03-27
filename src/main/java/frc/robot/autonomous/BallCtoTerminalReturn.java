@@ -86,7 +86,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 currentTurretPower = .3;
             }
         }
-        if ((autonomousStep>=4) && (autonomousStep < 8) && !targetFoundB){
+        if ((autonomousStep>=7) && (autonomousStep < 8) && !targetFoundB){
             if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
                 currentTurretPower = -.2;
             }
@@ -130,6 +130,12 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= rampDownDist){
+                    double rampUp = rampDown(defaultPower, 0.1, startDistance, rampDownDist,
+                            robot.getDriveDistanceInchesLeft(), rampDownDist);
+                    leftpower = defaultPower - rampUp;
+                    rightpower = defaultPower - rampUp;
+                }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC - rampDownDist){
                     double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist,
                             robot.getDriveDistanceInchesLeft(), distanceC);
@@ -211,6 +217,13 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
 
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
+
+                if (robot.getDriveDistanceInchesLeft() - startDistance >= rampDownDist){
+                    double rampUp = rampDown(defaultPower, 0.1, startDistance, rampDownDist,
+                            robot.getDriveDistanceInchesLeft(), rampDownDist);
+                    leftpower = defaultPower - rampUp;
+                    rightpower = defaultPower - rampUp;
+                }
 
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal - rampDownDist){
                     double ramp = rampDown(defaultPower, .1, startDistance, 10,
