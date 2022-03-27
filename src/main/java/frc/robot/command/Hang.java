@@ -56,6 +56,7 @@ public class Hang extends GenericCommand{
     double topExtend = 31;
     boolean swingTime = false;
     double origPitch;
+    double criticalHeight = 15;
 
     PIDController turretPIDController;
 
@@ -395,8 +396,11 @@ public class Hang extends GenericCommand{
                         leftArmPower = 0;
                         leftArrived = true;
                     }
-                    else{
+                    else if ((robot.getPitch()<-30 ) || (robot.armHeightLeft() < criticalHeight)){
                         leftArmPower = defaultClimbPowerUp;
+                    }
+                    else{
+                        leftArmPower = 0;
                     }
 
 
@@ -404,8 +408,11 @@ public class Hang extends GenericCommand{
                         rightArmPower = 0;
                         rightArrived = true;
                     }
-                    else{
+                    else if ((robot.getPitch()<-30 ) || (robot.armHeightRight() < criticalHeight)){
                         rightArmPower = defaultClimbPowerUp;
+                    }
+                    else{
+                        rightArmPower = 0;
                     }
 
                     if (leftArrived && rightArrived){
@@ -504,16 +511,25 @@ public class Hang extends GenericCommand{
 
 
             }
-        if (robot.getRoll() - level > leveltol){
-            rightArmPower *= .8;
+        if (robot.armHeightLeft() - robot.armHeightRight() > 1){
+            if (rightArmPower == defaultClimbPowerUp){
+                leftArmPower = 0;
+            }
+            else{
+                rightArmPower = 0;
+            }
         }
-        if (robot.getRoll() - level < - leveltol){
-            leftArmPower *= .8;
+        else if (robot.armHeightRight() - robot.armHeightLeft() > 1){
+            if (rightArmPower == defaultClimbPowerUp){
+                rightArmPower = 0;
+            }
+            else{
+                leftArmPower = 0;
+            }
+
         }
-        /*if (Math.abs(robot.getRoll()-level) >= 3*leveltol){
-            rightArmPower = 0;
-            leftArmPower = 0;
-        }*/
+
+
         robot.armPower(leftArmPower, rightArmPower);
         }
     }
