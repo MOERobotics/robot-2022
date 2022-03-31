@@ -303,16 +303,22 @@ public class Hang extends GenericCommand{
                         leftArmPower = 0;
                         leftArrived = true;
                     }
-                    else{
+                    else if (robot.armHeightLeft() - startHeightLeft >= topHeight - 6){
                         leftArmPower = defaultClimbPowerUp;
+                    }
+                    else{
+                        leftArmPower = 1;
                     }
 
                     if (robot.armHeightRight() - startHeightRight >= topHeight){
                         rightArmPower = 0;
                         rightArrived = true;
                     }
-                    else{
+                    else if (robot.armHeightRight() - startHeightRight >= topHeight - 6){
                         rightArmPower = defaultClimbPowerUp;
+                    }
+                    else{
+                        rightArmPower = 1;
                     }
 
 
@@ -417,7 +423,13 @@ public class Hang extends GenericCommand{
                         leftArrived = true;
                     }
                     else if ((robot.getPitch()<-30 ) || (robot.armHeightLeft() < criticalHeight)){
-                        leftArmPower = defaultClimbPowerUp;
+                        if (robot.armHeightLeft() - startHeightLeft >= topExtend - 6){
+                            leftArmPower = defaultClimbPowerUp;
+                        }
+                        else{
+                            leftArmPower = 1;
+                        }
+
                     }
                     else{
                         leftArmPower = 0;
@@ -429,7 +441,12 @@ public class Hang extends GenericCommand{
                         rightArrived = true;
                     }
                     else if ((robot.getPitch()<-30 ) || (robot.armHeightRight() < criticalHeight)){
-                        rightArmPower = defaultClimbPowerUp;
+                        if (robot.armHeightRight() - startHeightRight >= topExtend - 6){
+                            rightArmPower = defaultClimbPowerUp;
+                        }
+                        else{
+                            rightArmPower = 1;
+                        }
                     }
                     else{
                         rightArmPower = 0;
