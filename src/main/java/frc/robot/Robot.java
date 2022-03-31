@@ -106,6 +106,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     System.out.println("Klaatu barada nikto");
     robot.setTurretPitchPosition(0);
+    asdf.start();
   }
 
   @Override

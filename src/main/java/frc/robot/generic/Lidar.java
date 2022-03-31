@@ -37,18 +37,23 @@ public class Lidar extends Thread {
 			char characterRead = (char)newByte[0];
 
 
-			partialString.append(characterRead);
-			//partialString.delete(0,999);
-			//partialString.toString();
+			switch (characterRead) {
+				case '\n':
+				case '\r':
+				case ' ':
+					break;
+				default:
+					partialString.append(characterRead);
+			}
 
 			if (characterRead == ' '){
 				String e = partialString.toString();
-				if(e.length()>1){
+				partialString.delete(0,999);
+				if(e.length()>1 && e.contains("-")){
+					System.out.printf("Lidar '%s'", e);
 					String[] ID = e.split("-");
-
 					int id = Integer.parseInt(ID[0]);
 					int length = Integer.parseInt(ID[1]);
-
 					synchronized (distanceLock) { distances.put(id,length);}
 				}
 			}

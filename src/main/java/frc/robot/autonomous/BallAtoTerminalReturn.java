@@ -102,7 +102,6 @@ public class BallAtoTerminalReturn extends GenericAutonomous {
                 }
                 break;
             case 1: //drive to ball A
-
                 correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
 
                 leftpower = defaultPower + correction;
