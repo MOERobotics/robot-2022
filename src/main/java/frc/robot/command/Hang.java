@@ -56,7 +56,7 @@ public class Hang extends GenericCommand{
     double topExtend = 31;
     boolean swingTime = false;
     double origPitch;
-    double criticalHeight = 15;
+    double criticalHeight = 21;
 
     PIDController turretPIDController;
 
@@ -250,25 +250,56 @@ public class Hang extends GenericCommand{
                     rightArmPower = 0;
                     countLeft = 0;
                     countRight = 0;
+                    leftArrived = false;
+                    rightArrived = false;
                     startHeightLeft = robot.armHeightLeft();
                     startHeightRight = robot.armHeightRight();
                     if (System.currentTimeMillis() - startingTime >= 1000){
                         SmartDashboard.putNumber("driveOutputCurrent", robot.getDriveCurrent());
                         System.out.print("We are going to step 2 of the climb at ");
                         System.out.println(System.currentTimeMillis()%1000000);
-                        commandStep = 2; ///TODO: fix numbering
+                        commandStep += 1; ///TODO: fix numbering
                     }
 
                     break;
 
-                case 2: //////raise climber arms (skip 10 steps after in case we need to scoot/scoot
-
-                    if (robot.getClimbSensorLeft() && countLeft == 0){
-                        startHeightLeft = robot.armHeightLeft();
-                        countLeft = 1;
+                case 1:
+                    if (!robot.getClimbSensorRight()){
+                        startHeightRight = robot.armHeightRight();
+                        rightArrived = true;
                     }
+                    if (!robot.getClimbSensorLeft()){
+                        startHeightLeft = robot.armHeightLeft();
+                        leftArrived = true;
+                    }
+                    commandStep += 1;
+                    break;
+                case 2:
+                    if (!rightArrived){
+                        rightArmPower = defaultClimbPowerDown;
+                    }
+                    if (!leftArrived){
+                        leftArmPower = defaultClimbPowerDown;
+                    }
+                    if (!robot.getClimbSensorLeft()){
+                        leftArrived = true;
+                        leftArmPower = 0;
+                        startHeightLeft = robot.armHeightLeft();
+                    }
+                    if(!robot.getClimbSensorRight()){
+                        rightArmPower = 0;
+                        rightArrived = true;
+                        startHeightRight = robot.armHeightRight();
+                    }
+                    if (leftArrived && rightArrived){
+                        leftArrived = false;
+                        rightArrived = false;
+                        commandStep += 1;
+                    }
+                    break;
+                case 3:
 
-                    if ((robot.armHeightLeft() - startHeightLeft) >= topHeight){
+                    if (robot.armHeightLeft() - startHeightLeft >= topHeight){
                         leftArmPower = 0;
                         leftArrived = true;
                     }
@@ -276,13 +307,7 @@ public class Hang extends GenericCommand{
                         leftArmPower = defaultClimbPowerUp;
                     }
 
-
-                    if (robot.getClimbSensorRight() && countRight == 0){
-                        countRight = 1;
-                        startHeightRight = robot.armHeightRight();
-                    }
-
-                    if ((robot.armHeightRight() - startHeightRight) > topHeight){
+                    if (robot.armHeightRight() - startHeightRight >= topHeight){
                         rightArmPower = 0;
                         rightArrived = true;
                     }
@@ -290,22 +315,17 @@ public class Hang extends GenericCommand{
                         rightArmPower = defaultClimbPowerUp;
                     }
 
+
                     if (leftArrived && rightArrived){
                         leftArrived = false;
                         rightArrived = false;
-                        countLeft = 0;
-                        countRight = 0;
-                        leftArmPower = 0;
-                        rightArmPower = 0;
                         startingTime = System.currentTimeMillis();
-                        System.out.print("We are going to step 3 of the climb at ");
-                        System.out.println(System.currentTimeMillis()%1000000);
+                        rightArmPower = 0;
+                        leftArmPower = 0;
                         commandStep += 1;
-
                     }
-
                     break;
-                case 3:  ///////////unlock rotation piston to send arms back
+                case 4:  ///////////unlock rotation piston to send arms back
                     robot.setArmsBackward();
                     if (System.currentTimeMillis() - startingTime >= 1000) {
                         System.out.print("We are going to step 11 of the climb at ");

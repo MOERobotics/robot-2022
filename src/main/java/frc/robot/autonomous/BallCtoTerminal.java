@@ -119,8 +119,8 @@ public class BallCtoTerminal extends GenericAutonomous {
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC - rampDownDist){
                     double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist,
                             robot.getDriveDistanceInchesLeft(), distanceC);
-                    leftpower = ramp;
-                    rightpower = ramp;
+                    leftpower = ramp + correction;
+                    rightpower = ramp - correction;
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC){
                     autonomousStep += 1;

@@ -29,6 +29,7 @@ public class Robot extends TimedRobot {
           autoArc = new AutoArc5Ball(),
           ATerminalReturn = new BallAtoTerminalReturn(),
           simpleBTerminal = new BallBtoTerminal(),
+          armup = new ArmUpAndDown(),
           simpleC = new BallSimpleC(),
           CTerminalReturn = new BallCtoTerminalReturn(),
           BTerminalReturn = new BallBtoTerminalReturn(),
@@ -40,7 +41,7 @@ public class Robot extends TimedRobot {
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = CTerminalReturn;
+  GenericAutonomous autonomous = armup;
   GenericCommand testHang = new HangWithoutAlign();
 
 
@@ -593,16 +594,16 @@ public class Robot extends TimedRobot {
           delayLeft = true;
           leftTime = System.currentTimeMillis();
         }
-        if (!robot.getClimbSensorLeft() && (System.currentTimeMillis() - leftTime >= 200)){
+        if (!robot.getClimbSensorLeft() && (System.currentTimeMillis() - leftTime >= 170)){
           driveLeft = 0;
         }
-        if (!robot.getClimbSensorRight() && (System.currentTimeMillis() - rightTime >= 200)){
+        if (!robot.getClimbSensorRight() && (System.currentTimeMillis() - rightTime >= 170)){
           driveRight = 0;
         }
 
         if (!robot.getClimbSensorLeft() && !robot.getClimbSensorRight()
-                && (System.currentTimeMillis() - leftTime >= 200)
-                && (System.currentTimeMillis() - rightTime >= 200)){
+                && (System.currentTimeMillis() - leftTime >= 170)
+                && (System.currentTimeMillis() - rightTime >= 170)){
           robot.turnOffPTO();
           armReset = false;
           delayRight = false;

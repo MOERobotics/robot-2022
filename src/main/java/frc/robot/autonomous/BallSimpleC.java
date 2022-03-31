@@ -131,8 +131,8 @@ public class BallSimpleC extends GenericAutonomous {
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC - rampDownDist){
                     double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist,
                             robot.getDriveDistanceInchesLeft(), distanceC);
-                    leftpower = ramp;
-                    rightpower = ramp;
+                    leftpower = ramp + correction;
+                    rightpower = ramp - correction;
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC){
                     autonomousStep += 1;
@@ -165,7 +165,7 @@ public class BallSimpleC extends GenericAutonomous {
             case 4: //turn the shooter off
                 if (System.currentTimeMillis() - startTime >= 2000){
                     robot.setActivelyShooting(false);
-                    autonomousStep = 12; //TODO: REMEMBER TO CHANGE
+                    autonomousStep = 12;
                 }
                 break;
 
