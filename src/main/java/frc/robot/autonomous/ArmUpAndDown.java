@@ -98,7 +98,7 @@ public class ArmUpAndDown extends GenericAutonomous {
                 break;
             case 3:
 
-                if (robot.armHeightLeft() - startHeightLeft >= 5){
+                if (robot.armHeightLeft() - startHeightLeft >= 1){
                     leftArmPower = 0;
                     leftArrived = true;
                 }
@@ -106,7 +106,7 @@ public class ArmUpAndDown extends GenericAutonomous {
                     leftArmPower = defaultClimbPowerUp;
                 }
 
-                if (robot.armHeightRight() - startHeightRight >= 5){
+                if (robot.armHeightRight() - startHeightRight >= 1){
                     rightArmPower = 0;
                     rightArrived = true;
                 }

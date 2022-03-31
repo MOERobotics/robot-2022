@@ -647,7 +647,7 @@ public class Robot extends TimedRobot {
     }
 
     if (joystick.getRawButton(4)) autonomous = autoArc;
-    if (joystick.getRawButton(5)) autonomous = ATerminalReturn;
+    if (joystick.getRawButton(5)) autonomous = armup;
     if (joystick.getRawButton(6)) autonomous = BTerminalReturn;
     if (joystick.getRawButton(9)) autonomous = CTerminalReturn;
     if (joystick.getRawButton(7)) autonomous = simpleC;
