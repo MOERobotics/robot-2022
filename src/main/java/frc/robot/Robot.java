@@ -6,6 +6,8 @@ package frc.robot;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,7 +36,7 @@ public class Robot extends TimedRobot {
           calibration = new Calibration(),
           shortRun = new ShortRun();
 
-  GenericRobot robot = new Lightning();
+  GenericRobot robot = new Falcon();
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
@@ -100,7 +102,7 @@ public class Robot extends TimedRobot {
   double leftTime;
   double rightTime;
 
-
+  Solenoid lightA = new Solenoid(PneumaticsModuleType.CTREPCM, 3);
 
   @Override
   public void robotInit() {
@@ -250,6 +252,16 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Lidar B", asdf.getDistance(1));
     SmartDashboard.putNumber("Lidar C", asdf.getDistance(2));
     SmartDashboard.putNumber("Lidar D", asdf.getDistance(3));
+
+    lightA.set(
+        asdf.getDistance(0) > 785 &&
+        asdf.getDistance(0) < 915
+    );
+
+    SmartDashboard.putNumber("Lidar A - Converted", 6+(15/396.0)*(asdf.getDistance(0)-165));
+    SmartDashboard.putNumber("Lidar B - Converted", 6+(15/396.0)*(asdf.getDistance(1)-165));
+    SmartDashboard.putNumber("Lidar C - Converted", 6+(15/396.0)*(asdf.getDistance(2)-165));
+    SmartDashboard.putNumber("Lidar D - Converted", 6+(15/396.0)*(asdf.getDistance(3)-165));
 
   }
 
