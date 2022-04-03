@@ -29,6 +29,8 @@ public class Lidar extends Thread {
 			SerialPort.StopBits.kOne
 		);
 
+		//"-8192 ";
+
 		StringBuilder partialString = new StringBuilder();
 		while(true) {
 
@@ -49,7 +51,10 @@ public class Lidar extends Thread {
 			if (characterRead == ' '){
 				String e = partialString.toString();
 				partialString.delete(0,999);
+
 				if(e.length()>1 && e.contains("-")){
+					if(e.indexOf("-") == 0)
+						e = " " + e;
 					System.out.printf("Lidar '%s'", e);
 					String[] ID = e.split("-");
 					int id = Integer.parseInt(ID[0]);
