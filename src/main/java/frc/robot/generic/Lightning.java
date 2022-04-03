@@ -3,6 +3,7 @@ package frc.robot.generic;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.*;
 import edu.wpi.first.wpilibj.*;
+import frc.robot.diagnostics.*;
 
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 
@@ -108,7 +109,7 @@ public class Lightning implements GenericRobot {
 
         shooterB.follow(shooterA, true);
 
-        elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+        elevationLeft .setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
         elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
 
         shooterAPIDController.setP(3.0e-4);
@@ -127,12 +128,14 @@ public class Lightning implements GenericRobot {
         shooterCPIDController.setDFilter(0);
         shooterCPIDController.setOutputRange(0, 1);
 
-        /*shooterBPIDController.setP(5.0e-4);
+        /*
+        shooterBPIDController.setP(5.0e-4);
         shooterBPIDController.setI(5.0e-7);
         shooterBPIDController.setD(5.0e-1);
         shooterBPIDController.setFF(1.7e-4);
         shooterBPIDController.getIZone(500);
-        shooterBPIDController.getDFilter(0);*/
+        shooterBPIDController.getDFilter(0);
+        */
 
         shootReadyTimer = System.currentTimeMillis();
 
@@ -155,6 +158,22 @@ public class Lightning implements GenericRobot {
 
         elevationLeft.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
         elevationRight.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+
+
+
+        DiagnosticsController.addModule("collector"     , new SparkMaxDiagnostics(collector     ));
+        DiagnosticsController.addModule("indexer"       , new SparkMaxDiagnostics(indexer       ));
+        DiagnosticsController.addModule("turretRotator" , new SparkMaxDiagnostics(turretRotator ));
+        DiagnosticsController.addModule("shooterA"      , new SparkMaxDiagnostics(shooterA      ));
+        DiagnosticsController.addModule("shooterB"      , new SparkMaxDiagnostics(shooterB      ));
+        DiagnosticsController.addModule("shooterC"      , new SparkMaxDiagnostics(shooterC      ));
+        DiagnosticsController.addModule("leftMotorA"    , new SparkMaxDiagnostics(leftMotorA    ));
+        DiagnosticsController.addModule("leftMotorB"    , new SparkMaxDiagnostics(leftMotorB    ));
+        DiagnosticsController.addModule("rightMotorA"   , new SparkMaxDiagnostics(rightMotorA   ));
+        DiagnosticsController.addModule("rightMotorB"   , new SparkMaxDiagnostics(rightMotorB   ));
+        DiagnosticsController.addModule("navx"          , new NavxDiagnostics(navx   ));
+
+
 
 
     }

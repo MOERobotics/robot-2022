@@ -5,6 +5,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.*;
+import frc.robot.diagnostics.*;
 
 import static com.revrobotics.CANSparkMax.IdleMode.kBrake;
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
@@ -55,6 +56,19 @@ public class TurretBot implements GenericRobot {
 		leftMotorB.setIdleMode(kBrake);
 		rightMotorA.setIdleMode(kBrake);
 		rightMotorB.setIdleMode(kBrake);
+
+
+		DiagnosticsController.addModule("collector"     , new SparkMaxDiagnostics(collector     ));
+		DiagnosticsController.addModule("indexer"       , new SparkMaxDiagnostics(indexer       ));
+		DiagnosticsController.addModule("turretRotator" , new SparkMaxDiagnostics(speeeen       ));
+		DiagnosticsController.addModule("shooterA"      , new SparkMaxDiagnostics(shooterA      ));
+		DiagnosticsController.addModule("shooterB"      , new SparkMaxDiagnostics(shooterB      ));
+		DiagnosticsController.addModule("leftMotorA"    , new SparkMaxDiagnostics(leftMotorA    ));
+		DiagnosticsController.addModule("leftMotorB"    , new SparkMaxDiagnostics(leftMotorB    ));
+		DiagnosticsController.addModule("rightMotorA"   , new SparkMaxDiagnostics(rightMotorA   ));
+		DiagnosticsController.addModule("rightMotorB"   , new SparkMaxDiagnostics(rightMotorB   ));
+		DiagnosticsController.addModule("navx"          , new NavxDiagnostics(navx   ));
+
 
 	}
 

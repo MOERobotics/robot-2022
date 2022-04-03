@@ -12,9 +12,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.command.*;
+import frc.robot.diagnostics.DiagnosticsController;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
 import frc.robot.generic.TurretBot;
+import jdk.jshell.Diag;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -108,6 +110,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     System.out.println("Klaatu barada nikto");
     robot.setTurretPitchPosition(0);
+    DiagnosticsController.instance.start();
   }
 
   @Override
