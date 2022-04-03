@@ -1,5 +1,6 @@
 package frc.robot.generic;
 
+import edu.wpi.first.wpilibj.Timer;
 import io.github.pseudoresonance.pixy2api.Pixy2;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC;
 import io.github.pseudoresonance.pixy2api.links.SPILink;
@@ -30,9 +31,14 @@ public class Pixycam extends Thread {
 	String status = "";
 	String msg = "Init...";
 
+	double generalErrorCount = 0;
+
+	Timer timer;
+
 	@Override @SneakyThrows
 	public void run() {
 		int retc = 0;
+		timer = new Timer();
 		pixycam = Pixy2.createInstance(pixySPI);
 		retc = pixycam.init();
 		switch (retc) {
@@ -73,12 +79,15 @@ public class Pixycam extends Thread {
 				System.out.println("PIXY INIT: Program Change Error");
 				return;
 		}
-		//pixycam.setLamp(0x01);
+		pixycam.setLamp((byte)1, (byte)0);
 		Pixy2CCC ccc = pixycam.getCCC();
 		while(isRunning) {
 			//If nobody has seen our old data,
 			//We don't have permission to get new data
+
 			cargoSearchPermit.acquire();
+			//timer.delay(0.02);
+
 			int blockCount = ccc.getBlocks(true);
 			switch (blockCount) {
 				case 0:
@@ -91,32 +100,46 @@ public class Pixycam extends Thread {
 					//I'm not happy
 					status = "PIXY RUN: General Error";
 					System.out.println("PIXY RUN: General Error");
-					return;
+
+					generalErrorCount++;
+					//return;
+					break;
 				case PIXY_RESULT_BUSY:
 					//I'm not happy
 					status = "PIXY RUN: Busy Error";
 					System.out.println("PIXY RUN: Busy Error");
-					return;
+
+					generalErrorCount += 0.01;
+					//return;
+					break;
 				case PIXY_RESULT_CHECKSUM_ERROR:
 					//I'm not happy
 					status = "PIXY RUN: Checksum Error";
 					System.out.println("PIXY RUN: Checksum Error");
-					return;
+
+					generalErrorCount += 0.0001;
+					//return;
+					break;
 				case PIXY_RESULT_TIMEOUT:
 					//I'm not happy
 					status = "PIXY RUN: Timeout Error";
 					System.out.println("PIXY RUN: Timeout Error");
-					return;
+
+					generalErrorCount += 0.0001;
+					//return;
+					break;
 				case PIXY_RESULT_BUTTON_OVERRIDE:
 					//I'm not happy
 					status = "PIXY RUN: Button Override Error";
 					System.out.println("PIXY RUN: Button Override Error");
-					return;
+					//return;
+					break;
 				case PIXY_RESULT_PROG_CHANGING:
 					//I'm not happy
 					status = "PIXY RUN: Program Change Error";
 					System.out.println("PIXY RUN: Program Change Error");
-					return;
+					//return;
+					break;
 				default:
 					//I'm happy
 					status = "PIXY RUN: Target sighted";
@@ -177,7 +200,23 @@ public class Pixycam extends Thread {
 
 	public PixyCargo identifyClosestCargo(PixyCargo[] cargoList){
 		if(cargoList.length == 0) return null;
-		return cargoList[0];
+		double[] scores = new double[cargoList.length];
+		for (int i = 0; i < cargoList.length; i++) {
+			PixyCargo cargo = cargoList[i];
+			double aspectRatio = cargo.getW() / cargo.getH();
+			double bindingDimension = Math.min(cargo.getW(), cargo.getH());
+			scores[i] = bindingDimension * bindingDimension;
+			scores[i] *= Math.max(cargo.getAge(), 10)/5 + 1;
+		}
+		int maxIndex = 0;
+		double maxScore = scores[0];
+		for (int i = 1; i < cargoList.length; i++) {
+			if(scores[i] > maxScore){
+				maxIndex = i;
+				maxScore = scores[i];
+			}
+		}
+		return cargoList[maxIndex];
 	}
 
 	@Value
@@ -207,7 +246,8 @@ public class Pixycam extends Thread {
 					" x=" + x +
 					" y=" + y +
 					" w=" + w +
-					" h=" + h;
+					" h=" + h +
+					" id=" + id;
 
 		}
 
@@ -217,6 +257,10 @@ public class Pixycam extends Thread {
 		public double getProportionalOffsetY(){
 			return (((double) y) / FRAME_HEIGHT) * 2 - 1;
 		}
+	}
+
+	public double getGeneralErrorCount(){
+		return generalErrorCount;
 	}
 
 }
