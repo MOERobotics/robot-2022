@@ -43,6 +43,8 @@ public class TurretBot implements GenericRobot {
 
 	DigitalInput homeSensor = new DigitalInput(6);
 
+	Pixycam pixycam = new Pixycam();
+
 	public TurretBot(){
 		boolean invertLeft = false;
 		boolean invertRight = true;
@@ -335,4 +337,27 @@ public class TurretBot implements GenericRobot {
 
 	@Override
 	public void setArmsBackward() { return; }
+
+	public Pixycam getPixyCam(){
+		return pixycam;
+	}
+
+	public int pixyCargoCount(){
+		Pixycam pixycam = getPixyCam();
+		if(pixycam == null) return 0;
+		Pixycam.PixyCargo[] pixycargos = pixycam.getCargo(false);
+		return pixycargos.length;
+	}
+
+	//Gets the pixycam offest of the largest (aka closest) ball
+	//Range is from -1 (far left) to +1 (far right), 0 is centered
+	public double pixyOffsetOfClosest(){
+		Pixycam pixycam = getPixyCam();
+		if(pixycam == null) return 0;
+		Pixycam.PixyCargo[] pixycargos = pixycam.getCargo(false);
+		if(pixycargos.length == 0) return 0;
+		Pixycam.PixyCargo closestCargo = pixycam.identifyClosestCargo(pixycargos);
+		if(closestCargo == null) return 0;
+		return closestCargo.getProportionalOffset();
+	}
 }

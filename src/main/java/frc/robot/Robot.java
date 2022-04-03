@@ -14,6 +14,7 @@ import frc.robot.command.*;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
 import frc.robot.generic.Pixycam;
+import frc.robot.generic.TurretBot;
 
 import java.util.*;
 import java.util.function.Function;
@@ -34,7 +35,7 @@ public class Robot extends TimedRobot {
           calibration = new Calibration(),
           shortRun = new ShortRun();
 
-  GenericRobot robot = new Lightning();
+  GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
@@ -95,8 +96,8 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     System.out.println("Klaatu barada nikto");
     robot.setTurretPitchPosition(0);
-    Thread t = new Thread(robot.getPixyCam());
-    t.start();
+    //Thread t = new Thread(robot.getPixyCam());
+    robot.getPixyCam().start();
   }
 
 
@@ -113,17 +114,34 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Is Pixy Null", robot.getPixyCam() == null);
     SmartDashboard.putNumber("Number of cargo on Pixy", foundCargo.length);
 
-
-    for(int i = 0; i < 10; i++){
-      String msg = "PIXY CARGO " + (i+1);
-      if(i < foundCargo.length){
-        SmartDashboard.putString(msg, foundCargo[i].toString());
-      }else{
-        SmartDashboard.putString(msg, "no such cargo");
-
-      }
-
+    for (int i = 0; i < foundCargo.length; i++) {
+      String msg = "RAW PIXY " + i;
+      SmartDashboard.putString(msg, foundCargo[i].toString());
     }
+
+
+
+    for (int clr = 0; clr < 2; clr++) {
+      int currentIndex = 0;
+      String shortClr = (clr == 0) ? "RED" : "BLU";
+      for(int i = 0; i < 6; i++){
+        String msg = "PIXY CARGO " + shortClr + " " + i;
+        if(currentIndex >= foundCargo.length){
+          SmartDashboard.putString(msg, "no such cargo");
+          break;
+        }
+        Pixycam.PixyCargo.PixyCargoColor color = foundCargo[currentIndex].getColor();
+        int clrID = (color == Pixycam.PixyCargo.PixyCargoColor.PIXY_CARGO_RED) ? 0 : 1;
+        if(clrID != clr){
+          i--;
+          currentIndex++;
+          continue;
+        }
+        SmartDashboard.putString(msg, foundCargo[currentIndex].toString());
+        currentIndex++;
+      }
+    }
+
 
     Pixycam.PixyCargo trackedCargo = robot.getPixyCam().identifyClosestCargo();
 
