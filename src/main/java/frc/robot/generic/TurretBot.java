@@ -37,13 +37,13 @@ public class TurretBot implements GenericRobot {
 	SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
 	SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
 
+	final Pixycam pixycam = new Pixycam();
+
 	Solenoid shifter = new Solenoid(PneumaticsModuleType.CTREPCM,0);
 	Servo elevationLeft  = new Servo(0);
 	Servo elevationRight = new Servo(1);
 
 	DigitalInput homeSensor = new DigitalInput(6);
-
-	Pixycam pixycam = new Pixycam();
 
 	public TurretBot(){
 		boolean invertLeft = false;
@@ -338,10 +338,12 @@ public class TurretBot implements GenericRobot {
 	@Override
 	public void setArmsBackward() { return; }
 
+	@Override
 	public Pixycam getPixyCam(){
 		return pixycam;
 	}
 
+	@Override
 	public int pixyCargoCount(){
 		Pixycam pixycam = getPixyCam();
 		if(pixycam == null) return 0;
@@ -349,8 +351,8 @@ public class TurretBot implements GenericRobot {
 		return pixycargos.length;
 	}
 
-	//Gets the pixycam offest of the largest (aka closest) ball
-	//Range is from -1 (far left) to +1 (far right), 0 is centered
+
+	@Override
 	public double pixyOffsetOfClosest(){
 		Pixycam pixycam = getPixyCam();
 		if(pixycam == null) return 0;
@@ -358,6 +360,6 @@ public class TurretBot implements GenericRobot {
 		if(pixycargos.length == 0) return 0;
 		Pixycam.PixyCargo closestCargo = pixycam.identifyClosestCargo(pixycargos);
 		if(closestCargo == null) return 0;
-		return closestCargo.getProportionalOffset();
+		return closestCargo.getProportionalOffsetY();
 	}
 }

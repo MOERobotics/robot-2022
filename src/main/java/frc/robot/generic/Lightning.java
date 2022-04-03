@@ -695,10 +695,12 @@ public class Lightning implements GenericRobot {
     }
 
 
+    @Override
     public Pixycam getPixyCam(){
         return pixycam;
     }
 
+    @Override
     public int pixyCargoCount(){
         Pixycam pixycam = getPixyCam();
         if(pixycam == null) return 0;
@@ -706,8 +708,8 @@ public class Lightning implements GenericRobot {
         return pixycargos.length;
     }
 
-    //Gets the pixycam offest of the largest (aka closest) ball
-    //Range is from -1 (far left) to +1 (far right), 0 is centered
+
+    @Override
     public double pixyOffsetOfClosest(){
         Pixycam pixycam = getPixyCam();
         if(pixycam == null) return 0;

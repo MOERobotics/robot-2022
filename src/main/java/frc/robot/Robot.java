@@ -27,6 +27,7 @@ public class Robot extends TimedRobot {
   public static final GenericAutonomous
           autoArc = new autoArc(),
           ATerminalReturn = new BallAtoTerminalReturn(),
+          PixyTesting = new PixyTesting(),
           simpleBTerminal = new BallBtoTerminal(),
           simpleCTerminal = new BallCtoTerminal(),
           CTerminalReturn = new BallCtoTerminalReturn(),
@@ -39,7 +40,7 @@ public class Robot extends TimedRobot {
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = CTerminalReturn;
+  GenericAutonomous autonomous = PixyTesting;
   GenericCommand testHang = new HangWithoutAlign();
 
 
@@ -96,8 +97,13 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     System.out.println("Klaatu barada nikto");
     robot.setTurretPitchPosition(0);
-    //Thread t = new Thread(robot.getPixyCam());
-    robot.getPixyCam().start();
+
+    Pixycam pixycam = robot.getPixyCam();
+    if(pixycam != null){
+      pixycam.start();
+    } else {
+      System.err.println("NO PIXYCAM");
+    }
   }
 
 
@@ -312,6 +318,7 @@ public class Robot extends TimedRobot {
     xbox.getRawButtonPressed(3);
     turnTo45 = false;
     turnTo225 = false;
+
   }
 
   @Override

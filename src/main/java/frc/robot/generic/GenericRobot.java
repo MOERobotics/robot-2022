@@ -446,8 +446,11 @@ public interface GenericRobot {
 		return 0;
 	}
 
+	/**
+	 * Gets the pixycam offest of the largest (aka closest) ball
+	 * Range is from -1 (far left) to +1 (far right), 0 is centered
+	 */
 	public default double pixyOffsetOfClosest(){
-		//System.out.println("What even is a pixycam");
 		return 0;
 	}
 

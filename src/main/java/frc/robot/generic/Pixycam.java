@@ -9,6 +9,7 @@ import lombok.Value;
 import java.util.concurrent.Semaphore;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 
 import static io.github.pseudoresonance.pixy2api.Pixy2.*;
@@ -19,9 +20,8 @@ public class Pixycam extends Thread {
 
 	boolean isRunning = true;
 
-	private final Pixy2 pixy;
-	//private SPILink pixySPI = new SPILink();
-
+	private Pixy2 pixycam;
+	private SPILink pixySPI = new SPILink();
 
 	private final Semaphore cargoSearchPermit = new Semaphore(1);
 	private final PixyCargo[] NO_CARGO = new PixyCargo[0];
@@ -30,20 +30,11 @@ public class Pixycam extends Thread {
 	String status = "";
 	String msg = "Init...";
 
-	public Pixycam(){
-		status = "Pixy class init'd";
-		long timeA = System.nanoTime();
-		pixy = Pixy2.createInstance(new SPILink());
-
+	@Override @SneakyThrows
+	public void run() {
 		int retc = 0;
-		status = msg;
-		long timeB = System.nanoTime();
-
-		retc = pixy.init();
-		long timeC = System.nanoTime();
-
-		String timeInfo = "AB: " + (timeB-timeA) + " ; BC: " + (timeC-timeB);
-
+		pixycam = Pixy2.createInstance(pixySPI);
+		retc = pixycam.init();
 		switch (retc) {
 			case PIXY_RESULT_OK:
 				//I'm happy
@@ -68,7 +59,7 @@ public class Pixycam extends Thread {
 				return;
 			case PIXY_RESULT_TIMEOUT:
 				//I'm not happy
-				status = "PIXY INIT: Timeout Error :(  " + timeInfo;
+				status = "PIXY INIT: Timeout Error";
 				System.out.println("PIXY INIT: Timeout Error");
 				return;
 			case PIXY_RESULT_BUTTON_OVERRIDE:
@@ -82,15 +73,8 @@ public class Pixycam extends Thread {
 				System.out.println("PIXY INIT: Program Change Error");
 				return;
 		}
-		pixy.setLamp((byte)1, (byte)0);
-
-	}
-
-	@Override @SneakyThrows
-	public void run() {
-
-		//pixycam.setLamp(0x01, 0x01);
-		Pixy2CCC ccc = pixy.getCCC();
+		//pixycam.setLamp(0x01);
+		Pixy2CCC ccc = pixycam.getCCC();
 		while(isRunning) {
 			//If nobody has seen our old data,
 			//We don't have permission to get new data
@@ -99,43 +83,43 @@ public class Pixycam extends Thread {
 			switch (blockCount) {
 				case 0:
 					//I'm happyish
-					if(!status.equals(msg)) status = "PIXY RUN: No Cargo Found";
+					status = "PIXY RUN: No Cargo Found";
 					//Comment out to stop spam
 					//System.out.println("PIXY RUN: No Cargo Found");
 					break;
 				case PIXY_RESULT_ERROR:
 					//I'm not happy
-					if(!status.equals(msg)) status = "PIXY RUN: General Error";
+					status = "PIXY RUN: General Error";
 					System.out.println("PIXY RUN: General Error");
 					return;
 				case PIXY_RESULT_BUSY:
 					//I'm not happy
-					if(!status.equals(msg)) status = "PIXY RUN: Busy Error";
+					status = "PIXY RUN: Busy Error";
 					System.out.println("PIXY RUN: Busy Error");
 					return;
 				case PIXY_RESULT_CHECKSUM_ERROR:
 					//I'm not happy
-					if(!status.equals(msg)) status = "PIXY RUN: Checksum Error";
+					status = "PIXY RUN: Checksum Error";
 					System.out.println("PIXY RUN: Checksum Error");
 					return;
 				case PIXY_RESULT_TIMEOUT:
 					//I'm not happy
-					if(!status.equals(msg)) status = "PIXY RUN: Timeout Error";
+					status = "PIXY RUN: Timeout Error";
 					System.out.println("PIXY RUN: Timeout Error");
 					return;
 				case PIXY_RESULT_BUTTON_OVERRIDE:
 					//I'm not happy
-					if(!status.equals(msg)) status = "PIXY RUN: Button Override Error";
+					status = "PIXY RUN: Button Override Error";
 					System.out.println("PIXY RUN: Button Override Error");
 					return;
 				case PIXY_RESULT_PROG_CHANGING:
 					//I'm not happy
-					if(!status.equals(msg)) status = "PIXY RUN: Program Change Error";
+					status = "PIXY RUN: Program Change Error";
 					System.out.println("PIXY RUN: Program Change Error");
 					return;
 				default:
 					//I'm happy
-					if(!status.equals(msg)) status = "PIXY RUN: Target sighted";
+					status = "PIXY RUN: Target sighted";
 					System.out.println(status);
 
 					PixyCargo[] cargosFound = new PixyCargo[blockCount];
@@ -198,6 +182,8 @@ public class Pixycam extends Thread {
 
 	@Value
 	public static class PixyCargo {
+		static final int FRAME_WIDTH = 320;
+		static final int FRAME_HEIGHT = 200;
 		int x;
 		int y;
 		int w;
@@ -206,14 +192,14 @@ public class Pixycam extends Thread {
 		int id;
 		PixyCargoColor color;
 
-		public static enum PixyCargoColor {
-			PIXY_CARGO_RED,
-			PIXY_CARGO_BLUE
+		public enum PixyCargoColor {
+			RED,
+			BLUE,
 		}
 
-		public String toString(){
-			String shortColor = (color == PixyCargoColor.PIXY_CARGO_RED) ? "RED" : "BLU";
-			return  "offset=" + (y-104) +
+		public String toString() {
+			String shortColor = (color == PixyCargoColor.RED) ? "RED" : "BLU";
+			return  "offset=" + (x-157) +
 					" age=" + age +
 					" clr=" + shortColor +
 					" area=" + (w*h) +
@@ -225,8 +211,11 @@ public class Pixycam extends Thread {
 
 		}
 
-		public double getProportionalOffset(){
-			return (y-104)/104;
+		public double getProportionalOffsetX(){
+			return (((double) x) / FRAME_WIDTH) * 2 - 1;
+		}
+		public double getProportionalOffsetY(){
+			return (((double) y) / FRAME_HEIGHT) * 2 - 1;
 		}
 	}
 
