@@ -137,7 +137,7 @@ public class Robot extends TimedRobot {
           break;
         }
         Pixycam.PixyCargo.PixyCargoColor color = foundCargo[currentIndex].getColor();
-        int clrID = (color == Pixycam.PixyCargo.PixyCargoColor.PIXY_CARGO_RED) ? 0 : 1;
+        int clrID = (color == Pixycam.PixyCargo.PixyCargoColor.RED) ? 0 : 1;
         if(clrID != clr){
           i--;
           currentIndex++;
@@ -154,7 +154,7 @@ public class Robot extends TimedRobot {
     if (trackedCargo != null) {
       //proportional offset is most important var for reading deviations
       //round to 2 decimal places
-      double pOS = Math.round(trackedCargo.getProportionalOffset()*100)/100;
+      double pOS = Math.round(trackedCargo.getProportionalOffsetY()*100)/100;
       String msg = "pOS= "+pOS+ " " +trackedCargo.toString();
       SmartDashboard.putString("PIXY Tracked Cargo ", msg);
     }

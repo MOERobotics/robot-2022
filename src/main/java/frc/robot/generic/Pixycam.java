@@ -136,8 +136,8 @@ public class Pixycam extends Thread {
 							block.getIndex(),
 							//color
 							(block.getSignature() == 1)
-								? PixyCargo.PixyCargoColor.PIXY_CARGO_RED
-								: PixyCargo.PixyCargoColor.PIXY_CARGO_BLUE
+								? PixyCargo.PixyCargoColor.RED
+								: PixyCargo.PixyCargoColor.BLUE
 						);
 
 						cargosFound[i++] = pcargo;
@@ -182,8 +182,8 @@ public class Pixycam extends Thread {
 
 	@Value
 	public static class PixyCargo {
-		static final int FRAME_WIDTH = 320;
-		static final int FRAME_HEIGHT = 200;
+		static final int FRAME_WIDTH = 315;
+		static final int FRAME_HEIGHT = 208;
 		int x;
 		int y;
 		int w;
@@ -199,7 +199,7 @@ public class Pixycam extends Thread {
 
 		public String toString() {
 			String shortColor = (color == PixyCargoColor.RED) ? "RED" : "BLU";
-			return  "offset=" + (x-157) +
+			return  "offset=" + (y-104) +
 					" age=" + age +
 					" clr=" + shortColor +
 					" area=" + (w*h) +
