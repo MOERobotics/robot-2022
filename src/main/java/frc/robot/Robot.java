@@ -14,10 +14,10 @@ import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.command.*;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
+import frc.robot.generic.Pixycam;
 import frc.robot.generic.TurretBot;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,6 +28,7 @@ public class Robot extends TimedRobot {
   public static final GenericAutonomous
           autoArc = new AutoArc5Ball(),
           ATerminalReturn = new BallAtoTerminalReturn(),
+          PixyTesting = new PixyTesting(),
           simpleBTerminal = new BallBtoTerminal(),
           armup = new ArmUpAndDown(),
           simpleC = new BallSimpleC(),
@@ -41,7 +42,7 @@ public class Robot extends TimedRobot {
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = armup;
+  GenericAutonomous autonomous = CTerminalReturn;
   GenericCommand testHang = new HangWithoutAlign();
 
 
@@ -109,10 +110,70 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     System.out.println("Klaatu barada nikto");
     robot.setTurretPitchPosition(0);
+
+    Pixycam pixycam = robot.getPixyCam();
+    if(pixycam != null){
+      pixycam.start();
+    } else {
+      System.err.println("NO PIXYCAM");
+    }
   }
 
   @Override
   public void robotPeriodic() {
+
+    SmartDashboard.putString("PIXY STATUS: ", robot.getPixyCam().getStatus());
+
+    Pixycam.PixyCargo[] foundCargo = new Pixycam.PixyCargo[0];
+
+    if(robot.getPixyCam() != null){
+      foundCargo = robot.getPixyCam().getCargo(true);
+    }
+    SmartDashboard.putBoolean("Is Pixy Null", robot.getPixyCam() == null);
+    SmartDashboard.putNumber("Number of cargo on Pixy", foundCargo.length);
+
+    for (int i = 0; i < foundCargo.length; i++) {
+      String msg = "RAW PIXY " + i;
+      SmartDashboard.putString(msg, foundCargo[i].toString());
+    }
+
+    for (int clr = 0; clr < 2; clr++) {
+      int currentIndex = 0;
+      String shortClr = (clr == 0) ? "RED" : "BLU";
+      for(int i = 0; i < 6; i++){
+        String msg = "PIXY CARGO " + shortClr + " " + i;
+        if(currentIndex >= foundCargo.length){
+          SmartDashboard.putString(msg, "no such cargo");
+          break;
+        }
+        Pixycam.PixyCargo.PixyCargoColor color = foundCargo[currentIndex].getColor();
+        int clrID = (color == Pixycam.PixyCargo.PixyCargoColor.RED) ? 0 : 1;
+        if(clrID != clr){
+          i--;
+          currentIndex++;
+          continue;
+        }
+        SmartDashboard.putString(msg, foundCargo[currentIndex].toString());
+        currentIndex++;
+      }
+    }
+
+
+    Pixycam.PixyCargo trackedCargo = robot.getPixyCam().identifyClosestCargo();
+
+    if (trackedCargo != null) {
+      //proportional offset is most important var for reading deviations
+      //round to 2 decimal places
+      double pOS = Math.round(trackedCargo.getProportionalOffsetY()*100)/100;
+      String msg = "pOS= "+pOS+ " " +trackedCargo.toString();
+      SmartDashboard.putString("PIXY Tracked Cargo ", msg);
+    }
+    else{
+      SmartDashboard.putString("PIXY Tracked Cargo ", "Cargo Not Found :(");
+    }
+
+
+
 
     if (countShoot == 0){
       isShooting = false;
@@ -326,7 +387,6 @@ public class Robot extends TimedRobot {
     if (countHang == 1) {
       hang = true;
       countAltHang = 0;
-
     } else {
       hang = false;
     }

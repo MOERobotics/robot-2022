@@ -37,6 +37,8 @@ public class TurretBot implements GenericRobot {
 	SparkMaxPIDController shooterAPIDController = shooterA.getPIDController();
 	SparkMaxPIDController shooterBPIDController = shooterB.getPIDController();
 
+	final Pixycam pixycam = new Pixycam();
+
 	Solenoid shifter = new Solenoid(PneumaticsModuleType.CTREPCM,0);
 	Servo elevationLeft  = new Servo(0);
 	Servo elevationRight = new Servo(1);
@@ -335,4 +337,29 @@ public class TurretBot implements GenericRobot {
 
 	@Override
 	public void setArmsBackward() { return; }
+
+	@Override
+	public Pixycam getPixyCam(){
+		return pixycam;
+	}
+
+	@Override
+	public int pixyCargoCount(){
+		Pixycam pixycam = getPixyCam();
+		if(pixycam == null) return 0;
+		Pixycam.PixyCargo[] pixycargos = pixycam.getCargo(false);
+		return pixycargos.length;
+	}
+
+
+	@Override
+	public double pixyOffsetOfClosest(){
+		Pixycam pixycam = getPixyCam();
+		if(pixycam == null) return 0;
+		Pixycam.PixyCargo[] pixycargos = pixycam.getCargo(false);
+		if(pixycargos.length == 0) return 0;
+		Pixycam.PixyCargo closestCargo = pixycam.identifyClosestCargo(pixycargos);
+		if(closestCargo == null) return 0;
+		return closestCargo.getProportionalOffsetY();
+	}
 }
