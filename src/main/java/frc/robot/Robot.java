@@ -131,6 +131,8 @@ public class Robot extends TimedRobot {
     }
     SmartDashboard.putBoolean("Is Pixy Null", robot.getPixyCam() == null);
     SmartDashboard.putNumber("Number of cargo on Pixy", foundCargo.length);
+    SmartDashboard.putNumber("Pixy Gen. Erorors", robot.getPixyCam().getGeneralErrorCount());
+
 
     for (int i = 0; i < foundCargo.length; i++) {
       String msg = "RAW PIXY " + i;
@@ -164,7 +166,7 @@ public class Robot extends TimedRobot {
     if (trackedCargo != null) {
       //proportional offset is most important var for reading deviations
       //round to 2 decimal places
-      double pOS = Math.round(trackedCargo.getProportionalOffsetY()*100)/100;
+      double pOS = Math.round(trackedCargo.getProportionalOffsetY()*100.0);
       String msg = "pOS= "+pOS+ " " +trackedCargo.toString();
       SmartDashboard.putString("PIXY Tracked Cargo ", msg);
     }

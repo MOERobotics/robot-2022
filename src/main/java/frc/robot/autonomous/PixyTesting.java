@@ -11,7 +11,10 @@ public class PixyTesting extends GenericAutonomous {
 
 
 
-    double travelDist = 84;
+    double travelDist = 140;
+    double yawTolerance = 10;
+
+    double centerYaw;
 
     @Override
     public void autonomousInit(GenericRobot robot){
@@ -32,6 +35,8 @@ public class PixyTesting extends GenericAutonomous {
                 PIDDriveStraight.enableContinuousInput(-180,180);
                 robot.resetEncoders();
                 robot.resetAttitude();
+                centerYaw = robot.getYaw();
+
                 if (System.currentTimeMillis() - startTime > 100){
                     //startDistance = robot.getDriveDistanceInchesLeft();
                     autonomousStep += 1;
@@ -41,13 +46,14 @@ public class PixyTesting extends GenericAutonomous {
                 leftPower = 0.4;
                 rightPower = 0.4;
 
-                double tolerance = 0.1;
-                double steer = 0.1;
+                double tolerance = 0.3;
+                double steer = 0.08;
                 double offset = robot.pixyOffsetOfClosest();
-                if(offset > tolerance){
+                double curYaw = robot.getYaw();
+                if(offset > tolerance && curYaw < centerYaw + yawTolerance){
                     leftPower += steer;
                     rightPower -= steer;
-                } else if(offset < -tolerance){
+                } else if(offset < -tolerance && curYaw > centerYaw - yawTolerance){
                     leftPower -= steer;
                     rightPower += steer;
                 }
