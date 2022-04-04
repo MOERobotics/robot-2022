@@ -723,7 +723,7 @@ public class Lightning implements GenericRobot {
     public double findDistHub(){
         double x = getTargetY();
         if (x != 0){
-            DistHub = (.413*Math.pow(x,2)-11.9*x+221);
+            DistHub = 214 + -10.4*x + 0.333*Math.pow(x,2);
         }
         return DistHub;
     }

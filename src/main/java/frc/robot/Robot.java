@@ -697,7 +697,7 @@ public class Robot extends TimedRobot {
     int leftAxis = 1;
     int rightAxis = 5;
     double tolerance = 0.8;
-    double drivePower = 0.2;
+    double drivePower = 1;
 
     if (joystick.getRawButton(12)) robot.setTurretPowerPct(0.2);
     else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
