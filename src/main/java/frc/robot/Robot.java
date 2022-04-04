@@ -757,7 +757,7 @@ public class Robot extends TimedRobot {
 
     if (joystick.getRawButton(12)) robot.setTurretPowerPct(0.2);
     else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
-    else robot.setTurretPowerPct(0.0);
+    else robot.setTurretPowerPct(0.0); //TODO: repeat of lines 702-704
 
 
     if (joystick.getRawButton(13)) {
