@@ -253,21 +253,21 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Robot is Shooting?", isShooting);
 
 
-    SmartDashboard.putNumber("Lidar A", asdf.getDistance(0));
-    SmartDashboard.putNumber("Lidar B", asdf.getDistance(1));
-    SmartDashboard.putNumber("Lidar C", asdf.getDistance(2));
-    SmartDashboard.putNumber("Lidar D", asdf.getDistance(3));
+    SmartDashboard.putNumber("Lidar A - Direct", asdf.getDistance(0));
+    SmartDashboard.putNumber("Lidar B - Direct", asdf.getDistance(1));
+    SmartDashboard.putNumber("Lidar C - Direct", asdf.getDistance(2));
+    SmartDashboard.putNumber("Lidar D - Direct", asdf.getDistance(3));
 
     lightA.set(
         asdf.getDistance(0) > 785 &&
         asdf.getDistance(0) < 915
     );
-
-    SmartDashboard.putNumber("Lidar A - Converted", 6+(15/396.0)*(asdf.getDistance(0)-165));
-    SmartDashboard.putNumber("Lidar B - Converted", 6+(15/396.0)*(asdf.getDistance(1)-165));
-    SmartDashboard.putNumber("Lidar C - Converted", 6+(15/396.0)*(asdf.getDistance(2)-165));
-    SmartDashboard.putNumber("Lidar D - Converted", 6+(15/396.0)*(asdf.getDistance(3)-165));
-
+//<Irrelevant>
+    SmartDashboard.putNumber("Lidar A - ConvertedBad", 6+(15/396.0)*(asdf.getDistance(0)-165));
+    SmartDashboard.putNumber("Lidar B - ConvertedBad", 6+(15/396.0)*(asdf.getDistance(1)-165));
+    SmartDashboard.putNumber("Lidar C - ConvertedBad", 6+(15/396.0)*(asdf.getDistance(2)-165));
+    SmartDashboard.putNumber("Lidar D - ConvertedBad", 6+(15/396.0)*(asdf.getDistance(3)-165));
+//</Irrelevant>
   }
 
   @Override
