@@ -739,5 +739,6 @@ public class Lightning implements GenericRobot {
         double x = findDistHub();
         return -1.46 + 0.0239*x + -1.08E-04*Math.pow(x,2) + 1.73E-07*Math.pow(x,3);
     }
+    //
 
 }
