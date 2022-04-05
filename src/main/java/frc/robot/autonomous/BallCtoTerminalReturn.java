@@ -16,7 +16,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
     double leftpower;
     double rightpower;
     double defaultPower = .75;
-    double highPower = .92;
+    double highPower = 0.6;
     double correction;
     boolean time = false;
 
@@ -24,6 +24,8 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
     double distanceTerminal = 226;
     double angleC = 84.74;
     double rampDownDist = 36;
+
+    double cameraConnection;
 
     PIDController PIDDriveStraight;
     PIDController PIDTurret;
@@ -58,6 +60,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
         robot.setPipeline(0);
         targetFoundA = false;
         targetFoundB = false;
+        cameraConnection = 0;
     }
 
     @Override
@@ -211,7 +214,25 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                     targetFoundB = true;
                 }
 
-                correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
+
+                // Update cameraOffset based on pixycam
+                double tolerance = 0.15;
+                double cameraSteer = 1.5;
+                double offset = robot.pixyOffsetOfClosest();
+                double distanceTravelled = robot.getDriveDistanceInchesLeft() - startDistance;
+                if(distanceTravelled >= distanceTerminal - 60 && distanceTravelled <= distanceTerminal - 18){
+
+                }
+                if(offset > tolerance){
+                    cameraConnection += cameraSteer;
+                } else if(offset < -tolerance){
+                    cameraConnection -= cameraSteer;
+                }
+                // Correct by up to 10deg
+                cameraConnection = Math.min(Math.max(cameraConnection, -20), 20);
+
+                double targetYaw = startingYaw + cameraConnection;
+                correction = PIDDriveStraight.calculate(robot.getYaw() - targetYaw);
 
                 leftpower = highPower + correction;
                 rightpower = highPower - correction;
@@ -222,6 +243,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                     leftpower = highPower - rampUp + correction;
                     rightpower = highPower - rampUp - correction;
                 }
+
 
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal - rampDownDist){
                     double ramp = rampDown(highPower, .2, startDistance, rampDownDist,

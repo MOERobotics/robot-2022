@@ -1,6 +1,8 @@
 package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.generic.GenericRobot;
 
 public class PixyTesting extends GenericAutonomous {
@@ -9,8 +11,9 @@ public class PixyTesting extends GenericAutonomous {
     long startTime;
     PIDController PIDDriveStraight;
 
+    double cameraConnection = 0;
 
-
+    double highPower = .6;
     double travelDist = 140;
     double yawTolerance = 10;
 
@@ -43,20 +46,30 @@ public class PixyTesting extends GenericAutonomous {
                 }
                 break;
             case 1:
-                leftPower = 0.4;
-                rightPower = 0.4;
-
-                double tolerance = 0.3;
-                double steer = 0.08;
+                // Update cameraOffset based on pixycam
+                double tolerance = 0.15;
+                double cameraSteer = 1.5;
                 double offset = robot.pixyOffsetOfClosest();
-                double curYaw = robot.getYaw();
-                if(offset > tolerance && curYaw < centerYaw + yawTolerance){
-                    leftPower += steer;
-                    rightPower -= steer;
-                } else if(offset < -tolerance && curYaw > centerYaw - yawTolerance){
-                    leftPower -= steer;
-                    rightPower += steer;
+                if(offset > tolerance){
+                    cameraConnection += cameraSteer;
+                } else if(offset < -tolerance){
+                    cameraConnection -= cameraSteer;
                 }
+                // Correct by up to 10deg
+                cameraConnection = Math.min(Math.max(cameraConnection, -10), 10);
+
+                if(robot.getDriveDistanceInchesLeft() < 9){
+                    cameraConnection = 0;
+                }
+
+                SmartDashboard.putNumber("Camera Connection", cameraConnection);
+                double targetYaw = centerYaw + cameraConnection;
+
+                double correction = PIDDriveStraight.calculate(robot.getYaw() - targetYaw);
+
+                leftPower = highPower + correction;
+                rightPower = highPower - correction;
+
 
                 if(robot.getDriveDistanceInchesLeft() > startEncoder + travelDist){
                     autonomousStep += 1;

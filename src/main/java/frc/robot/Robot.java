@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
           calibration = new Calibration(),
           shortRun = new ShortRun();
 
-  GenericRobot robot = new Lightning();
+  GenericRobot robot = new TurretBot();
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
