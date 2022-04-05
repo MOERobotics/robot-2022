@@ -19,6 +19,7 @@ public class Lightning implements GenericRobot {
     public static  final double LEFTBTOLERANCE = 0;
     public static  final double RIGHTATOLERANCE = 0;
     public static  final double RIGHTBTOLERANCE = 0;
+    public static double DistHub = 0;
 
     AHRS navx = new AHRS(SPI.Port.kMXP, (byte) 50);
 
@@ -357,7 +358,7 @@ public class Lightning implements GenericRobot {
     public double getAlternateTurretAngle(){
         double raw = encoderTurretAlt.getPosition();
         double out;
-        double offset = 43;
+        double offset = 50+13;
         out = (raw *  136.467) - 5.73 - offset;
         if (out>360)
         {
@@ -386,11 +387,11 @@ public class Lightning implements GenericRobot {
 
     @Override
     public void setTurretPowerPct(double powerPct) {
-        if ( (getAlternateTurretAngle()>350) & (powerPct<0))
+        if ( (getAlternateTurretAngle()>345) & (powerPct<0))
         {
             powerPct = 0;
         }
-        if ( (getAlternateTurretAngle()<10) & (powerPct>0))
+        if ( (getAlternateTurretAngle()<15) & (powerPct>0))
         {
             powerPct = 0;
         }
@@ -479,7 +480,6 @@ public class Lightning implements GenericRobot {
             shooterC.set(0);
         }
         else {
-            System.out.printf("Kevin was wrong %f\n", rpm);
             shooterCPIDController.setReference(rpm, CANSparkMax.ControlType.kVelocity);
         }
     }
@@ -680,12 +680,12 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double turretPIDgetI() {
-        return 0;
+        return 1.0e-3;
     }
 
     @Override
     public double turretPIDgetD() {
-        return 1.0e-3;
+        return 2.0e-3;
     }
 
 
@@ -722,19 +722,27 @@ public class Lightning implements GenericRobot {
     @Override
     public double findDistHub(){
         double x = getTargetY();
-        return (.413*Math.pow(x,2)-11.9*x+221);
+        if (x != 0){
+            DistHub = 214 + -10.4*x + 0.333*Math.pow(x,2);
+        }
+        return DistHub;
     }
 
     @Override
     public double findShooterRPM(){
         double x = findDistHub()/12.0;
-        return (-3020 + 1364*x + -109*Math.pow(x,2) + 2.93*Math.pow(x,3));
+        if(x*12 <= 160){
+            return (-3020 + 1364*x + -109*Math.pow(x,2) + 2.93*Math.pow(x,3));
+        }
+        else {
+            return (-3020 + 1364 * x + -109 * Math.pow(x, 2) + 2.93 * Math.pow(x, 3)) - ((x- 160/12.0)*50/((203-160)/12.0));
+        }
     }
 
     @Override
     public double findShooterPitch(){
         double x = findDistHub()/12.0;
-        return (-0.217 + 0.0503*x + -8.84e-04*Math.pow(x,2));
+        return (-0.217 + 0.0503*x + -8.84e-04*Math.pow(x,2));/*(.02/4.5*(x-14)+.01)*/
     }
 
 }

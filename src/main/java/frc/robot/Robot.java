@@ -29,7 +29,8 @@ public class Robot extends TimedRobot {
           autoArc = new AutoArc5Ball(),
           ATerminalReturn = new BallAtoTerminalReturn(),
           simpleBTerminal = new BallBtoTerminal(),
-          simpleCTerminal = new BallCtoTerminal(),
+          armup = new ArmUpAndDown(),
+          simpleC = new BallSimpleC(),
           CTerminalReturn = new BallCtoTerminalReturn(),
           BTerminalReturn = new BallBtoTerminalReturn(),
           simpleB         = new BallSimpleB(),
@@ -40,7 +41,7 @@ public class Robot extends TimedRobot {
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = calibration;
+  GenericAutonomous autonomous = armup;
   GenericCommand testHang = new HangWithoutAlign();
 
   Lidar asdf = new Lidar();
@@ -101,6 +102,9 @@ public class Robot extends TimedRobot {
   boolean delayRight = false;
   double leftTime;
   double rightTime;
+  boolean altHang = false;
+  int countAltHang = 0;
+  double altHangStartTime;
 
   Solenoid lightA = new Solenoid(PneumaticsModuleType.CTREPCM, 3);
 
@@ -135,6 +139,7 @@ public class Robot extends TimedRobot {
     }
 
 
+    SmartDashboard.putNumber("FindDistance", robot.findDistHub());
     SmartDashboard.putNumber("XBOX AXIS DEBUG - 0 ", xbox.getRawAxis(0));
     SmartDashboard.putNumber("XBOX AXIS DEBUG - 1 ", xbox.getRawAxis(1));
     SmartDashboard.putNumber("XBOX AXIS DEBUG - 2 ", xbox.getRawAxis(2));
@@ -283,6 +288,11 @@ public class Robot extends TimedRobot {
     turretPIDController = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
     hang = false;
     countHang = 0;
+    armReset = false;
+    altHang = false;
+    countAltHang = 0;
+    armReset = false;
+
     xbox.getRawButtonPressed(3);
     turnTo45 = false;
     turnTo225 = false;
@@ -291,7 +301,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     turretPower = 0;
-
+    robot.setPipeline(1);
 
     switch (POVDirection.getDirection(xbox.getPOV())) {
       case NORTH: //MEDIUM SHOT RANGE
@@ -303,17 +313,29 @@ public class Robot extends TimedRobot {
         turretPitch = 1.0;
         break;
       case SOUTH: ////CLOSE SHOT--> collector out
-        targetRPM = 3400*.7;
-        turretPitch = 0.00;
+        targetRPM = 2175;
+        turretPitch = 0.03;
         turnTo225 = true;
         turnTo45 = false;
         break;
       case WEST:
         targetRPM = 2340; //////////collector facing
-        turretPitch = 0.08;
+        turretPitch = 0.064;
         turnTo45 = true;
         turnTo225 = false;
         break;
+    }
+
+    if (joystick.getRawButtonPressed(5) && joystick.getRawButtonPressed(6)){
+      countAltHang = (countAltHang + 1)%2;
+    }
+
+    if (countAltHang == 1){
+      altHang = true;
+      countHang = 0;
+    }
+    else{
+      altHang = false;
     }
 
     if (joystick.getRawButtonPressed(8)) {
@@ -322,11 +344,13 @@ public class Robot extends TimedRobot {
 
     if (countHang == 1) {
       hang = true;
+      countAltHang = 0;
+
     } else {
       hang = false;
     }
 
-    if (!hang && !armReset) {
+    if (!hang && !armReset && !altHang) {
       reset = true;
       robot.turnOffPTO();
 
@@ -566,6 +590,16 @@ public class Robot extends TimedRobot {
       //////////////////////////////////////////////////POWER SETTERS END
 
     }
+    if (altHang){
+     if (reset){
+       command.altBegin(robot);
+       reset = false;
+     }
+     else{
+       command.step(robot);
+     }
+
+    }
     if (armReset){
       robot.turnOnPTO();
       if (armReset && (System.currentTimeMillis() - timerForPTO)>=2000){
@@ -579,16 +613,16 @@ public class Robot extends TimedRobot {
           delayLeft = true;
           leftTime = System.currentTimeMillis();
         }
-        if (!robot.getClimbSensorLeft() && (System.currentTimeMillis() - leftTime >= 100)){
+        if (!robot.getClimbSensorLeft() && (System.currentTimeMillis() - leftTime >= 170)){
           driveLeft = 0;
         }
-        if (!robot.getClimbSensorRight() && (System.currentTimeMillis() - rightTime >= 100)){
+        if (!robot.getClimbSensorRight() && (System.currentTimeMillis() - rightTime >= 170)){
           driveRight = 0;
         }
 
         if (!robot.getClimbSensorLeft() && !robot.getClimbSensorRight()
-                && (System.currentTimeMillis() - leftTime >= 100)
-                && (System.currentTimeMillis() - rightTime >= 100)){
+                && (System.currentTimeMillis() - leftTime >= 170)
+                && (System.currentTimeMillis() - rightTime >= 170)){
           robot.turnOffPTO();
           armReset = false;
           delayRight = false;
@@ -620,6 +654,8 @@ public class Robot extends TimedRobot {
   public void disabledPeriodic() {
     joystick.getRawButtonPressed(10);
     joystick.getRawButtonPressed(9);
+    joystick.getRawButtonPressed(5);
+    joystick.getRawButtonPressed(6);
     xbox.getRawButtonPressed(3);
     joystick.getRawButtonPressed(8);
     hang = false;
@@ -630,10 +666,10 @@ public class Robot extends TimedRobot {
     }
 
     if (joystick.getRawButton(4)) autonomous = autoArc;
-    if (joystick.getRawButton(5)) autonomous = ATerminalReturn;
+    if (joystick.getRawButton(5)) autonomous = armup;
     if (joystick.getRawButton(6)) autonomous = BTerminalReturn;
     if (joystick.getRawButton(9)) autonomous = CTerminalReturn;
-    if (joystick.getRawButton(7)) autonomous = shortRun;
+    if (joystick.getRawButton(7)) autonomous = simpleC;
 
   }
 
@@ -680,7 +716,7 @@ public class Robot extends TimedRobot {
     int leftAxis = 1;
     int rightAxis = 5;
     double tolerance = 0.8;
-    double drivePower = 0.2;
+    double drivePower = 1;
 
     if (joystick.getRawButton(12)) robot.setTurretPowerPct(0.2);
     else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
@@ -740,7 +776,7 @@ public class Robot extends TimedRobot {
 
     if (joystick.getRawButton(12)) robot.setTurretPowerPct(0.2);
     else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);
-    else robot.setTurretPowerPct(0.0);
+    else robot.setTurretPowerPct(0.0); //TODO: repeat of lines 702-704
 
 
     if (joystick.getRawButton(13)) {
