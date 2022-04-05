@@ -103,6 +103,17 @@ public class Robot extends TimedRobot {
   int countAltHang = 0;
   double altHangStartTime;
 
+  double leftArmPower = 0;
+  double rightArmPower = 0;
+  double defaultClimbPowerUp = .3;
+  double defaultClimbPowerDown = -.3;
+  boolean leftArrived = false;
+  boolean rightArrived = false;
+  double startHeightLeft = 0;
+  double startHeightRight = 0;
+
+  double startTime;
+  int armStep = 0;
 
 
   @Override
@@ -334,6 +345,7 @@ public class Robot extends TimedRobot {
     if (!hang && !armReset && !altHang) {
       reset = true;
       robot.turnOffPTO();
+      armStep = 0 ;
 
       //////////////////////////////////////////////////DRIVETRAIN CONTROL
 
@@ -582,36 +594,87 @@ public class Robot extends TimedRobot {
 
     }
     if (armReset){
-      robot.turnOnPTO();
-      if (armReset && (System.currentTimeMillis() - timerForPTO)>=2000){
-        driveLeft = -.2;
-        driveRight = -.2;
-        if (!robot.getClimbSensorRight() && !delayRight){
-          delayRight = true;
-          rightTime = System.currentTimeMillis();
-        }
-        if (!robot.getClimbSensorLeft() && !delayLeft){
-          delayLeft = true;
-          leftTime = System.currentTimeMillis();
-        }
-        if (!robot.getClimbSensorLeft() && (System.currentTimeMillis() - leftTime >= 170)){
-          driveLeft = 0;
-        }
-        if (!robot.getClimbSensorRight() && (System.currentTimeMillis() - rightTime >= 170)){
-          driveRight = 0;
-        }
+      switch (armStep){
+        case 0:
+          robot.turnOnPTO();
+          if (!leftArrived){
+            startTime = System.currentTimeMillis();
+            leftArrived = true;
+          }
+          if (System.currentTimeMillis() - startTime >= 1000){
+            leftArrived = false;
+            armStep += 1;
+          }
+          break;
+        case 1:
+          if (!robot.getClimbSensorRight()){
+            startHeightRight = robot.armHeightRight();
+            rightArrived = true;
+          }
+          if (!robot.getClimbSensorLeft()){
+            startHeightLeft = robot.armHeightLeft();
+            leftArrived = true;
+          }
+          armStep += 1;
+          break;
+        case 2:
+          if (!rightArrived){
+            rightArmPower = defaultClimbPowerDown;
+          }
+          if (!leftArrived){
+            leftArmPower = defaultClimbPowerDown;
+          }
+          if (!robot.getClimbSensorLeft()){
+            leftArrived = true;
+            leftArmPower = 0;
+            startHeightLeft = robot.armHeightLeft();
+          }
+          if(!robot.getClimbSensorRight()){
+            rightArmPower = 0;
+            rightArrived = true;
+            startHeightRight = robot.armHeightRight();
+          }
+          if (leftArrived && rightArrived){
+            leftArrived = false;
+            rightArrived = false;
+            armStep += 1;
+          }
+          break;
+        case 3:
 
-        if (!robot.getClimbSensorLeft() && !robot.getClimbSensorRight()
-                && (System.currentTimeMillis() - leftTime >= 170)
-                && (System.currentTimeMillis() - rightTime >= 170)){
-          robot.turnOffPTO();
+          if (robot.armHeightLeft() - startHeightLeft >= 1){
+            leftArmPower = 0;
+            leftArrived = true;
+          }
+          else{
+            leftArmPower = defaultClimbPowerUp;
+          }
+
+          if (robot.armHeightRight() - startHeightRight >= 1){
+            rightArmPower = 0;
+            rightArrived = true;
+          }
+          else{
+            rightArmPower = defaultClimbPowerUp;
+          }
+
+
+          if (leftArrived && rightArrived){
+            rightArmPower = 0;
+            leftArmPower = 0;
+            armStep += 1;
+          }
+          break;
+        case 4:
+          leftArmPower = 0;
+          rightArmPower = 0;
+          leftArrived = false;
+          rightArrived = false;
           armReset = false;
-          delayRight = false;
-          delayLeft = false;
-        }
-        robot.drivePercent(driveLeft, driveRight);
-      }
+          break;
 
+      }
+      robot.armPower(leftArmPower, rightArmPower);
     }
     if (hang) {
       ///////////////////////////////////////////RUN AUTO-CLIMB
