@@ -1,5 +1,8 @@
 package frc.robot.generic;
 
+import edu.wpi.first.hal.AllianceStationID;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import io.github.pseudoresonance.pixy2api.Pixy2;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC;
@@ -13,6 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
+import static edu.wpi.first.wpilibj.DriverStation.getAlliance;
 import static io.github.pseudoresonance.pixy2api.Pixy2.*;
 
 
@@ -236,8 +240,29 @@ public class Pixycam extends Thread {
 			BLUE,
 		}
 
+		public static PixyCargoColor getAlliance() {
+			AllianceStationID allianceStationID = HAL.getAllianceStation();
+			if (allianceStationID == null) {
+			      return PixyCargoColor.RED;
+			}
+			switch (allianceStationID) {
+			     case Red1:
+			     case Red2:
+			     case Red3:
+			         return PixyCargoColor.RED;
+				 case Blue1:
+				 case Blue2:
+				 case Blue3:
+				      return PixyCargoColor.BLUE;
+
+			    default:
+			          return PixyCargoColor.RED;
+			}
+		}
+
 		public String toString() {
-			String shortColor = (color == PixyCargoColor.RED) ? "RED" : "BLU";
+
+			String shortColor = (color == getAlliance()) ? "RED" : "BLU";
 			return  "offset=" + (y-104) +
 					" age=" + age +
 					" clr=" + shortColor +
