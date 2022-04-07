@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.command.*;
+import frc.robot.generic.*;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
 import frc.robot.generic.TurretBot;
@@ -420,6 +421,7 @@ public class Robot extends TimedRobot {
       for (int i = 0; i < averageTurretXSize; i++)
         average += averageX[i];
       average /= averageTurretXSize;
+      average+=.5;
 
       if ((xbox.getRawAxis(2) > 0.10) && robot.isTargetFound()) { ////////////AUTO-AIM
         turnTo45 = false;
