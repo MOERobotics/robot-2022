@@ -73,6 +73,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
             average += i;
         }
         average /= averageTurretXSize;
+        average += .5;
 
         double currentTurretPower = 0;
 
