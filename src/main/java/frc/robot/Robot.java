@@ -41,7 +41,7 @@ public class Robot extends TimedRobot {
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
-  GenericAutonomous autonomous = armup;
+  GenericAutonomous autonomous = CTerminalReturn;
   GenericCommand testHang = new HangWithoutAlign();
 
 
@@ -760,7 +760,7 @@ public class Robot extends TimedRobot {
     int leftAxis = 1;
     int rightAxis = 5;
     double tolerance = 0.8;
-    double drivePower = 1;
+    double drivePower = .2;
 
     if (joystick.getRawButton(12)) robot.setTurretPowerPct(0.2);
     else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);

@@ -52,7 +52,7 @@ public class Hang extends GenericCommand{
     double turretPower = 0;
     double level = 7;
     double leveltol = 2;
-    double topHeight = 26;
+    double topHeight = 25.5;
     double topExtend = 31;
     boolean swingTime = false;
     double origPitch;
