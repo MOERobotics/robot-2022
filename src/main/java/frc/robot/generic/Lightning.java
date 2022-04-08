@@ -358,7 +358,7 @@ public class Lightning implements GenericRobot {
     public double getAlternateTurretAngle(){
         double raw = encoderTurretAlt.getPosition();
         double out;
-        double offset = 50+13+84;
+        double offset = 50+13+84+5;
         out = (raw *  136.467) - 5.73 - offset;
         if (out>360)
         {
@@ -416,6 +416,7 @@ public class Lightning implements GenericRobot {
 
 
         //TODO: figure out use setSpeed() or set()
+
         elevationLeft.set(position);
         elevationRight.set(position);
     }
@@ -590,7 +591,7 @@ public class Lightning implements GenericRobot {
     public double armHeightLeft() {
         //TODO: put in conversion
         //Maybe use some sensor. Do NOT want to use encoders for this.
-        return encoderTicksLeftDriveB()*INCHES_PER_TICK_ARMS;
+        return encoderTicksLeftDriveA()*INCHES_PER_TICK_ARMS;
     }
 
     @Override
@@ -724,6 +725,9 @@ public class Lightning implements GenericRobot {
         double x = getTargetY();
         if (x != 0){
             DistHub = 214 + -10.4*x + 0.333*Math.pow(x,2);
+            if (DistHub <= 145){
+                DistHub = 145;
+            }
         }
         return DistHub;
     }

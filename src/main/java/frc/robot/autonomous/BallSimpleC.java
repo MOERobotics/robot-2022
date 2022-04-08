@@ -98,7 +98,7 @@ public class BallSimpleC extends GenericAutonomous {
         if (autonomousStep >= 1 && autonomousStep <= 11){
             robot.getCargo();
             robot.shoot();
-            if (autonomousStep>1) {
+            if (autonomousStep>1 && targetFoundA) {
                 robot.setShooterTargetRPM(robot.findShooterRPM());
                 robot.setTurretPitchPosition(robot.findShooterPitch());
             }
@@ -151,7 +151,7 @@ public class BallSimpleC extends GenericAutonomous {
                 leftpower = 0;
                 rightpower = 0;
                 startDistance = robot.getDriveDistanceInchesLeft();
-                if (System.currentTimeMillis() - startTime >= 1000){
+                if (System.currentTimeMillis() - startTime >= 2000){
                     autonomousStep += 1;
                 }
                 time = false;
