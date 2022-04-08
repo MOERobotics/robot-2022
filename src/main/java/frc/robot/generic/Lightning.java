@@ -285,7 +285,7 @@ public class Lightning implements GenericRobot {
     public void shoot(){
         double shooterRPM = defaultShooterTargetRPM;
         setShooterRPM(shooterRPM, shooterRPM);
-        if (getShooterRPMTop() >= (shooterRPM-300) && getShooterRPMBottom() >= (shooterRPM-300)){
+        if ((getShooterRPMTop() >= (shooterRPM-50)) && (getShooterRPMBottom() >= (shooterRPM-50))){
             canShoot = true;
         }
         else{

@@ -84,6 +84,8 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
         }
 
         if (autonomousStep < 4 && !targetFoundA){
+            robot.setShooterTargetRPM(2700);
+            robot.setTurretPitchPosition(.26);
             if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
                 currentTurretPower = .3;
             }
@@ -100,8 +102,10 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
         if (autonomousStep >= 1 && autonomousStep <= 13){
             robot.getCargo();
             robot.shoot();
-            robot.setShooterTargetRPM(robot.findShooterRPM());
-            robot.setTurretPitchPosition(robot.findShooterPitch());
+            if (autonomousStep>1) {
+                robot.setShooterTargetRPM(robot.findShooterRPM());
+                robot.setTurretPitchPosition(robot.findShooterPitch());
+            }
         }
         else{
             robot.setCollectorIntakePercentage(0);
@@ -157,7 +161,9 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 leftpower = 0;
                 rightpower = 0;
                 startDistance = robot.getDriveDistanceInchesLeft();
-                autonomousStep += 1;
+                if (System.currentTimeMillis() - startTime >= 1000){
+                    autonomousStep += 1;
+                }
                 time = false;
                 break;
             case 3: //create a target shooter value and see if shooter reaches it.
@@ -171,6 +177,12 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 }
                 break;
             case 4: //turn the shooter off
+                System.out.print("TargetRPM:");
+                System.out.print(robot.findShooterRPM());
+                System.out.print(" Pitch:");
+                System.out.print(robot.findShooterPitch());
+                System.out.print(" What I have:");
+                System.out.println(robot.getShooterRPMTop());
                 if (System.currentTimeMillis() - startTime >= 1500){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1;
@@ -258,14 +270,14 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                     rightpower = -highPower + rampUp - correction;
                 }
 
-                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal-122 - rampDownDist){
+                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal-110 - rampDownDist){
                     double ramp = rampDown(highPower, 0.2, startDistance, rampDownDist,
 
-                            robot.getDriveDistanceInchesLeft(), distanceTerminal-122);
+                            robot.getDriveDistanceInchesLeft(), distanceTerminal-110);
                     leftpower = -ramp + correction;
                     rightpower = -ramp - correction;
                 }
-                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal-122){
+                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal-110){
                     leftpower = 0;
                     rightpower = 0;
                     autonomousStep += 1;
@@ -273,7 +285,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 }
                 break;
             case 10: //delay
-                if (System.currentTimeMillis() - startTime >= 400){
+                if (System.currentTimeMillis() - startTime >= 600){
                     autonomousStep += 1;
                 }
             case 11: //shoot it :)

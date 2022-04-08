@@ -55,7 +55,7 @@ public class Lidar extends Thread {
 				if(e.length()>1 && e.contains("-")){
 					if(e.indexOf("-") == 0)
 						e = " " + e;
-					System.out.printf("Lidar '%s'", e);
+					//System.out.printf("Lidar '%s'", e);
 					String[] ID = e.split("-");
 					int id = Integer.parseInt(ID[0]);
 					int length = Integer.parseInt(ID[1]);
