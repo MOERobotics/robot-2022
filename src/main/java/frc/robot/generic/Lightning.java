@@ -21,8 +21,8 @@ public class Lightning implements GenericRobot {
     public static  final double RIGHTBTOLERANCE = 0;
     public static double DistHub = 0;
 
-    public static double averageTurretY[];
     public static int averageTurretYSize = 2;
+    public static double[] averageTurretY = new double[averageTurretYSize];
     public static int counter = 0;
 
     AHRS navx = new AHRS(SPI.Port.kMXP, (byte) 50);
