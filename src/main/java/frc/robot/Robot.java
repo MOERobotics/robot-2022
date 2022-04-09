@@ -421,7 +421,7 @@ public class Robot extends TimedRobot {
       for (int i = 0; i < averageTurretXSize; i++)
         average += averageX[i];
       average /= averageTurretXSize;
-      average+=.5;
+      average+=.75;
 
       if ((xbox.getRawAxis(2) > 0.10) && robot.isTargetFound()) { ////////////AUTO-AIM
         turnTo45 = false;
