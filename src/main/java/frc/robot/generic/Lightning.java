@@ -14,6 +14,8 @@ public class Lightning implements GenericRobot {
     public static final double TICKS_PER_REVOLUTION_SHOOTERA = 1;
     public static final double TICKS_PER_REVOLUTION_SHOOTERB = 1;
     public static final double TICKS_PER_REVOLUTION_SHOOTERC = 1;
+    public static final double leftScalar = 1.007;
+    public static final double rightScalar = .95;
 
     public static  final double LEFTATOLERANCE = 0;
     public static  final double LEFTBTOLERANCE = 0;
@@ -591,13 +593,13 @@ public class Lightning implements GenericRobot {
     public double armHeightLeft() {
         //TODO: put in conversion
         //Maybe use some sensor. Do NOT want to use encoders for this.
-        return encoderTicksLeftDriveA()*INCHES_PER_TICK_ARMS;
+        return encoderTicksLeftDriveA()*INCHES_PER_TICK_ARMS*leftScalar;
     }
 
     @Override
     public double armHeightRight(){
         //TODO: put in conversion
-        return encoderTicksRightDriveA()*INCHES_PER_TICK_ARMS;
+        return encoderTicksRightDriveA()*INCHES_PER_TICK_ARMS*rightScalar;
     }
 
     @Override

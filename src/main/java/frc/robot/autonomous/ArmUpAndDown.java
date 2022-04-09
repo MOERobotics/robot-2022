@@ -51,6 +51,7 @@ public class ArmUpAndDown extends GenericAutonomous {
         SmartDashboard.putNumber("LeftHeight", robot.armHeightLeft()-startHeightLeft);
 
         switch (autonomousStep){
+
             case 0:
                 robot.turnOnPTO();
                 if (!leftArrived){
