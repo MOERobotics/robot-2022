@@ -21,6 +21,10 @@ public class Lightning implements GenericRobot {
     public static  final double RIGHTBTOLERANCE = 0;
     public static double DistHub = 0;
 
+    public static double averageTurretY[];
+    public static int averageTurretYSize = 2;
+    public static int counter = 0;
+
     AHRS navx = new AHRS(SPI.Port.kMXP, (byte) 50);
 
     CANSparkMax collector         = new CANSparkMax( 3, kBrushless);
@@ -722,7 +726,7 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double findDistHub(){
-        double x = getTargetY();
+        double x = findAverageY();
         if (x != 0){
             DistHub = 214 + -10.4*x + 0.333*Math.pow(x,2);
             if (DistHub <= 145){
@@ -744,5 +748,21 @@ public class Lightning implements GenericRobot {
         return -1.46 + 0.0239*x + -1.08E-04*Math.pow(x,2) + 1.73E-07*Math.pow(x,3);
     }
     //
+
+    @Override
+    public double findAverageY(){
+        if(isTargetFound()) {
+            averageTurretY[counter] = getTargetY();
+            counter = (counter + 1)%averageTurretYSize;
+        }
+
+        double average = 0;
+        for(double i: averageTurretY){
+            average += i;
+        }
+        average /= averageTurretYSize;
+
+        return average;
+    }
 
 }
