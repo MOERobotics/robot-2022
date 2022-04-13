@@ -2,6 +2,7 @@ package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.command.PixyAutoTrack;
 import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball B, ball between ball A and C
@@ -31,6 +32,9 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
 
     boolean targetFoundA = false;
 
+    PixyAutoTrack pixyAutoTrack;
+
+
     @Override
     public void autonomousInit(GenericRobot robot) {
         autonomousStep = 0;
@@ -39,6 +43,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
         startTime = System.currentTimeMillis();
         PIDTurret = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
         robot.setPipeline(0);
+        pixyAutoTrack = new PixyAutoTrack(PIDDriveStraight);
 
     }
 
@@ -158,7 +163,16 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
 
                 break;
             case 6://drive to ball at terminal
-                correction = PIDDriveStraight.calculate(robot.getYaw() - startingYaw);
+
+                double distanceTravelled = robot.getDriveDistanceInchesLeft() - startDistance;
+
+                double startPixyDist = distanceTerminal - pixyAutoTrack.getPixyDistFar();
+                double endPixyDist = distanceTerminal - pixyAutoTrack.getPixyDistNear();
+                if(distanceTravelled >= startPixyDist && distanceTravelled <= endPixyDist){
+                    pixyAutoTrack.updateReqCorrection(robot, defaultPower, startingYaw);
+                }
+
+                correction = pixyAutoTrack.getPIDCorrection(robot, startingYaw);
 
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;

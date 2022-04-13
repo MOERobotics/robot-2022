@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.command.PixyAutoTrack;
 import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball C, closest ball to the hangar, and driving to the ball at terminal
@@ -43,6 +44,8 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
     boolean targetFoundA = false;
     boolean targetFoundB = false;
 
+    PixyAutoTrack pixyAutoTrack;
+
 
 
     @Override
@@ -61,6 +64,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
         targetFoundA = false;
         targetFoundB = false;
         cameraConnection = 0;
+        pixyAutoTrack = new PixyAutoTrack(PIDDriveStraight);
     }
 
     @Override
@@ -159,7 +163,8 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 leftpower = 0;
                 rightpower = 0;
                 startDistance = robot.getDriveDistanceInchesLeft();
-                autonomousStep += 1;
+                autonomousStep = 5;
+                //TODO: change to += 1;
                 time = false;
                 break;
             case 3: //create a target shooter value and see if shooter reaches it.
@@ -207,6 +212,8 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                     startingYaw = -angleC;
                     startDistance = robot.getDriveDistanceInchesLeft();
                     startTime = System.currentTimeMillis();
+
+                    pixyAutoTrack.resetCorrection();
                 }
                 break;
             case 7: //drive towards Ball Terminal
@@ -214,25 +221,16 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                     targetFoundB = true;
                 }
 
-
-                // Update cameraOffset based on pixycam
-                double tolerance = 0.15;
-                double cameraSteer = 1.5;
-                double offset = robot.pixyOffsetOfClosest();
                 double distanceTravelled = robot.getDriveDistanceInchesLeft() - startDistance;
-                if(distanceTravelled >= distanceTerminal - 60 && distanceTravelled <= distanceTerminal - 18){
 
+                double startPixyDist = distanceTerminal - pixyAutoTrack.getPixyDistFar();
+                double endPixyDist = distanceTerminal - pixyAutoTrack.getPixyDistNear();
+                if(distanceTravelled >= startPixyDist && distanceTravelled <= endPixyDist){
+                    pixyAutoTrack.updateReqCorrection(robot, defaultPower, startingYaw);
                 }
-                if(offset > tolerance){
-                    cameraConnection += cameraSteer;
-                } else if(offset < -tolerance){
-                    cameraConnection -= cameraSteer;
-                }
-                // Correct by up to 10deg
-                cameraConnection = Math.min(Math.max(cameraConnection, -20), 20);
 
-                double targetYaw = startingYaw + cameraConnection;
-                correction = PIDDriveStraight.calculate(robot.getYaw() - targetYaw);
+                correction = pixyAutoTrack.getPIDCorrection(robot, startingYaw);
+
 
                 leftpower = highPower + correction;
                 rightpower = highPower - correction;
