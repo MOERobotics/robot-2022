@@ -67,4 +67,8 @@ public class PixyAutoTrack {
     public double getPixyDistFar(){
         return pixyDistFar;
     }
+
+    public void setDeviationLimit(double newDeviationLimit){
+        deviationLimit = newDeviationLimit;
+    }
 }

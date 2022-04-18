@@ -45,6 +45,7 @@ public class Robot extends TimedRobot {
   GenericAutonomous autonomous = CTerminalReturn;
   GenericCommand testHang = new HangWithoutAlign();
 
+  PixyAutoTrack pixyAutoTrack;
 
   int averageTurretXSize = 2;
   double[] averageX = new double[averageTurretXSize];
@@ -104,6 +105,7 @@ public class Robot extends TimedRobot {
   int countAltHang = 0;
   double altHangStartTime;
 
+  double pixyCenterYaw;
 
 
   @Override
@@ -340,6 +342,10 @@ public class Robot extends TimedRobot {
     xbox.getRawButtonPressed(3);
     turnTo45 = false;
     turnTo225 = false;
+
+    PIDController drivePIDforPixy = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
+    pixyAutoTrack = new PixyAutoTrack(drivePIDforPixy);
+    pixyAutoTrack.setDeviationLimit(60);
   }
 
   @Override
@@ -434,7 +440,26 @@ public class Robot extends TimedRobot {
           driveRight = (joystickY - joystickX) * scaleFactor;
         }
 
+        //Using pixycam to lock onto a cargo during tele-op driving
+        if(joystick.getRawButton(14)) {
+          //Power here shouldn't be based on actual robot power (only in autonomous)
+          pixyAutoTrack.updateReqCorrection(robot, 0.5, pixyCenterYaw);
+          double pixySteer = pixyAutoTrack.getPIDCorrection(robot, pixyCenterYaw);
+
+          driveLeft += pixySteer;
+          driveRight -= pixySteer;
+        }
+        else{
+          pixyAutoTrack.resetCorrection();
+          pixyCenterYaw = robot.getYaw();
+        }
+
+
       }
+
+
+
+
 
       //////////////////////////////////////////////DRIVETRAIN CONTROL ENDS
 

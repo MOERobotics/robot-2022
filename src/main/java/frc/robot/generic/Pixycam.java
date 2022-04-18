@@ -207,10 +207,11 @@ public class Pixycam extends Thread {
 		double[] scores = new double[cargoList.length];
 		for (int i = 0; i < cargoList.length; i++) {
 			PixyCargo cargo = cargoList[i];
-			double aspectRatio = cargo.getW() / cargo.getH();
+			//double aspectRatio = cargo.getW() / cargo.getH();
 			double bindingDimension = Math.min(cargo.getW(), cargo.getH());
 			scores[i] = bindingDimension * bindingDimension;
-			scores[i] *= Math.max(cargo.getAge(), 10)/5 + 1;
+			scores[i] *= (Math.max(cargo.getAge(), 10)/5.0 + 1)/3;
+			if(!cargo.cargoMatchesAlliance()) scores[i] = 0;
 		}
 		int maxIndex = 0;
 		double maxScore = scores[0];
@@ -258,6 +259,10 @@ public class Pixycam extends Thread {
 			    default:
 			          return PixyCargoColor.RED;
 			}
+		}
+
+		public boolean cargoMatchesAlliance(){
+			return this.color == getAlliance();
 		}
 
 		public String toString() {
