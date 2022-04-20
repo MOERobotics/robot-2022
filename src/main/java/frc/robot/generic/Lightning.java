@@ -212,7 +212,7 @@ public class Lightning implements GenericRobot {
 
     @Override
     public double encoderLeftDriveTicksPerInch() {
-        return TICKS_PER_INCH_DRIVE;
+        return TICKS_PER_INCH_DRIVE*200/192;
     }
 
     @Override
