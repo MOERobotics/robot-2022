@@ -79,7 +79,9 @@ public class BallSimpleC extends GenericAutonomous {
             PIDTurret.reset();
         }
 
-        if (autonomousStep < 4 && !targetFoundA){
+        if (autonomousStep <= 4 && !targetFoundA){
+            robot.setShooterTargetRPM(2700);
+            robot.setTurretPitchPosition(.272);
             if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
                 currentTurretPower = .3;
             }
@@ -96,8 +98,10 @@ public class BallSimpleC extends GenericAutonomous {
         if (autonomousStep >= 1 && autonomousStep <= 11){
             robot.getCargo();
             robot.shoot();
-            robot.setShooterTargetRPM(robot.findShooterRPM());
-            robot.setTurretPitchPosition(robot.findShooterPitch());
+            if (autonomousStep>4 && targetFoundA) {
+                robot.setShooterTargetRPM(robot.findShooterRPM());
+                robot.setTurretPitchPosition(robot.findShooterPitch());
+            }
         }
         else{
             robot.setCollectorIntakePercentage(0);
@@ -136,7 +140,6 @@ public class BallSimpleC extends GenericAutonomous {
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC){
                     autonomousStep += 1;
-                    robot.setPipeline(1);
                     startTime = System.currentTimeMillis();
                 }
                 break;
@@ -147,7 +150,8 @@ public class BallSimpleC extends GenericAutonomous {
                 leftpower = 0;
                 rightpower = 0;
                 startDistance = robot.getDriveDistanceInchesLeft();
-                if (System.currentTimeMillis() - startTime >= 500){
+                if (System.currentTimeMillis() - startTime >= 2000){
+                    robot.setPipeline(1);
                     autonomousStep += 1;
                 }
                 time = false;

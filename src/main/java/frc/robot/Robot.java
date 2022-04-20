@@ -6,12 +6,15 @@ package frc.robot;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.*;
 import frc.robot.autonomous.GenericAutonomous;
 import frc.robot.command.*;
+import frc.robot.generic.*;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Lightning;
 import frc.robot.generic.Pixycam;
@@ -38,7 +41,7 @@ public class Robot extends TimedRobot {
           calibration = new Calibration(),
           shortRun = new ShortRun();
 
-  GenericRobot robot = new TurretBot();
+  GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
@@ -46,6 +49,7 @@ public class Robot extends TimedRobot {
   GenericCommand testHang = new HangWithoutAlign();
 
   PixyAutoTrack pixyAutoTrack;
+  Lidar asdf = new Lidar();
 
   int averageTurretXSize = 2;
   double[] averageX = new double[averageTurretXSize];
@@ -110,6 +114,19 @@ public class Robot extends TimedRobot {
   int pixyCommitTargetID = 0;
   double pixyCommitProgress = 0;
   double pixyLockOnTol = 0.1;
+  double leftArmPower = 0;
+  double rightArmPower = 0;
+  double defaultClimbPowerUp = .3;
+  double defaultClimbPowerDown = -.3;
+  boolean leftArrived = false;
+  boolean rightArrived = false;
+  double startHeightLeft = 0;
+  double startHeightRight = 0;
+
+  double startTime;
+  int armStep = 0;
+
+  Solenoid lightA = new Solenoid(PneumaticsModuleType.CTREPCM, 3);
 
   @Override
   public void robotInit() {
@@ -122,6 +139,7 @@ public class Robot extends TimedRobot {
     } else {
       System.err.println("NO PIXYCAM");
     }
+    asdf.start();
   }
 
   @Override
@@ -321,6 +339,21 @@ public class Robot extends TimedRobot {
     SmartDashboard.putBoolean("Robot is Shooting?", isShooting);
 
 
+    SmartDashboard.putNumber("Lidar A - Direct", asdf.getDistance(0));
+    SmartDashboard.putNumber("Lidar B - Direct", asdf.getDistance(1));
+    SmartDashboard.putNumber("Lidar C - Direct", asdf.getDistance(2));
+    SmartDashboard.putNumber("Lidar D - Direct", asdf.getDistance(3));
+
+    lightA.set(
+        asdf.getDistance(0) > 785 &&
+        asdf.getDistance(0) < 915
+    );
+//<Irrelevant>
+    SmartDashboard.putNumber("Lidar A - ConvertedBad", 6+(15/396.0)*(asdf.getDistance(0)-165));
+    SmartDashboard.putNumber("Lidar B - ConvertedBad", 6+(15/396.0)*(asdf.getDistance(1)-165));
+    SmartDashboard.putNumber("Lidar C - ConvertedBad", 6+(15/396.0)*(asdf.getDistance(2)-165));
+    SmartDashboard.putNumber("Lidar D - ConvertedBad", 6+(15/396.0)*(asdf.getDistance(3)-165));
+//</Irrelevant>
   }
 
   @Override
@@ -411,6 +444,7 @@ public class Robot extends TimedRobot {
     if (!hang && !armReset && !altHang) {
       reset = true;
       robot.turnOffPTO();
+      armStep = 0 ;
 
       //////////////////////////////////////////////////DRIVETRAIN CONTROL
 
@@ -524,6 +558,7 @@ public class Robot extends TimedRobot {
       for (int i = 0; i < averageTurretXSize; i++)
         average += averageX[i];
       average /= averageTurretXSize;
+      average+=.75;
 
       if ((xbox.getRawAxis(2) > 0.10) && robot.isTargetFound()) { ////////////AUTO-AIM
         turnTo45 = false;
@@ -720,36 +755,87 @@ public class Robot extends TimedRobot {
 
     }
     if (armReset){
-      robot.turnOnPTO();
-      if (armReset && (System.currentTimeMillis() - timerForPTO)>=2000){
-        driveLeft = -.2;
-        driveRight = -.2;
-        if (!robot.getClimbSensorRight() && !delayRight){
-          delayRight = true;
-          rightTime = System.currentTimeMillis();
-        }
-        if (!robot.getClimbSensorLeft() && !delayLeft){
-          delayLeft = true;
-          leftTime = System.currentTimeMillis();
-        }
-        if (!robot.getClimbSensorLeft() && (System.currentTimeMillis() - leftTime >= 170)){
-          driveLeft = 0;
-        }
-        if (!robot.getClimbSensorRight() && (System.currentTimeMillis() - rightTime >= 170)){
-          driveRight = 0;
-        }
+      switch (armStep){
+        case 0:
+          robot.turnOnPTO();
+          if (!leftArrived){
+            startTime = System.currentTimeMillis();
+            leftArrived = true;
+          }
+          if (System.currentTimeMillis() - startTime >= 1000){
+            leftArrived = false;
+            armStep += 1;
+          }
+          break;
+        case 1:
+          if (!robot.getClimbSensorRight()){
+            startHeightRight = robot.armHeightRight();
+            rightArrived = true;
+          }
+          if (!robot.getClimbSensorLeft()){
+            startHeightLeft = robot.armHeightLeft();
+            leftArrived = true;
+          }
+          armStep += 1;
+          break;
+        case 2:
+          if (!rightArrived){
+            rightArmPower = defaultClimbPowerDown;
+          }
+          if (!leftArrived){
+            leftArmPower = defaultClimbPowerDown;
+          }
+          if (!robot.getClimbSensorLeft()){
+            leftArrived = true;
+            leftArmPower = 0;
+            startHeightLeft = robot.armHeightLeft();
+          }
+          if(!robot.getClimbSensorRight()){
+            rightArmPower = 0;
+            rightArrived = true;
+            startHeightRight = robot.armHeightRight();
+          }
+          if (leftArrived && rightArrived){
+            leftArrived = false;
+            rightArrived = false;
+            armStep += 1;
+          }
+          break;
+        case 3:
 
-        if (!robot.getClimbSensorLeft() && !robot.getClimbSensorRight()
-                && (System.currentTimeMillis() - leftTime >= 170)
-                && (System.currentTimeMillis() - rightTime >= 170)){
-          robot.turnOffPTO();
+          if (robot.armHeightLeft() - startHeightLeft >= 1){
+            leftArmPower = 0;
+            leftArrived = true;
+          }
+          else{
+            leftArmPower = defaultClimbPowerUp;
+          }
+
+          if (robot.armHeightRight() - startHeightRight >= 1){
+            rightArmPower = 0;
+            rightArrived = true;
+          }
+          else{
+            rightArmPower = defaultClimbPowerUp;
+          }
+
+
+          if (leftArrived && rightArrived){
+            rightArmPower = 0;
+            leftArmPower = 0;
+            armStep += 1;
+          }
+          break;
+        case 4:
+          leftArmPower = 0;
+          rightArmPower = 0;
+          leftArrived = false;
+          rightArrived = false;
           armReset = false;
-          delayRight = false;
-          delayLeft = false;
-        }
-        robot.drivePercent(driveLeft, driveRight);
-      }
+          break;
 
+      }
+      robot.armPower(leftArmPower, rightArmPower);
     }
     if (hang) {
       ///////////////////////////////////////////RUN AUTO-CLIMB
@@ -835,7 +921,7 @@ public class Robot extends TimedRobot {
     int leftAxis = 1;
     int rightAxis = 5;
     double tolerance = 0.8;
-    double drivePower = 1;
+    double drivePower = .2;
 
     if (joystick.getRawButton(12)) robot.setTurretPowerPct(0.2);
     else if (joystick.getRawButton(15)) robot.setTurretPowerPct(-0.2);

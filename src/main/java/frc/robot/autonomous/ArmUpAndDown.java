@@ -51,6 +51,7 @@ public class ArmUpAndDown extends GenericAutonomous {
         SmartDashboard.putNumber("LeftHeight", robot.armHeightLeft()-startHeightLeft);
 
         switch (autonomousStep){
+
             case 0:
                 robot.turnOnPTO();
                 if (!leftArrived){
@@ -98,7 +99,7 @@ public class ArmUpAndDown extends GenericAutonomous {
                 break;
             case 3:
 
-                if (robot.armHeightLeft() - startHeightLeft >= 1){
+                if (robot.armHeightLeft() - startHeightLeft >= 25){
                     leftArmPower = 0;
                     leftArrived = true;
                 }
@@ -106,7 +107,7 @@ public class ArmUpAndDown extends GenericAutonomous {
                     leftArmPower = defaultClimbPowerUp;
                 }
 
-                if (robot.armHeightRight() - startHeightRight >= 1){
+                if (robot.armHeightRight() - startHeightRight >= 25){
                     rightArmPower = 0;
                     rightArrived = true;
                 }

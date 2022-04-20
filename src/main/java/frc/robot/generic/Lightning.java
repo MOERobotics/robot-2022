@@ -14,6 +14,8 @@ public class Lightning implements GenericRobot {
     public static final double TICKS_PER_REVOLUTION_SHOOTERA = 1;
     public static final double TICKS_PER_REVOLUTION_SHOOTERB = 1;
     public static final double TICKS_PER_REVOLUTION_SHOOTERC = 1;
+    public static final double leftScalar = 1.007;
+    public static final double rightScalar = .95;
 
     public static  final double LEFTATOLERANCE = 0;
     public static  final double LEFTBTOLERANCE = 0;
@@ -286,7 +288,7 @@ public class Lightning implements GenericRobot {
     public void shoot(){
         double shooterRPM = defaultShooterTargetRPM;
         setShooterRPM(shooterRPM, shooterRPM);
-        if (getShooterRPMTop() >= (shooterRPM-300) && getShooterRPMBottom() >= (shooterRPM-300)){
+        if ((getShooterRPMTop() >= (shooterRPM-50)) && (getShooterRPMBottom() >= (shooterRPM-50))){
             canShoot = true;
         }
         else{
@@ -359,7 +361,7 @@ public class Lightning implements GenericRobot {
     public double getAlternateTurretAngle(){
         double raw = encoderTurretAlt.getPosition();
         double out;
-        double offset = 50+13;
+        double offset = 50+13+84+5;
         out = (raw *  136.467) - 5.73 - offset;
         if (out>360)
         {
@@ -417,6 +419,7 @@ public class Lightning implements GenericRobot {
 
 
         //TODO: figure out use setSpeed() or set()
+
         elevationLeft.set(position);
         elevationRight.set(position);
     }
@@ -588,13 +591,13 @@ public class Lightning implements GenericRobot {
     public double armHeightLeft() {
         //TODO: put in conversion
         //Maybe use some sensor. Do NOT want to use encoders for this.
-        return encoderTicksLeftDriveB()*INCHES_PER_TICK_ARMS;
+        return encoderTicksLeftDriveA()*INCHES_PER_TICK_ARMS*leftScalar;
     }
 
     @Override
     public double armHeightRight(){
         //TODO: put in conversion
-        return encoderTicksRightDriveA()*INCHES_PER_TICK_ARMS;
+        return encoderTicksRightDriveA()*INCHES_PER_TICK_ARMS*rightScalar;
     }
 
     @Override
@@ -722,26 +725,25 @@ public class Lightning implements GenericRobot {
         double x = getTargetY();
         if (x != 0){
             DistHub = 214 + -10.4*x + 0.333*Math.pow(x,2);
+            if (DistHub <= 145){
+                DistHub = 145;
+            }
         }
         return DistHub;
     }
 
     @Override
     public double findShooterRPM(){
-        double x = findDistHub()/12.0;
-        if(x*12 <= 160){
-            return (-3020 + 1364*x + -109*Math.pow(x,2) + 2.93*Math.pow(x,3));
-        }
-        else {
-            return (-3020 + 1364 * x + -109 * Math.pow(x, 2) + 2.93 * Math.pow(x, 3)) - ((x- 160/12.0)*50/((203-160)/12.0));
-        }
+        double x = findDistHub();
+        return -5618 + 126*x + -0.631*Math.pow(x,2) + 1.08E-03*Math.pow(x,3);
     }
 
     @Override
     public double findShooterPitch(){
-        double x = findDistHub()/12.0;
-        return (-0.217 + 0.0503*x + -8.84e-04*Math.pow(x,2));/*(.02/4.5*(x-14)+.01)*/
+        double x = findDistHub();
+        return -1.46 + 0.0239*x + -1.08E-04*Math.pow(x,2) + 1.73E-07*Math.pow(x,3);
     }
+    //
 
     @Override
     public Pixycam getPixyCam(){
