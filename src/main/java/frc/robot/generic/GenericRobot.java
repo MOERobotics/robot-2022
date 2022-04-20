@@ -45,7 +45,7 @@ public interface GenericRobot {
 	};
 
 	public default double getDriveDistanceInchesLeft(){
-		return encoderTicksLeftDriveA()/encoderLeftDriveTicksPerInch();
+		return encoderTicksLeftDriveB()/encoderLeftDriveTicksPerInch();
 	}
 
 	public default double getDriveDistanceInchesRight(){
