@@ -85,7 +85,7 @@ public class Pixycam implements GenericPixycam {
 				System.out.println("PIXY INIT: Program Change Error");
 				return;
 		}
-		pixycam.setLamp((byte)1, (byte)0);
+		pixycam.setLamp((byte)2, (byte)0);
 		Pixy2CCC ccc = pixycam.getCCC();
 		while(isRunning) {
 			//If nobody has seen our old data,

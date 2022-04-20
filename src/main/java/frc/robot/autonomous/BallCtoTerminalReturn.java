@@ -26,7 +26,6 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
     double angleC = 84.74;
     double rampDownDist = 36;
 
-    double cameraConnection;
 
     PIDController PIDDriveStraight;
     PIDController PIDTurret;
@@ -63,7 +62,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
         robot.setPipeline(0);
         targetFoundA = false;
         targetFoundB = false;
-        cameraConnection = 0;
+
         pixyAutoTrack = new PixyAutoTrack(PIDDriveStraight);
     }
 

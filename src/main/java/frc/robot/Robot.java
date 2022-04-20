@@ -203,6 +203,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("PIXY TELEOP Target ID", pixyCommitTargetID);
 
 
+    //NETWORK TABLES
+
 
     if (countShoot == 0){
       isShooting = false;
