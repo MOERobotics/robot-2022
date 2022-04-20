@@ -45,7 +45,7 @@ public interface GenericRobot {
 	};
 
 	public default double getDriveDistanceInchesLeft(){
-		return encoderTicksLeftDriveA()/encoderLeftDriveTicksPerInch();
+		return encoderTicksLeftDriveB()/encoderLeftDriveTicksPerInch();
 	}
 
 	public default double getDriveDistanceInchesRight(){
@@ -447,6 +447,10 @@ public interface GenericRobot {
 		return 0.0;
 	}
 
+	public default double findAverageY(){
+
+		return 0.0;
+	}
 
 
 }

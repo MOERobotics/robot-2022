@@ -433,6 +433,7 @@ public class Robot extends TimedRobot {
       }
 
       else {
+        robot.findAverageY();
         turretPIDController.reset();
         if (xbox.getRawButton(6)) {
           turretPower = -0.45;
