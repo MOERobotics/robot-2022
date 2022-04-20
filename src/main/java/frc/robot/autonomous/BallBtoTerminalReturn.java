@@ -14,7 +14,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
 
     double leftpower;
     double rightpower;
-    double defaultPower = .7;
+    double defaultPower = .4;
     double correction;
 
     double distanceB = 61.5;
@@ -78,11 +78,16 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
         if (autonomousStep >= 1){
             robot.getCargo();
             robot.shoot();
-            robot.setShooterTargetRPM(robot.findShooterRPM());
+            if (autonomousStep >= 5) {
+                robot.setShooterTargetRPM(robot.findShooterRPM());
+                robot.setTurretPitchPosition(robot.findShooterPitch());
+            }
+            else{
+                robot.setShooterTargetRPM(2700);
+                robot.setTurretPitchPosition(.272);
+            }
         }
-        if (autonomousStep >= 1 && autonomousStep <=10){
-            robot.setTurretPitchPosition(robot.findShooterPitch());
-        }
+
         else{
             robot.setCollectorIntakePercentage(0);
             robot.setTurretPowerPct(0);
@@ -110,21 +115,13 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if (robot.getDriveDistanceInchesLeft() - startDistance >= rampDownDist){
-                    double rampUp = rampDown(defaultPower, 0.1, startDistance, rampDownDist,
-                            robot.getDriveDistanceInchesLeft(), rampDownDist);
-                    leftpower = defaultPower - rampUp;
-                    rightpower = defaultPower - rampUp;
-                }
-
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB - rampDownDist){
                     double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist,
                             robot.getDriveDistanceInchesLeft(), distanceB);
-                    leftpower = ramp;
-                    rightpower = ramp;
+                    leftpower = ramp + correction;
+                    rightpower = ramp - correction;
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceB){
-                    robot.setPipeline(1);
                     autonomousStep += 1;
                     startTime = System.currentTimeMillis();
                 }
@@ -135,7 +132,11 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 }
                 leftpower = 0;
                 rightpower = 0;
-                autonomousStep += 1;
+
+                if (System.currentTimeMillis() - startTime >= 500){
+                    robot.setPipeline(1);
+                    autonomousStep += 1;
+                }
                 break;
             case 3:
                 if (robot.isTargetFound()){
@@ -177,17 +178,12 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 leftpower = defaultPower + correction;
                 rightpower = defaultPower - correction;
 
-                if (robot.getDriveDistanceInchesLeft() - startDistance >= rampDownDist){
-                    double rampUp = rampDown(defaultPower, 0.1, startDistance, rampDownDist,
-                            robot.getDriveDistanceInchesLeft(), rampDownDist);
-                    leftpower = defaultPower - rampUp;
-                    rightpower = defaultPower - rampUp;
-                }
+
 
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal - rampDownDist){
                     double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist, robot.getDriveDistanceInchesLeft(), distanceTerminal);
-                    leftpower = ramp;
-                    rightpower = ramp;
+                    leftpower = ramp + correction;
+                    rightpower = ramp - correction;
                 }
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceTerminal) {
                     autonomousStep += 1;
@@ -211,17 +207,10 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 leftpower = -defaultPower + correction;
                 rightpower = -defaultPower - correction;
 
-                if (robot.getDriveDistanceInchesLeft() - startDistance >= rampDownDist){
-                    double rampUp = rampDown(defaultPower, 0.1, startDistance, rampDownDist,
-                            robot.getDriveDistanceInchesLeft(), rampDownDist);
-                    leftpower = -defaultPower + rampUp;
-                    rightpower = -defaultPower + rampUp;
-                }
-
                 if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal - rampDownDist){
                     double ramp = rampDown(defaultPower, .1, startDistance, rampDownDist, robot.getDriveDistanceInchesLeft(), distanceTerminal);
-                    leftpower = -ramp;
-                    rightpower = -ramp;
+                    leftpower = -ramp + correction;
+                    rightpower = -ramp - correction;
                 }
                 if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal - 1000) {
                     autonomousStep += 1;
