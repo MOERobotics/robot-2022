@@ -21,9 +21,11 @@ import static io.github.pseudoresonance.pixy2api.Pixy2.*;
 
 
 
-public class Pixycam extends Thread implements GenericPixycam {
+public class Pixycam implements GenericPixycam {
 
 	boolean isRunning = true;
+
+	Thread pixyThread = new Thread(this);
 
 	private Pixy2 pixycam;
 	private SPILink pixySPI = new SPILink();
@@ -177,10 +179,12 @@ public class Pixycam extends Thread implements GenericPixycam {
 		}
 	}
 
+	@Override
 	public PixyCargo[] getCargo(){
 		return this.getCargo(false);
 	}
 
+	@Override
 	//Refresh = true only if call is from robot-periodic, controls 50 semaphore sets/second
 	public PixyCargo[] getCargo(boolean refresh) {
 		PixyCargo[] result = pixyCargos.get();
@@ -192,16 +196,17 @@ public class Pixycam extends Thread implements GenericPixycam {
 
 
 
-
+	@Override
 	public String getStatus(){
 		return status;
 	}
 
-
+	@Override
 	public PixyCargo identifyClosestCargo(){
 		return identifyClosestCargo(getCargo(false));
 	}
 
+	@Override
 	public PixyCargo identifyClosestCargo(PixyCargo[] cargoList){
 		if(cargoList.length == 0) return null;
 		double[] scores = new double[cargoList.length];
@@ -224,9 +229,20 @@ public class Pixycam extends Thread implements GenericPixycam {
 		return cargoList[maxIndex];
 	}
 
-
+	@Override
 	public double getGeneralErrorCount(){
 		return generalErrorCount;
+	}
+
+	@Override
+	public void start(){
+		pixyThread.start();
+	}
+
+	@Override
+	public void stop(){
+		//IntelliJ complains this is deprecated
+		pixyThread.stop();
 	}
 
 

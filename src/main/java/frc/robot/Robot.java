@@ -133,10 +133,10 @@ public class Robot extends TimedRobot {
 
     if(robot.getPixyCam() != null){
       foundCargo = robot.getPixyCam().getCargo(true);
+      SmartDashboard.putNumber("Pixy Gen. Erorors", robot.getPixyCam().getGeneralErrorCount());
     }
     SmartDashboard.putBoolean("Is Pixy Null", robot.getPixyCam() == null);
     SmartDashboard.putNumber("Number of cargo on Pixy", foundCargo.length);
-    SmartDashboard.putNumber("Pixy Gen. Erorors", robot.getPixyCam().getGeneralErrorCount());
 
 
     for (int i = 0; i < foundCargo.length; i++) {

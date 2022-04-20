@@ -5,10 +5,8 @@ import edu.wpi.first.hal.HAL;
 import lombok.SneakyThrows;
 import lombok.Value;
 
-public interface GenericPixycam {
+public interface GenericPixycam extends Runnable {
 
-    //Old pixycam is inheriting run from thread so this shouldn't be necessary
-    //It's here anyways
     public void run();
 
     public Pixycam.PixyCargo[] getCargo();
@@ -18,9 +16,13 @@ public interface GenericPixycam {
 
     public String getStatus();
 
-    public Pixycam.PixyCargo identifyClosestCargo();
+    public PixyCargo identifyClosestCargo();
+    public PixyCargo identifyClosestCargo(PixyCargo[] cargoList);
 
     public double getGeneralErrorCount();
+
+    public void start();
+    public void stop();
 
 
     @Value
