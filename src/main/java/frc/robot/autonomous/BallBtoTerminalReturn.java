@@ -33,7 +33,8 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
     boolean targetFoundA = false;
 
     PixyAutoTrack pixyAutoTrack;
-
+    int pixyTotalHits;
+    int pixyHits;
 
     @Override
     public void autonomousInit(GenericRobot robot) {
@@ -170,6 +171,10 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 double startPixyDist = distanceTerminal - pixyAutoTrack.getPixyDistFar();
                 double endPixyDist = distanceTerminal - pixyAutoTrack.getPixyDistNear();
                 if(distanceTravelled >= startPixyDist && distanceTravelled <= endPixyDist){
+                    boolean hit = robot.getPixyCam().hasFoundCargoLastFrame();
+                    pixyTotalHits++;
+                    if(hit) pixyHits++;
+
                     pixyAutoTrack.updateReqCorrection(robot, defaultPower, startingYaw);
                 }
 
@@ -237,5 +242,9 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
         }
         robot.drivePercent(leftpower, rightpower);
 
+    }
+
+    public int[] pixyDebugs(){
+        return new int[]{pixyHits, pixyTotalHits};
     }
 }
