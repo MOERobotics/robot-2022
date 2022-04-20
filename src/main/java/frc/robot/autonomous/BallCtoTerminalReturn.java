@@ -254,7 +254,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 correction = PIDDriveStraight.calculate(robot.getYaw() - (startingYaw+20));
                 leftpower = -1*(.5-correction);
                 rightpower = -1*(.5+correction);
-                if (Math.abs(robot.getDriveDistanceInchesLeft() - startDistance)<= 10){
+                if (Math.abs(robot.getDriveDistanceInchesLeft() - startDistance)>= 10){
                     leftpower = 0;
                     rightpower = 0;
                     autonomousStep += 1;
