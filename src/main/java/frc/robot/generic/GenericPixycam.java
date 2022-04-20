@@ -62,6 +62,14 @@ public interface GenericPixycam extends Runnable {
             }
         }
 
+        public PixyCargoColor getColor() {
+            return this.color;
+        }
+
+        public int getId() {
+            return this.id;
+        }
+
         public boolean cargoMatchesAlliance(){
             return this.color == getAlliance();
         }
