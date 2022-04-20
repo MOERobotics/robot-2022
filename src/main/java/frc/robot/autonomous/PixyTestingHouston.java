@@ -13,8 +13,9 @@ public class PixyTestingHouston extends GenericAutonomous {
     PIDController PIDDriveStraight;
     PixyAutoTrack pixyAutoTrack;
 
-    double pixyPower = .6;
-    double actualPower = .0;
+    double pixyPower = .3;
+    double actualPower = .3;
+    double visionDist = 36;
     double travelDist = 36;
 
     double correction = 0;
@@ -51,8 +52,8 @@ public class PixyTestingHouston extends GenericAutonomous {
             case 1:
                 double distanceTravelled = robot.getDriveDistanceInchesLeft() - startEncoder;
 
-                double startPixyDist = travelDist - pixyAutoTrack.getPixyDistFar();
-                double endPixyDist = travelDist - pixyAutoTrack.getPixyDistNear();
+                double startPixyDist = visionDist - pixyAutoTrack.getPixyDistFar();
+                double endPixyDist = visionDist - pixyAutoTrack.getPixyDistNear();
                 if(distanceTravelled >= startPixyDist && distanceTravelled <= endPixyDist){
                     pixyAutoTrack.updateReqCorrection(robot, pixyPower, centerYaw);
                 }

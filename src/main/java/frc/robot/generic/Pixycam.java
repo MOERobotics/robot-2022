@@ -21,7 +21,7 @@ import static io.github.pseudoresonance.pixy2api.Pixy2.*;
 
 
 
-public class Pixycam implements GenericPixycam {
+public class Pixycam implements GenericPixycam, Runnable {
 
 	boolean isRunning = true;
 
@@ -36,10 +36,13 @@ public class Pixycam implements GenericPixycam {
 
 	String status = "";
 	String msg = "Init...";
+	boolean initSuccess = false;
 
 	double generalErrorCount = 0;
 
 	Timer timer;
+
+	boolean foundCargoLastFrame = false;
 
 	@Override @SneakyThrows
 	public void run() {
@@ -47,44 +50,56 @@ public class Pixycam implements GenericPixycam {
 		timer = new Timer();
 		pixycam = Pixy2.createInstance(pixySPI);
 		retc = pixycam.init();
-		switch (retc) {
-			case PIXY_RESULT_OK:
-				//I'm happy
-				status = "PIXY INIT: Success!";
-				System.out.println("PIXY INIT: Success!");
-				break;
-			default:
-			case PIXY_RESULT_ERROR:
-				//I'm not happy
-				status = "PIXY INIT: General Error";
-				System.out.println("PIXY INIT: General Error");
-				return;
-			case PIXY_RESULT_BUSY:
-				//I'm not happy
-				status = "PIXY INIT: Busy Error";
-				System.out.println("PIXY INIT: Busy Error");
-				return;
-			case PIXY_RESULT_CHECKSUM_ERROR:
-				//I'm not happy
-				status = "PIXY INIT: Checksum Error";
-				System.out.println("PIXY INIT: Checksum Error");
-				return;
-			case PIXY_RESULT_TIMEOUT:
-				//I'm not happy
-				status = "PIXY INIT: Timeout Error";
-				System.out.println("PIXY INIT: Timeout Error");
-				return;
-			case PIXY_RESULT_BUTTON_OVERRIDE:
-				//I'm not happy
-				status = "PIXY INIT: Button Override Error";
-				System.out.println("PIXY INIT: Button Override Error");
-				return;
-			case PIXY_RESULT_PROG_CHANGING:
-				//I'm not happy
-				status = "PIXY INIT: Program Change Error";
-				System.out.println("PIXY INIT: Program Change Error");
-				return;
+
+		while(!initSuccess){
+			switch (retc) {
+				case PIXY_RESULT_OK:
+					//I'm happy
+					status = "PIXY INIT: Success!";
+					//System.out.println("PIXY INIT: Success!");
+					initSuccess = true;
+					break;
+				default:
+				case PIXY_RESULT_ERROR:
+					//I'm not happy
+					status = "PIXY INIT: General Error";
+					System.out.println("PIXY INIT: General Error");
+					//return;
+				case PIXY_RESULT_BUSY:
+					//I'm not happy
+					status = "PIXY INIT: Busy Error";
+					System.out.println("PIXY INIT: Busy Error");
+					//return;
+				case PIXY_RESULT_CHECKSUM_ERROR:
+					//I'm not happy
+					status = "PIXY INIT: Checksum Error";
+					System.out.println("PIXY INIT: Checksum Error");
+					//return;
+				case PIXY_RESULT_TIMEOUT:
+					//I'm not happy
+					status = "PIXY INIT: Timeout Error";
+					System.out.println("PIXY INIT: Timeout Error");
+					generalErrorCount++;
+					//return;
+				case PIXY_RESULT_BUTTON_OVERRIDE:
+					//I'm not happy
+					status = "PIXY INIT: Button Override Error";
+					System.out.println("PIXY INIT: Button Override Error");
+					//return;
+				case PIXY_RESULT_PROG_CHANGING:
+					//I'm not happy
+					status = "PIXY INIT: Program Change Error";
+					System.out.println("PIXY INIT: Program Change Error");
+					//return;
+			}
+
+			//one of these is bound to
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException r) {}
+			timer.delay(0.1);
 		}
+
 		pixycam.setLamp((byte)2, (byte)0);
 		Pixy2CCC ccc = pixycam.getCCC();
 		while(isRunning) {
@@ -101,6 +116,7 @@ public class Pixycam implements GenericPixycam {
 					status = "PIXY RUN: No Cargo Found";
 					//Comment out to stop spam
 					//System.out.println("PIXY RUN: No Cargo Found");
+					foundCargoLastFrame = false;
 					break;
 				case PIXY_RESULT_ERROR:
 					//I'm not happy
@@ -150,6 +166,7 @@ public class Pixycam implements GenericPixycam {
 					//I'm happy
 					status = "PIXY RUN: Target sighted";
 					System.out.println(status);
+					foundCargoLastFrame = true;
 
 					PixyCargo[] cargosFound = new PixyCargo[blockCount];
 					ArrayList<Pixy2CCC.Block> blocksFound = ccc.getBlockCache();
@@ -245,6 +262,10 @@ public class Pixycam implements GenericPixycam {
 		pixyThread.stop();
 	}
 
+
+	public boolean hasFoundCargoLastFrame(){
+		return foundCargoLastFrame;
+	}
 
 
 

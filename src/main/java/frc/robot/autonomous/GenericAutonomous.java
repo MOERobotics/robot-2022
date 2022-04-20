@@ -22,4 +22,8 @@ public abstract class GenericAutonomous {
         double power = (endDist-Math.abs(currentDist-startDistance))*(startPower-endPower)/rolloutDistance+endPower;
         return power;
     }
+
+    public int[] pixyDebugs(){
+        return new int[0];
+    }
 }

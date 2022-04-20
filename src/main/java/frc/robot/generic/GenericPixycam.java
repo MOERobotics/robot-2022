@@ -5,9 +5,7 @@ import edu.wpi.first.hal.HAL;
 import lombok.SneakyThrows;
 import lombok.Value;
 
-public interface GenericPixycam extends Runnable {
-
-    public void run();
+public interface GenericPixycam {
 
     public Pixycam.PixyCargo[] getCargo();
 

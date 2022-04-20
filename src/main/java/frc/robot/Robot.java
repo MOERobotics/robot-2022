@@ -37,6 +37,7 @@ public class Robot extends TimedRobot {
           simpleC = new BallSimpleC(),
           CTerminalReturn = new BallCtoTerminalReturn(),
           BTerminalReturn = new BallBtoTerminalReturn(),
+          PixyTestHouston = new PixyTestingHouston(),
           simpleB         = new BallSimpleB(),
           calibration = new Calibration(),
           shortRun = new ShortRun();
@@ -152,10 +153,17 @@ public class Robot extends TimedRobot {
     if(robot.getPixyCam() != null){
       foundCargo = robot.getPixyCam().getCargo(true);
       SmartDashboard.putNumber("Pixy Gen. Erorors", robot.getPixyCam().getGeneralErrorCount());
+      SmartDashboard.putBoolean("Pixy actually sees?", robot.getPixyCam().hasFoundCargoLastFrame());
     }
     SmartDashboard.putBoolean("Is Pixy Null", robot.getPixyCam() == null);
     SmartDashboard.putNumber("Number of cargo on Pixy", foundCargo.length);
 
+
+    if(autonomous != null && autonomous.pixyDebugs().length >= 2){
+      SmartDashboard.putNumber("PIXY AUTO Hits", autonomous.pixyDebugs()[0]);
+      SmartDashboard.putNumber("PIXY AUTO Tries", autonomous.pixyDebugs()[1]);
+
+    }
 
     for (int i = 0; i < foundCargo.length; i++) {
       String msg = "RAW PIXY " + i;
@@ -202,8 +210,6 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("PIXY TELEOP Target ID", pixyCommitTargetID);
 
-
-    //NETWORK TABLES
 
 
     if (countShoot == 0){
