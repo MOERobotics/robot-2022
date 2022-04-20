@@ -447,6 +447,10 @@ public interface GenericRobot {
 		return 0.0;
 	}
 
+	public default double findAverageY(){
+
+		return 0.0;
+	}
 
 	public default Pixycam getPixyCam(){
 		//System.out.println("What even is a pixycam");
