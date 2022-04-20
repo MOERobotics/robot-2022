@@ -756,6 +756,14 @@ public class Lightning implements GenericRobot {
         return pixycargos.length;
     }
 
+    @Override
+    public Pixycam.PixyCargo pixyClosestCargo(){
+        Pixycam pixycam = getPixyCam();
+        if(pixycam == null) return null;
+        Pixycam.PixyCargo[] pixycargos = pixycam.getCargo(false);
+        if(pixycargos.length == 0) return null;
+        return pixycam.identifyClosestCargo(pixycargos);
+    }
 
     @Override
     public double pixyOffsetOfClosest(){

@@ -105,8 +105,11 @@ public class Robot extends TimedRobot {
   int countAltHang = 0;
   double altHangStartTime;
 
-  double pixyCenterYaw;
-
+  double pixyCenterYaw = 0;
+  boolean pixyHasCommitTarget = false;
+  int pixyCommitTargetID = 0;
+  double pixyCommitProgress = 0;
+  double pixyLockOnTol = 0.1;
 
   @Override
   public void robotInit() {
@@ -176,6 +179,10 @@ public class Robot extends TimedRobot {
       SmartDashboard.putString("PIXY Tracked Cargo ", "Cargo Not Found :(");
     }
 
+    SmartDashboard.putBoolean("PIXY TELEOP Has commit?", pixyHasCommitTarget);
+    SmartDashboard.putNumber("PIXY TELEOP Progress", pixyCommitProgress);
+
+    SmartDashboard.putNumber("PIXY TELEOP Target ID", pixyCommitTargetID);
 
 
 
@@ -346,6 +353,8 @@ public class Robot extends TimedRobot {
     PIDController drivePIDforPixy = new PIDController(robot.getPIDmaneuverP(), robot.getPIDmaneuverI(), robot.getPIDmaneuverD());
     pixyAutoTrack = new PixyAutoTrack(drivePIDforPixy);
     pixyAutoTrack.setDeviationLimit(60);
+    pixyCenterYaw = robot.getYaw();
+
   }
 
   @Override
@@ -407,6 +416,9 @@ public class Robot extends TimedRobot {
 
       if (!robot.getPTOState()) {
 
+        joystickX = joystick.getX();
+        joystickY = -joystick.getY();
+
         if(joystick.getRawButton(1)){
           driveLeft = .4;
           driveRight = .4 ;
@@ -426,8 +438,6 @@ public class Robot extends TimedRobot {
           driveRight = -.4;
         }
         else{
-          joystickX = joystick.getX();
-          joystickY = -joystick.getY();
 
           if (joystickY > -cutoff && joystickY < cutoff) {
             joystickY = 0;
@@ -440,21 +450,62 @@ public class Robot extends TimedRobot {
           driveRight = (joystickY - joystickX) * scaleFactor;
         }
 
+        ///////PIXY TELEOP CONTROLS
+
+
         //Using pixycam to lock onto a cargo during tele-op driving
         if(joystick.getRawButton(14)) {
           //Power here shouldn't be based on actual robot power (only in autonomous)
-          pixyAutoTrack.updateReqCorrection(robot, 0.5, pixyCenterYaw);
+          pixyAutoTrack.updateReqCorrection(robot, 0.5, pixyCenterYaw, pixyHasCommitTarget, pixyCommitTargetID);
           double pixySteer = pixyAutoTrack.getPIDCorrection(robot, pixyCenterYaw);
 
-          driveLeft += pixySteer;
-          driveRight -= pixySteer;
+          if(joystick.getRawButton(1)){
+            driveLeft = .4 + pixySteer;
+            driveRight = .4 - pixySteer ;
+          }
+          //I really don't know why you would drive backwards if you're tracking pixy but I guess it's here
+          else if(joystick.getRawButton(2)){
+            driveLeft = -.4 + pixySteer;
+            driveRight = -.4 - pixySteer;
+          }
+          //only consider joystickY, ignore joystickX, so no weird overlapping steer
+          else{
+            driveLeft = joystickY + pixySteer;
+            driveRight = joystickY - pixySteer;
+          }
+
+          double currentAbsOS = pixyAutoTrack.getMostRecentAbsOffset();
+          int blockCount = pixyAutoTrack.getMostRecentBlockCount();
+          if(blockCount > 0 && currentAbsOS < pixyLockOnTol){
+            //50 frames or 1 second to lock
+            pixyCommitProgress += 0.02;
+          }
+          else{
+            pixyCommitProgress -= 0.05;
+            if(pixyCommitProgress < 0) pixyCommitProgress = 0;
+          }
+
+          if(!pixyHasCommitTarget && pixyCommitProgress > 1){
+            pixyHasCommitTarget = true;
+            Pixycam.PixyCargo closestCargo = robot.pixyClosestCargo();
+            if(closestCargo != null){
+              if(closestCargo.getProportionalOffsetY() < pixyLockOnTol){
+                pixyCommitTargetID = closestCargo.getId();
+              }
+            }
+
+          }
+
         }
         else{
           pixyAutoTrack.resetCorrection();
           pixyCenterYaw = robot.getYaw();
+
+          pixyHasCommitTarget = false;
+          pixyCommitProgress = 0;
         }
 
-
+        ///////PIXY TELEOP CONTROLS
       }
 
 

@@ -463,6 +463,15 @@ public interface GenericRobot {
 	 * Gets the pixycam offest of the largest (aka closest) ball
 	 * Range is from -1 (far left) to +1 (far right), 0 is centered
 	 */
+	public default Pixycam.PixyCargo pixyClosestCargo(){
+		return null;
+	}
+
+
+	/**
+	 * Gets the pixycam offest of the largest (aka closest) ball
+	 * Range is from -1 (far left) to +1 (far right), 0 is centered
+	 */
 	public default double pixyOffsetOfClosest(){
 		return 0;
 	}

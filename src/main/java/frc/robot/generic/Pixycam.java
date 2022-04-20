@@ -21,7 +21,7 @@ import static io.github.pseudoresonance.pixy2api.Pixy2.*;
 
 
 
-public class Pixycam extends Thread {
+public class Pixycam extends Thread implements GenericPixycam {
 
 	boolean isRunning = true;
 
@@ -224,73 +224,12 @@ public class Pixycam extends Thread {
 		return cargoList[maxIndex];
 	}
 
-	@Value
-	public static class PixyCargo {
-		static final int FRAME_WIDTH = 315;
-		static final int FRAME_HEIGHT = 208;
-		int x;
-		int y;
-		int w;
-		int h;
-		int age;
-		int id;
-		PixyCargoColor color;
-
-		public enum PixyCargoColor {
-			RED,
-			BLUE,
-		}
-
-		public static PixyCargoColor getAlliance() {
-			AllianceStationID allianceStationID = HAL.getAllianceStation();
-			if (allianceStationID == null) {
-			      return PixyCargoColor.RED;
-			}
-			switch (allianceStationID) {
-			     case Red1:
-			     case Red2:
-			     case Red3:
-			         return PixyCargoColor.RED;
-				 case Blue1:
-				 case Blue2:
-				 case Blue3:
-				      return PixyCargoColor.BLUE;
-
-			    default:
-			          return PixyCargoColor.RED;
-			}
-		}
-
-		public boolean cargoMatchesAlliance(){
-			return this.color == getAlliance();
-		}
-
-		public String toString() {
-
-			String shortColor = (color == getAlliance()) ? "RED" : "BLU";
-			return  "offset=" + (y-104) +
-					" age=" + age +
-					" clr=" + shortColor +
-					" area=" + (w*h) +
-					" asp.=" + (w/h) +
-					" x=" + x +
-					" y=" + y +
-					" w=" + w +
-					" h=" + h +
-					" id=" + id;
-
-		}
-
-		public double getProportionalOffsetX(){
-			return (((double) x) / FRAME_WIDTH) * 2 - 1;
-		}
-		public double getProportionalOffsetY(){
-			return (((double) y) / FRAME_HEIGHT) * 2 - 1;
-		}
-	}
 
 	public double getGeneralErrorCount(){
 		return generalErrorCount;
 	}
+
+
+
 
 }
