@@ -739,13 +739,13 @@ public class Lightning implements GenericRobot {
     @Override
     public double findShooterRPM(){
         double x = findDistHub();
-        return -5618 + 126*x + -0.631*Math.pow(x,2) + 1.08E-03*Math.pow(x,3);
+        return 5.97*x + 1643;
     }
 
     @Override
     public double findShooterPitch(){
         double x = findDistHub();
-        return -1.46 + 0.0239*x + -1.08E-04*Math.pow(x,2) + 1.73E-07*Math.pow(x,3);
+        return 2.65E-03*x + -0.0816;
     }
     //
 

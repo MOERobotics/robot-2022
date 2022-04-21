@@ -70,7 +70,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
             PIDTurret.reset();
         }
         if((!robot.isTargetFound()) && !targetFoundA) {
-            currentTurretPower = .2;
+            currentTurretPower = .45;
         }
         robot.setTurretPowerPct(currentTurretPower);
         //////////AUTO TRACK STUFF
@@ -84,8 +84,8 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 robot.setTurretPitchPosition(robot.findShooterPitch());
             }
             else{
-                robot.setShooterTargetRPM(2700);
-                robot.setTurretPitchPosition(.272);
+                robot.setShooterTargetRPM(2500);
+                robot.setTurretPitchPosition(.302);
             }
         }
 
@@ -217,7 +217,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                     leftpower = -ramp + correction;
                     rightpower = -ramp - correction;
                 }
-                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal - 1000) {
+                if(Math.abs(robot.getDriveDistanceInchesLeft() - startDistance) >= distanceTerminal - 60) {
                     autonomousStep += 1;
                     leftpower = 0;
                     rightpower = 0;

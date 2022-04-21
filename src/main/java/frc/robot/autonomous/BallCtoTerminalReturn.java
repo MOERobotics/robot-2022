@@ -91,10 +91,10 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
         }
 
         if (autonomousStep <= 4 && !targetFoundA){
-            robot.setShooterTargetRPM(2700);
-            robot.setTurretPitchPosition(.272);
+            robot.setShooterTargetRPM(2500);
+            robot.setTurretPitchPosition(.302);
             if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
-                currentTurretPower = .3;
+                currentTurretPower = .45;
             }
         }
         if ((autonomousStep>=7) && (autonomousStep < 8) && !targetFoundB){
@@ -191,7 +191,9 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 System.out.print(" Pitch:");
                 System.out.print(robot.findShooterPitch());
                 System.out.print(" What I have:");
-                System.out.println(robot.getShooterRPMTop());
+                System.out.print(robot.getShooterRPMTop());
+                System.out.print(" And back RPM:");
+                System.out.println(robot.getShooterRPMC());
                 if (System.currentTimeMillis() - startTime >= 1300){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1;
@@ -339,7 +341,9 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 System.out.print(" and my pitch: ");
                 System.out.print(robot.getTurretPitchPosition());
                 System.out.print("and my turret angle");
-                System.out.println(robot.getAlternateTurretAngle());
+                System.out.print(robot.getAlternateTurretAngle());
+                System.out.print(" And back RPM:");
+                System.out.println(robot.getShooterRPMC());
                 if (System.currentTimeMillis() - startTime >= 2000){
                     robot.setActivelyShooting(false);
                     autonomousStep += 1.0;

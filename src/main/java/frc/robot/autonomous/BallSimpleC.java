@@ -80,10 +80,10 @@ public class BallSimpleC extends GenericAutonomous {
         }
 
         if (autonomousStep <= 4 && !targetFoundA){
-            robot.setShooterTargetRPM(2700);
-            robot.setTurretPitchPosition(.272);
+            robot.setShooterTargetRPM(2500);
+            robot.setTurretPitchPosition(.302);
             if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
-                currentTurretPower = .3;
+                currentTurretPower = .45;
             }
         }
         if ((autonomousStep>=4) && (autonomousStep < 8)){
@@ -167,6 +167,14 @@ public class BallSimpleC extends GenericAutonomous {
                 }
                 break;
             case 4: //turn the shooter off
+                System.out.print("TargetRPM:");
+                System.out.print(robot.findShooterRPM());
+                System.out.print(" Pitch:");
+                System.out.print(robot.findShooterPitch());
+                System.out.print(" What I have:");
+                System.out.print(robot.getShooterRPMTop());
+                System.out.print(" And back RPM:");
+                System.out.println(robot.getShooterRPMC());
                 if (System.currentTimeMillis() - startTime >= 2000){
                     robot.setActivelyShooting(false);
                     autonomousStep = 12;
