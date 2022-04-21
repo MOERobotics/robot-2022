@@ -40,6 +40,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
     double collectorPct;
     boolean targetFoundA = false;
     boolean targetFoundB = false;
+    boolean autoTarg = false;
 
 
 
@@ -58,6 +59,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
         robot.setPipeline(0);
         targetFoundA = false;
         targetFoundB = false;
+        autoTarg = false;
     }
 
     @Override
@@ -90,6 +92,12 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 currentTurretPower = .45;
             }
         }
+
+        if (autoTarg){
+            robot.setShooterTargetRPM(robot.findShooterRPM());
+            robot.setTurretPitchPosition(robot.findShooterPitch());
+        }
+
         if ((autonomousStep>=7) && (autonomousStep < 8) && !targetFoundB){
             if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
                 currentTurretPower = -.2;
@@ -162,9 +170,12 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 leftpower = 0;
                 rightpower = 0;
                 startDistance = robot.getDriveDistanceInchesLeft();
-                if (System.currentTimeMillis() - startTime >= 500){
+                if (System.currentTimeMillis() - startTime >= 250){
                     robot.setPipeline(1);
-                    autonomousStep += 1;
+                    autoTarg = true;
+                    if (System.currentTimeMillis() - startTime >= 500){
+                        autonomousStep += 1;
+                    }
                 }
                 time = false;
                 break;

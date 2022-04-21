@@ -30,6 +30,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
     PIDController PIDDriveStraight;
 
     boolean targetFoundA = false;
+    boolean autoTarg = false;
 
     @Override
     public void autonomousInit(GenericRobot robot) {
@@ -39,6 +40,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
         startTime = System.currentTimeMillis();
         PIDTurret = new PIDController(robot.turretPIDgetP(), robot.turretPIDgetI(), robot.turretPIDgetD());
         robot.setPipeline(0);
+        autoTarg = false;
 
     }
 
@@ -67,6 +69,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
         if((!robot.isTargetFound()) && !targetFoundA) {
             currentTurretPower = .45;
         }
+
         robot.setTurretPowerPct(currentTurretPower);
         //////////AUTO TRACK STUFF
 
@@ -79,8 +82,14 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 robot.setTurretPitchPosition(robot.findShooterPitch());
             }
             else{
-                robot.setShooterTargetRPM(2520);
-                robot.setTurretPitchPosition(.307);
+                if (!autoTarg) {
+                    robot.setShooterTargetRPM(2520);
+                    robot.setTurretPitchPosition(.307);
+                }
+                else{
+                    robot.setShooterTargetRPM(robot.findShooterRPM());
+                    robot.setTurretPitchPosition(robot.findShooterPitch());
+                }
             }
         }
 
@@ -129,9 +138,13 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 leftpower = 0;
                 rightpower = 0;
 
-                if (System.currentTimeMillis() - startTime >= 500){
+                if (System.currentTimeMillis() - startTime >= 250){
+
                     robot.setPipeline(1);
-                    autonomousStep += 1;
+                    autoTarg = true;
+                    if (System.currentTimeMillis() - startTime >= 500) {
+                        autonomousStep += 1;
+                    }
                 }
                 break;
             case 3:
