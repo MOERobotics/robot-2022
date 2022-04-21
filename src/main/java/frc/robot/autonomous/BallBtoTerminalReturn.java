@@ -55,6 +55,7 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
             average += i;
         }
         average /= averageTurretXSize;
+        average += 2;
 
         double currentTurretPower = 0;
 
@@ -78,8 +79,8 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
                 robot.setTurretPitchPosition(robot.findShooterPitch());
             }
             else{
-                robot.setShooterTargetRPM(2500);
-                robot.setTurretPitchPosition(.302);
+                robot.setShooterTargetRPM(2520);
+                robot.setTurretPitchPosition(.307);
             }
         }
 
