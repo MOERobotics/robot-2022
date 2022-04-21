@@ -80,10 +80,10 @@ public class BallSimpleC extends GenericAutonomous {
         }
 
         if (autonomousStep <= 4 && !targetFoundA){
-            robot.setShooterTargetRPM(2700);
-            robot.setTurretPitchPosition(.272);
+            robot.setShooterTargetRPM(2500);
+            robot.setTurretPitchPosition(.302);
             if((!robot.isTargetFound()) && (System.currentTimeMillis() - startTime < 5000)) {
-                currentTurretPower = .3;
+                currentTurretPower = .45;
             }
         }
         if ((autonomousStep>=4) && (autonomousStep < 8)){
