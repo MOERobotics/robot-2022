@@ -233,6 +233,12 @@ public class Pixycam implements GenericPixycam, Runnable {
 			double bindingDimension = Math.min(cargo.getW(), cargo.getH());
 			scores[i] = bindingDimension * bindingDimension;
 			scores[i] *= (Math.max(cargo.getAge(), 10)/5.0 + 1)/3;
+
+			double relativeHeight = cargo.getProportionalOffsetX();
+			double heightPenalty = 0;
+			if(relativeHeight > 0) heightPenalty = relativeHeight;
+			scores[i] *= 1 - heightPenalty;
+
 			if(!cargo.cargoMatchesAlliance()) scores[i] = 0;
 		}
 		int maxIndex = 0;
@@ -243,6 +249,7 @@ public class Pixycam implements GenericPixycam, Runnable {
 				maxScore = scores[i];
 			}
 		}
+		if(maxScore < 360) return null;
 		return cargoList[maxIndex];
 	}
 

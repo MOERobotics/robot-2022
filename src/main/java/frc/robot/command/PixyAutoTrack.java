@@ -13,7 +13,7 @@ public class PixyAutoTrack {
     int mostRecentBlockCount = 0;
 
     //bounds for the distances pixy track is active
-    double pixyDistNear = 18;
+    double pixyDistNear = 27;
     double pixyDistFar = 72;
 
     static double pixyToleranceNarrow = 0.1;
@@ -30,14 +30,14 @@ public class PixyAutoTrack {
     }
 
     public void updateReqCorrection(GenericRobot robot, double power, double centerYaw) {
-        updateReqCorrection(robot, power, centerYaw, false, 42);
+        updateReqCorrection(robot, power, centerYaw, false, 42); //42 is always the answer
     }
 
     //power(speed) is important because higher power means higher PID strength needed
     public void updateReqCorrection(GenericRobot robot, double power, double centerYaw, boolean lockOnTarget, int targetID){
         double offset = 0;
 
-        //if we have a lock on, search for that specific cargo
+        //JUST TELEOP: if we have a lock on, search for that specific cargo
         if(lockOnTarget){
             Pixycam pixycam = robot.getPixyCam();
             if(pixycam != null){
