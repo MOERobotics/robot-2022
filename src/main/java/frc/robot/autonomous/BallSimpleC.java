@@ -72,7 +72,7 @@ public class BallSimpleC extends GenericAutonomous {
             average += i;
         }
         average /= averageTurretXSize;
-        average += 2;
+        average += 1.8;
 
         double currentTurretPower = 0;
 
@@ -148,6 +148,7 @@ public class BallSimpleC extends GenericAutonomous {
                 if(robot.getDriveDistanceInchesLeft() - startDistance >= distanceC){
                     autonomousStep += 1;
                     startTime = System.currentTimeMillis();
+
                 }
                 break;
             case 2: //stop

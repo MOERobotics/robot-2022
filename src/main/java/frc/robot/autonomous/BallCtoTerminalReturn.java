@@ -75,7 +75,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
             average += i;
         }
         average /= averageTurretXSize;
-        average += 2;
+        average += 1.8;
 
         double currentTurretPower = 0;
 
@@ -264,7 +264,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 }
                 break;
             case 8: //roll back a lil bit
-                correction = PIDDriveStraight.calculate(robot.getYaw() - (startingYaw+20));
+                correction = PIDDriveStraight.calculate(robot.getYaw() - (startingYaw+30));
                 leftpower = -1*(.5-correction);
                 rightpower = -1*(.5+correction);
                 if (Math.abs(robot.getDriveDistanceInchesLeft() - startDistance)>= 10){

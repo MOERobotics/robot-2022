@@ -423,8 +423,9 @@ public class Lightning implements GenericRobot {
 
         //TODO: figure out use setSpeed() or set()
 
-        elevationLeft.set(position);
         elevationRight.set(position);
+        elevationLeft.set(position);
+
     }
 
 
@@ -597,13 +598,13 @@ public class Lightning implements GenericRobot {
     public double armHeightLeft() {
         //TODO: put in conversion
         //Maybe use some sensor. Do NOT want to use encoders for this.
-        return encoderTicksLeftDriveA()*INCHES_PER_TICK_ARMS/129.90*136.83*leftScalar;
+        return encoderTicksLeftDriveA()*.1865;
     }
 
     @Override
     public double armHeightRight(){
         //TODO: put in conversion
-        return encoderTicksRightDriveA()*INCHES_PER_TICK_ARMS*rightScalar;
+        return encoderTicksRightDriveA()*.16426;
     }
 
     @Override
@@ -741,13 +742,13 @@ public class Lightning implements GenericRobot {
     @Override
     public double findShooterRPM(){
         double x = findDistHub();
-        return 5.97*x + 1643;
+        return 2132 + -0.0652*x + 0.0184*Math.pow(x,2);
     }
 
     @Override
     public double findShooterPitch(){
         double x = findDistHub();
-        return 2.65E-03*x + -0.0816;
+        return 0.835 + -9.75E-03*x + 5.6E-05*Math.pow(x,2) + -8.56E-08*Math.pow(x,3);
     }
     //
 
