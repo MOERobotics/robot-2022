@@ -23,6 +23,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
 
     double distanceC = 47.9;
     double distanceTerminal = 218;
+    double terminalVisionDist = 200;
     double angleC = 84.74;
     double rampDownDist = 36;
 
@@ -239,8 +240,8 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
 
                 double distanceTravelled = robot.getDriveDistanceInchesLeft() - startDistance;
 
-                double startPixyDist = distanceTerminal - pixyAutoTrack.getPixyDistFar();
-                double endPixyDist = distanceTerminal - pixyAutoTrack.getPixyDistNear();
+                double startPixyDist = terminalVisionDist - pixyAutoTrack.getPixyDistFar();
+                double endPixyDist = terminalVisionDist - pixyAutoTrack.getPixyDistNear();
                 if(distanceTravelled >= startPixyDist && distanceTravelled <= endPixyDist){
 
                     boolean hit = robot.getPixyCam().hasFoundCargoLastFrame();
@@ -255,7 +256,7 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 }
 
                 double basePower = highPower;
-                double pixySlowdown = 0.2;
+                double pixySlowdown = 0.5;
 
                 //Ramp up (rampUp var is subtracted)
                 if (distanceTravelled <= rampDownDist) {
@@ -266,12 +267,14 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
                 // Ramp down
                 else if(distanceTravelled >= distanceTerminal - rampDownDist){
                     //added pixySlowdown to start power because third if case gives starting power
-                    double ramp = rampDown(highPower - pixySlowdown, .2, startDistance, rampDownDist,
+                    double ramp = rampDown(pixySlowdown, .2, startDistance, rampDownDist,
                             robot.getDriveDistanceInchesLeft(), distanceTerminal);
                     basePower = ramp;
                 }
-                else if (distanceTravelled >= startPixyDist - 40){
-                    basePower = highPower - pixySlowdown;
+                else if (distanceTravelled >= startPixyDist - rampDownDist - 12){
+                    double ramp = rampDown(highPower, pixySlowdown, startDistance, rampDownDist,
+                            robot.getDriveDistanceInchesLeft(), distanceTerminal);
+                    basePower = ramp;
                 }
 
                 leftpower = basePower + correction;
@@ -367,5 +370,10 @@ public class BallCtoTerminalReturn extends GenericAutonomous {
 
     public int[] pixyDebugs(){
         return new int[]{pixyHits, pixyTotalHits};
+    }
+
+    @Override
+    public PixyAutoTrack getPixyAutoTrack(){
+        return pixyAutoTrack;
     }
 }

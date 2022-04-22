@@ -3,6 +3,7 @@ package frc.robot.autonomous;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.command.PixyAutoTrack;
 import frc.robot.generic.GenericRobot;
 
 public class PixyTesting extends GenericAutonomous {
@@ -85,5 +86,6 @@ public class PixyTesting extends GenericAutonomous {
 
         robot.drivePercent(leftPower, rightPower);
     }
+
 
 }

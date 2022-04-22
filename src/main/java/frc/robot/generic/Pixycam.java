@@ -249,7 +249,7 @@ public class Pixycam implements GenericPixycam, Runnable {
 				maxScore = scores[i];
 			}
 		}
-		if(maxScore < 360) return null;
+		if(maxScore < 90) return null;
 		return cargoList[maxIndex];
 	}
 

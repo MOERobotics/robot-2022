@@ -2,6 +2,7 @@ package frc.robot.autonomous;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.command.PixyAutoTrack;
 import frc.robot.generic.GenericRobot;
 
 
@@ -25,5 +26,9 @@ public abstract class GenericAutonomous {
 
     public int[] pixyDebugs(){
         return new int[0];
+    }
+
+    public PixyAutoTrack getPixyAutoTrack(){
+        return null;
     }
 }

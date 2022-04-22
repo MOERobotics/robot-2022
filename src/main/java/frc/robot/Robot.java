@@ -154,6 +154,9 @@ public class Robot extends TimedRobot {
       foundCargo = robot.getPixyCam().getCargo(true);
       SmartDashboard.putNumber("Pixy Gen. Erorors", robot.getPixyCam().getGeneralErrorCount());
       SmartDashboard.putBoolean("Pixy actually sees?", robot.getPixyCam().hasFoundCargoLastFrame());
+      if(autonomous.getPixyAutoTrack() != null){
+        SmartDashboard.putNumber("PIXY AUTO CAMCORRECTION", autonomous.getPixyAutoTrack().getCameraCorrection());
+      }
     }
     SmartDashboard.putBoolean("Is Pixy Null", robot.getPixyCam() == null);
     SmartDashboard.putNumber("Number of cargo on Pixy", foundCargo.length);
@@ -162,7 +165,6 @@ public class Robot extends TimedRobot {
     if(autonomous != null && autonomous.pixyDebugs().length >= 2){
       SmartDashboard.putNumber("PIXY AUTO Hits", autonomous.pixyDebugs()[0]);
       SmartDashboard.putNumber("PIXY AUTO Tries", autonomous.pixyDebugs()[1]);
-
     }
 
     for (int i = 0; i < foundCargo.length; i++) {
@@ -352,10 +354,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Lidar C - Direct", asdf.getDistance(2));
     SmartDashboard.putNumber("Lidar D - Direct", asdf.getDistance(3));
 
-    lightA.set(
-        asdf.getDistance(0) > 785 &&
-        asdf.getDistance(0) < 915
-    );
+
 //<Irrelevant>
     SmartDashboard.putNumber("Lidar A - ConvertedBad", 6+(15/396.0)*(asdf.getDistance(0)-165));
     SmartDashboard.putNumber("Lidar B - ConvertedBad", 6+(15/396.0)*(asdf.getDistance(1)-165));
@@ -372,6 +371,13 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     autonomous.autonomousPeriodic(robot);
+
+    Pixycam pixy = robot.getPixyCam();
+    if(pixy != null){
+      GenericPixycam.PixyCargo bestCargo = pixy.identifyClosestCargo();
+      lightA.set(bestCargo != null);
+    }
+
   }
 
   @Override
@@ -402,6 +408,10 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     turretPower = 0;
     robot.setPipeline(1);
+
+    lightA.set(
+            asdf.getDistance(0) > 785 && asdf.getDistance(0) < 915
+    );
 
     switch (POVDirection.getDirection(xbox.getPOV())) {
       case NORTH: //MEDIUM SHOT RANGE
@@ -867,6 +877,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    lightA.set(
+            asdf.getDistance(0) > 785 && asdf.getDistance(0) < 915
+    );
+
     joystick.getRawButtonPressed(10);
     joystick.getRawButtonPressed(9);
     joystick.getRawButtonPressed(5);

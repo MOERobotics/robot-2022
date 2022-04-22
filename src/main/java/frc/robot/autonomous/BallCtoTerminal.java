@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.command.PixyAutoTrack;
 import frc.robot.generic.GenericRobot;
 
 //Simple autonomous code for ball C, closest ball to the hangar, and driving to the ball at terminal
@@ -228,4 +229,5 @@ public class BallCtoTerminal extends GenericAutonomous {
 
         //tracker.turretMove(robot);
     }
+
 }

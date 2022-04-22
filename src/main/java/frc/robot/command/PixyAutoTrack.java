@@ -1,6 +1,7 @@
 package frc.robot.command;
 
 import edu.wpi.first.math.controller.PIDController;
+import frc.robot.generic.GenericPixycam;
 import frc.robot.generic.GenericRobot;
 import frc.robot.generic.Pixycam;
 
@@ -13,11 +14,14 @@ public class PixyAutoTrack {
     int mostRecentBlockCount = 0;
 
     //bounds for the distances pixy track is active
-    double pixyDistNear = 27;
-    double pixyDistFar = 72;
+    double pixyDistNearRed = 36;
+    double pixyDistNearBlue = 36;
 
-    static double pixyToleranceNarrow = 0.1;
-    static double pixyToleranceWide = 0.3;
+    double pixyDistFarRed = 90;
+    double pixyDistFarBlue = 120;
+
+    static double pixyToleranceNarrow = 0.05;
+    static double pixyToleranceWide = 0.15;
     static double steerConstant = 2; //steer if robot is at 100% power
     static double deviationLimit = 20;
 
@@ -89,14 +93,22 @@ public class PixyAutoTrack {
     }
 
     public double getPixyDistNear(){
-        return pixyDistNear;
+        if(GenericPixycam.PixyCargo.getAlliance() == GenericPixycam.PixyCargo.PixyCargoColor.RED)
+            return pixyDistNearRed;
+        else return pixyDistNearBlue;
     }
     public double getPixyDistFar(){
-        return pixyDistFar;
+        if(GenericPixycam.PixyCargo.getAlliance() == GenericPixycam.PixyCargo.PixyCargoColor.RED)
+            return pixyDistFarRed;
+        else return pixyDistFarBlue;
     }
 
     public double getMostRecentAbsOffset() { return mostRecentAbsOffset; }
     public int getMostRecentBlockCount() { return mostRecentBlockCount; }
+
+    public double getCameraCorrection() {
+        return cameraCorrection;
+    }
 
     public void setDeviationLimit(double newDeviationLimit){
         deviationLimit = newDeviationLimit;

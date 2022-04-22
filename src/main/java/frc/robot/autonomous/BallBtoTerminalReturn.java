@@ -248,4 +248,9 @@ public class BallBtoTerminalReturn extends GenericAutonomous {
     public int[] pixyDebugs(){
         return new int[]{pixyHits, pixyTotalHits};
     }
+
+    @Override
+    public PixyAutoTrack getPixyAutoTrack(){
+        return pixyAutoTrack;
+    }
 }

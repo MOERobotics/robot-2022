@@ -15,8 +15,8 @@ public class PixyTestingHouston extends GenericAutonomous {
 
     double pixyPower = .3;
     double actualPower = .3;
-    double visionDist = 36;
-    double travelDist = 36;
+    double visionDist = 120; //distance the bot starts from the cargo
+    double travelDist = 120; //actual distance we want bot to schmoove
 
     double correction = 0;
 
@@ -76,6 +76,11 @@ public class PixyTestingHouston extends GenericAutonomous {
         }
 
         robot.drivePercent(leftPower, rightPower);
+    }
+
+    @Override
+    public PixyAutoTrack getPixyAutoTrack(){
+        return pixyAutoTrack;
     }
 
 }
