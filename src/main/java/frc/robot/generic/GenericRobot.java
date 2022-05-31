@@ -452,5 +452,43 @@ public interface GenericRobot {
 		return 0.0;
 	}
 
+	public default void setPivotLeftMotorA(double pivot){}
+	public default void setPivotLeftMotorB(double pivot){}
+	public default void setPivotRightMotorA(double pivot){}
+	public default void setPivotRightMotorB(double pivot){}
+
+	public default double getPivotLeftMotorA(){
+		return 0.0;
+	}
+	public default double getPivotLeftMotorB(){
+		return 0.0;
+	}
+	public default double getPivotRightMotorA(){
+		return 0.0;
+	}
+	public default double getPivotRightMotorB(){
+		return 0.0;
+	}
+
+	public default double fieldCentricHeading(){
+		return 0.0;
+	}
+
+	public default double desiredHeading(double x, double y){
+		return 0.0;
+	}
+
+	public default void pivotToHeading(double heading){
+		setPivotLeftMotorA(heading);
+		setPivotLeftMotorB(heading);
+		setPivotRightMotorA(heading);
+		setPivotRightMotorB(heading);
+	}
+
+	public default void resetHeading(){
+
+	}
+
+
 
 }

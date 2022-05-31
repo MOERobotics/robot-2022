@@ -42,6 +42,7 @@ public class Robot extends TimedRobot {
 
   GenericRobot robot = new Lightning();
   Joystick joystick = new Joystick(0);
+  Joystick swerveStick = new Joystick(4); //TODO:actually figure this out
   GenericCommand command = new Hang();
   Joystick xbox = new Joystick(1);
   GenericAutonomous autonomous = CTerminalReturn;
@@ -73,6 +74,8 @@ public class Robot extends TimedRobot {
   double driveRight = 0;
   double joystickX;
   double joystickY;
+  double swerveStickX;
+  double swerveStickY;
   double cutoff = 0.05;
   double scaleFactor = 1.0;
 
@@ -410,6 +413,26 @@ public class Robot extends TimedRobot {
       }
 
       //////////////////////////////////////////////DRIVETRAIN CONTROL ENDS
+
+
+      ///////////////////////////////////////////////////////SWERVE CONTROL
+
+      if (!robot.getPTOState()){
+          swerveStickX = swerveStick.getX();
+          swerveStickY = -swerveStick.getY();
+          double desiredHeading = robot.desiredHeading(swerveStickX, swerveStickY);
+          robot.pivotToHeading(desiredHeading-robot.fieldCentricHeading());
+
+          driveLeft = Math.sqrt(swerveStickX*swerveStickX + swerveStickY*swerveStickY);
+          driveRight = Math.sqrt(swerveStickX*swerveStickX + swerveStickY*swerveStickY);
+      }
+      if (swerveStick.getRawButton(1)){
+          robot.resetHeading();
+      }
+
+
+      /////////////////////////////////////////////////////////SWERVE CONTROL ENDS
+
 
 
       //////////////////////////////////////////////////////////TURRET CONTROL
